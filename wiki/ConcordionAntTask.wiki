@@ -1,0 +1,7 @@
+#summary Description of concordion-ant-task by bad.robot
+
+= Generate a Concordion Overview Page =
+
+The {{{concordion-ant-task-x.jar}}} contains a custom Ant task collect [Concordion|http://www.concordion.org/] test specs into a single overview page to be run with Concordion (using the {{{Run}}} command.
+
+Use this as part of your build process to ensure *all* test htmls are run and summarised from a central starting point.
