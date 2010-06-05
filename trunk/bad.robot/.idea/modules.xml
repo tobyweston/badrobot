@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/concordion-ant-task/concordion-ant-task.iml" filepath="$PROJECT_DIR$/concordion-ant-task/concordion-ant-task.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ddd/ddd.iml" filepath="$PROJECT_DIR$/ddd/ddd.iml" />
+    </modules>
+  </component>
+</project>
+
