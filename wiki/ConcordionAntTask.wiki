@@ -5,3 +5,23 @@
 The {{{concordion-ant-task-x.jar}}} contains a custom Ant task collect [Concordion|http://www.concordion.org/] test specs into a single overview page to be run with Concordion (using the {{{Run}}} command.
 
 Use this as part of your build process to ensure *all* test htmls are run and summarised from a central starting point.
+
+= Recommended Build Process =
+
+Follow the recommended build process in your Ant script to leverage the awesome power of the power puff girls...
+
+  # Clean everything
+  # Compile everything
+  # Collect Concordion tests into an overview page (see below)
+  # Run unit (and other non-Concordion tests), exclude all Concordion tests (and the overview page)
+  # Run just the generated Concordion overview page (and so all your Concordion tests)
+
+Because the overview page is generated *every* time your run the build, the generated overview page will include all Concordion tests (selected by your user defined filter).
+
+= Collecting Concordion Tests with Ant =
+
+Setup your build file with the task.
+
+{{{
+<taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask"/>
+}}}
