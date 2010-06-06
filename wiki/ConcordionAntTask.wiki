@@ -45,3 +45,18 @@ then generate your overview page during your build
         </generate-test-overview>
     </target>
 }}}
+
+all that's left is to run your newly generated Overview.html as a Concordion test. Ensure that you have a corresponding Java test ({{{@RunWith(ConcordionRunner.class)}}}) with the same name as your overview page (in our example, {{{Overview.jara}}}, then...
+
+{{{
+    <target name="run.acceptance.tests" depends="generate-overview">
+        <junit printsummary="yes" haltonfailure="yes">
+            <formatter type="plain"/>
+            <test name="Overview"/>
+        </junit>
+    </target>
+}}}
+
+(Make sure you setup a filter that will only run the single {{{Overview}}} as a test, not all the Concordion tests).
+
+
