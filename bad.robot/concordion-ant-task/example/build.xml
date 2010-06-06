@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="bad.robot.concordion.ant.example" default="generate-overview">
+
+    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask"/>
+
+    <target name="generate-overview">
+        <generate-test-overview template="Overview.ftl" output="Overview.html">
+            <fileset dir="${basedir}" includes="**/specs/**/*.html"/>
+        </generate-test-overview>
+    </target>
+
+    <target name="run.acceptance.tests" depends="generate-overview">
+        <junit printsummary="yes" haltonfailure="yes">
+            <formatter type="plain"/>
+            <test name="Overview"/>
+        </junit>
+    </target>
+</project>
