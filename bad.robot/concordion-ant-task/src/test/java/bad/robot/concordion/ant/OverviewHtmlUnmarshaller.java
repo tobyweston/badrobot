@@ -25,12 +25,12 @@ class OverviewHtmlUnmarshaller {
         NodeList nodes = (NodeList) xpath().evaluate("//a", document, XPathConstants.NODESET);
         List<DuplicateAwareTestHtml> htmls = new ArrayList<DuplicateAwareTestHtml>();
         for (int i = 0; i < nodes.getLength(); i++) {
-            String iteration = nodes.item(i).getAttributes().getNamedItem("iteration").getNodeValue();
+            String group = nodes.item(i).getAttributes().getNamedItem("group").getNodeValue();
             String location = nodes.item(i).getAttributes().getNamedItem("location").getNodeValue();
             String title = nodes.item(i).getAttributes().getNamedItem("title").getNodeValue();
             String ignore = nodes.item(i).getAttributes().getNamedItem("ignore").getNodeValue();
             String duplicate = nodes.item(i).getAttributes().getNamedItem("duplicate").getNodeValue();
-            htmls.add(new DuplicateAwareTestHtml(new TestHtml(iteration, title, location, Boolean.valueOf(ignore)), Boolean.valueOf(duplicate)));
+            htmls.add(new DuplicateAwareTestHtml(new TestHtml(group, title, location, Boolean.valueOf(ignore)), Boolean.valueOf(duplicate)));
         }
         return htmls;
     }

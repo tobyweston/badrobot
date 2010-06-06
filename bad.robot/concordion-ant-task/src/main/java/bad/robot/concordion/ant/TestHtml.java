@@ -2,20 +2,20 @@ package bad.robot.concordion.ant;
 
 public class TestHtml implements Comparable<TestHtml> {
 
-    private final String iteration;
+    private final String group;
     private final String title;
     private final String location;
     private final boolean ignore;
 
-    public TestHtml(String iteration, String title, String location, boolean ignore) {
-        this.iteration = iteration;
+    public TestHtml(String group, String title, String location, boolean ignore) {
+        this.group = group;
         this.title = title;
         this.location = location;
         this.ignore = ignore;
     }
 
-    public String getIteration() {
-        return iteration;
+    public String getGroup() {
+        return group;
     }
 
     public String getTitle() {
@@ -42,7 +42,7 @@ public class TestHtml implements Comparable<TestHtml> {
         TestHtml testHtml = (TestHtml) o;
 
         if (ignore != testHtml.ignore) return false;
-        if (iteration != null ? !iteration.equals(testHtml.iteration) : testHtml.iteration != null) return false;
+        if (group != null ? !group.equals(testHtml.group) : testHtml.group != null) return false;
         if (location != null ? !location.equals(testHtml.location) : testHtml.location != null) return false;
         if (title != null ? !title.equals(testHtml.title) : testHtml.title != null) return false;
 
@@ -51,7 +51,7 @@ public class TestHtml implements Comparable<TestHtml> {
 
     @Override
     public int hashCode() {
-        int result = iteration != null ? iteration.hashCode() : 0;
+        int result = group != null ? group.hashCode() : 0;
         result = 31 * result + (title != null ? title.hashCode() : 0);
         result = 31 * result + (location != null ? location.hashCode() : 0);
         result = 31 * result + (ignore ? 1 : 0);
@@ -65,6 +65,6 @@ public class TestHtml implements Comparable<TestHtml> {
 
     @Override
     public String toString() {
-        return "title[" + title + "] iteration[" + iteration + "] location[" + location + "]" + " ignore[" + ignore + "]";
+        return "title[" + title + "] group[" + group + "] location[" + location + "]" + " ignore[" + ignore + "]";
     }
 }

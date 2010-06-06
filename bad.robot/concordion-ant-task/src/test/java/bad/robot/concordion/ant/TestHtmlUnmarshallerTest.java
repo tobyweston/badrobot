@@ -27,8 +27,8 @@ public class TestHtmlUnmarshallerTest {
     }
 
     @Test
-    public void shouldSetIteration() throws IOException {
-        assertThat(unmarshaller.unmarshall(file("sample.html")).getIteration(), is("0, 1, 2"));
+    public void shouldSetGroup() throws IOException {
+        assertThat(unmarshaller.unmarshall(file("sample.html")).getGroup(), is("0, 1, 2"));
     }
 
     @Test
