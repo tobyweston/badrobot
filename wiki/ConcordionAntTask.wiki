@@ -8,7 +8,7 @@ Use this as part of your build process to ensure *all* test htmls are run and su
 
 = Recommended Build Process =
 
-Follow the recommended build process in your Ant script to leverage the awesome power of the power puff girls...
+Follow the recommended build process in your Ant script to leverage the awesome synergies of the power puff girls...
 
   # Clean everything
   # Compile everything
@@ -18,10 +18,30 @@ Follow the recommended build process in your Ant script to leverage the awesome 
 
 Because the overview page is generated *every* time your run the build, the generated overview page will include all Concordion tests (selected by your user defined filter).
 
+= Dependencies = 
+
+Available to Ant, you must have
+
+  # {{{concordion-ant-task-x.jar}}}
+  # FreeMarker (lets say, version 2.3.16)
+
+
 = Collecting Concordion Tests with Ant =
 
 Setup your build file with the task.
 
 {{{
 <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask"/>
+}}}
+
+(having copied {{{concordion-ant-task-x.jar}}} into $ANT_HOME/lib or reference it in the {{{taskdef}}} above by some other [http://ant.apache.org/manual/Tasks/typedef.html Ant] mechanism).
+
+then generate your overview page during your build
+
+{{{
+    <target name="generate-overview">
+        <generate-test-overview template="Overview.ftl" output="Overview.html">
+            <fileset dir="${basedir}" includes="**/specs/**/*.html"/>
+        </generate-test-overview>
+    </target>
 }}}
