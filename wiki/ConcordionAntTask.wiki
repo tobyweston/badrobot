@@ -2,7 +2,7 @@
 
 = Generate a Concordion Overview Page =
 
-The [http://code.google.com/p/badrobot/downloads/list concordion-ant-task-x.jar] contains a custom Ant task collect [http://www.concordion.org/ Concordion] test specs into a single overview page to be run with Concordion (using the {{{Run}}} command.
+The [http://code.google.com/p/badrobot/downloads/list concordion-ant-task-x.jar] contains a custom Ant task collect [http://www.concordion.org/ Concordion] test specs into a single overview page to be run with Concordion (using the {{{Run}}} command. See an example, [http://badrobot.googlecode.com/svn/trunk/bad.robot/concordion-ant-task/example/Overview.html here].
 
 Use this as part of your build process to ensure *all* test htmls are run and summarised from a central starting point.
 
@@ -59,4 +59,12 @@ all that's left is to run your newly generated Overview.html as a Concordion tes
 
 (Make sure you setup a filter that will only run the single {{{Overview}}} as a test, not all the Concordion tests).
 
+= Test Meta-data =
 
+You can give the test meta-data via the HTML, you can associate the following
+
+  # group (for example, what iteration a test is associated with, or a functional area)
+  # ignored (indicate whether Concordion should ignore this test)
+  # title (the title of the test to display on the overview page)
+
+You can see how to markup a test via the example (http://badrobot.googlecode.com/svn/trunk/bad.robot/concordion-ant-task/example/Overview.html). Click through to each test to see the markup.
