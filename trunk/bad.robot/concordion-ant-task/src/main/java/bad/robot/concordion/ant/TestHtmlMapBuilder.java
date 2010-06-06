@@ -20,8 +20,8 @@ public class TestHtmlMapBuilder implements Builder<Map<String, ? extends SortedS
         Map<String, TreeSet<DuplicateAwareTestHtml>> results = new HashMap<String, TreeSet<DuplicateAwareTestHtml>>();
         for (TestHtml test : tests) {
             boolean duplicate = false;
-            for (String iteration : split(test.getIteration())) {
-                String key = iteration.trim();
+            for (String group : split(test.getGroup())) {
+                String key = group.trim();
                 createIfRequired(results, key);
                 results.get(key).add(new DuplicateAwareTestHtml(test, duplicate));
                 duplicate = true;
@@ -34,9 +34,9 @@ public class TestHtmlMapBuilder implements Builder<Map<String, ? extends SortedS
         return asList(string.split(","));
     }
 
-    private void createIfRequired(Map<String, TreeSet<DuplicateAwareTestHtml>> results, String iteration) {
-        if (!results.containsKey(iteration))
-            results.put(iteration, new TreeSet<DuplicateAwareTestHtml>());
+    private void createIfRequired(Map<String, TreeSet<DuplicateAwareTestHtml>> results, String group) {
+        if (!results.containsKey(group))
+            results.put(group, new TreeSet<DuplicateAwareTestHtml>());
     }
 
 }

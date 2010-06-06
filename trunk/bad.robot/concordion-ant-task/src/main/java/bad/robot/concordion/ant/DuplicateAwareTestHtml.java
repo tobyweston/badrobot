@@ -4,7 +4,7 @@ public class DuplicateAwareTestHtml extends TestHtml {
     private final Boolean duplicate;
 
     public DuplicateAwareTestHtml(TestHtml test, boolean duplicate) {
-        super(test.getIteration(), test.getTitle(), test.getLocation(), test.isIgnore());
+        super(test.getGroup(), test.getTitle(), test.getLocation(), test.isIgnore());
         this.duplicate = duplicate;
     }
 

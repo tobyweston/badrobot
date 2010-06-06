@@ -42,7 +42,7 @@ public class TestHtmlMapBuilderTest {
     }
 
     @Test
-    public void shouldBuildMultipleIterationsResults() {
+    public void shouldBuildMultipleGroupsResults() {
         TestHtml html = new TestHtml("1, 2", "title", "location", false);
         DuplicateAwareTestHtml test = new DuplicateAwareTestHtml(html);
         Map<String, ? extends SortedSet<DuplicateAwareTestHtml>> result = builder.with(set(test)).build();
