@@ -22,7 +22,13 @@
     <groupId>bad.robot</groupId>
     <artifactId>ddd</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <description>Examples of DDD constructs</description>
+    <description>
+        The Dipped in Dinosaur Doodoo project is an attempt to pull together the authors understanding of Domain Driven
+        Design into something re-usable across projects. It contains common implementations and ideas as well as some
+        utility programs that pull together meta-information about project using the classes and annotations (such as a
+        project dictionary, generated from the code). It also offers some ideas from the broader perspective like
+        transaction handling.
+    </description>  
 
 
     <build>

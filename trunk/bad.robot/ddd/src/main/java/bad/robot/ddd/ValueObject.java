@@ -36,7 +36,7 @@ package bad.robot.ddd;
  */
 
 @Immutable
-public interface ValueObject<T> {
+public interface ValueObject<T> extends Comparable<T> {
     
     T value();
 }
