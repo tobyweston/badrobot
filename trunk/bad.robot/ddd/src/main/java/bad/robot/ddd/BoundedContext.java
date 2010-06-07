@@ -27,7 +27,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The applicability of a given model, fairly open ended at this point but I imagine it will firm up into describing
- * contexts against <i>specific</i> classes and interfaces. For example, only being appropriate for use with
+ * context against <i>specific</i> classes and interfaces. For example, only being appropriate for use with
  * {@link bad.robot.ddd.Entity}.
  */
 
