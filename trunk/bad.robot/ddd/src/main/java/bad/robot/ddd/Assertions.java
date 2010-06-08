@@ -16,16 +16,11 @@
 
 package bad.robot.ddd;
 
-/**
- * Used within the context of an {@link bad.robot.ddd.Entity}, the unique identifier value object.
- *
- * @param <T> the type of identifier
- * @see bad.robot.ddd.ValueObject
- */
-public abstract class Identifier<T> extends AbstractValueObject<T> {
+public class Assertions {
 
-    public Identifier(T value) {
-        super(value);
+    public static void assertNotNull(Object... objects) {
+        for (Object object : objects)
+            if (object == null)
+                throw new IllegalArgumentException("one or more objects were null");
     }
-    
 }

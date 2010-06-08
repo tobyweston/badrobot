@@ -28,7 +28,7 @@ package bad.robot.ddd;
  * </p>
  * <p>
  * A {@link ValueObject} should be {@link Immutable}
- * </p>
+N * </p>
  * @param <T> the type of value object. For example, a {@link String} {@link bad.robot.ddd.ValueObject} would give
  * context to the use of {@link String} and avoid using general method parameter lists; parameters to methods become
  * type safe and more meaningful. The type should be based on primitive types such as {@link String}, {@link Number} etc
