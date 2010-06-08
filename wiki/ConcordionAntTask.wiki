@@ -68,3 +68,36 @@ You can give the test meta-data via the HTML, you can associate the following
   # title (the title of the test to display on the overview page)
 
 You can see how to markup a test via the example (http://badrobot.googlecode.com/svn/trunk/bad.robot/concordion-ant-task/example/Overview.html). Click through to each test to see the markup.
+
+= Debugging =
+
+If things don't work, you can get a little more information out of the Ant task by using {{{-v}}} on the command like. For example,
+
+{{{
+ant -v -f build.xml generate-overview
+}}}
+
+It'll output where the fileset is looking for HTMLs. 
+
+If you get something similar to the following
+
+{{{
+build.xml:666: java.io.IOException: org.xml.sax.SAXParseException: Premature end of file.
+        at bad.robot.concordion.ant.XPather.<init>(XPather.java:26)
+        at bad.robot.concordion.ant.TestHtmlUnmarshaller.unmarshall(TestHtmlUnmarshaller.java:9)
+        at bad.robot.concordion.ant.TestHtmlUnmarshaller.unmarshall(TestHtmlUnmarshaller.java:6)
+        at bad.robot.concordion.ant.TestHtmlCollectionBuilder.build(TestHtmlCollectionBuilder.java:29)
+        at bad.robot.concordion.ant.GenerateTestOverviewTask.mergeTemplate(GenerateTestOverviewTask.java:50)
+        at bad.robot.concordion.ant.GenerateTestOverviewTask.execute(GenerateTestOverviewTask.java:39)
+        at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:291)
+        <snip>
+Caused by: org.xml.sax.SAXParseException: Premature end of file.
+        at org.apache.xerces.parsers.DOMParser.parse(Unknown Source)
+        at org.apache.xerces.jaxp.DocumentBuilderImpl.parse(Unknown Source)
+        at javax.xml.parsers.DocumentBuilder.parse(DocumentBuilder.java:208)
+        at bad.robot.concordion.ant.XPather.<init>(XPather.java:22)
+        ... 22 more 
+}}}
+
+It _may_ be that the HTML isn't well formed. It might also be because rodents chewed the wrong cable. Your millage may vary.
+ 
