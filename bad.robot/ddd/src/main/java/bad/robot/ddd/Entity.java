@@ -19,7 +19,11 @@ package bad.robot.ddd;
 /**
  * An <i>identifiable</i> domain object, an object that exists <i>because</i> it has an {@link bad.robot.ddd.Identifier}
  * and without the idea of being uniquely identifiable, the object has less gravitas and meaning.
+ *
+ * @param <T> the type of the entities identifier, a special type of {@link bad.robot.ddd.ValueObject}
+ * @see bad.robot.ddd.Identifier
+ * @see bad.robot.ddd.Identifiable
  */
-public interface Entity {
+public interface Entity<T extends Identifier> extends Identifiable<T> {
     
 }

@@ -17,15 +17,13 @@
 package bad.robot.ddd;
 
 /**
- * Used within the context of an {@link bad.robot.ddd.Entity}, the unique identifier value object.
+ * Indicates that implementations have the concept of <i>identity</i> implemented by providing
+ * access to an {@link bad.robot.ddd.Identifier}
  *
- * @param <T> the type of identifier
- * @see bad.robot.ddd.ValueObject
+ * @param <T> the {@link bad.robot.ddd.Identifier} type of this object
  */
-public abstract class Identifier<T> extends AbstractValueObject<T> {
+public interface Identifiable<T extends Identifier> {
 
-    public Identifier(T value) {
-        super(value);
-    }
-    
+    T getIdentifier();
+
 }

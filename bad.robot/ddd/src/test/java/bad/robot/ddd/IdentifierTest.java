@@ -16,16 +16,15 @@
 
 package bad.robot.ddd;
 
-/**
- * Used within the context of an {@link bad.robot.ddd.Entity}, the unique identifier value object.
- *
- * @param <T> the type of identifier
- * @see bad.robot.ddd.ValueObject
- */
-public abstract class Identifier<T> extends AbstractValueObject<T> {
+import org.junit.Test;
 
-    public Identifier(T value) {
-        super(value);
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
+public class IdentifierTest {
+
+    @Test
+    public void shouldAlsoBeAValueObject() {
+        assertThat(Identifier.class.getSuperclass().getName(), is(AbstractValueObject.class.getName()));
     }
-    
 }
