@@ -16,23 +16,21 @@
 
 package bad.robot.ddd;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-
 /**
- * A member of an {@link bad.robot.ddd.Entity} that is externally referenced.
+ * An {@link bad.robot.ddd.Entity} that is externally referenced. For an {@link bad.robot.ddd.Entity} to be classified
+ * as an {@link AggregateRoot}, it must conceptually exist <i>wholly</i> on its own. That is to say, within the  business
+ * domain of an Auto-Parts Shop, a <code>Tyre</code> might well exist as a whole entity, an aggregate root. Within the business
+ * domain of a Car Dealership, the <code>Tyre</code> is more likely to form <i>part of</i> another whole entity; a <code>Car</code>.
+ * <p/>
+ * The line about being externally referenced therefore is around being wholly identifiable as well as implying the
+ * collection of instances being important to the business domain. This in turn implies access via the {@link bad.robot.ddd.Repository}.
+ * <p/>
+ * It therefore doesn't make sense for an {@link bad.robot.ddd.AggregateRoot} to contain another {@link bad.robot.ddd.AggregateRoot}.
  *
  * @see bad.robot.ddd.Aggregate
+ * @see bad.robot.ddd.Repository
  */
 
-@Documented
-@Target(FIELD)
-@Retention(RUNTIME)
-public @interface AggregateRoot {
+public interface AggregateRoot<T extends Identifier> extends Entity<T> {
 
 }
