@@ -28,9 +28,10 @@
         Design into something re-usable across projects. It contains common implementations and ideas as well as some
         utility programs that pull together meta-information about project using the classes and annotations (such as a
         project dictionary, generated from the code). It also offers some ideas from the broader perspective like
-        transaction handling. The name comes from the fact that most of the ideas are fairly old and the authors implementation is likely to
+        transaction handling. The name comes from the fact that most of the ideas are fairly old and the authors
+        implementation is likely to
         be shite.
-    </description>  
+    </description>
 
 
     <build>
@@ -78,6 +79,16 @@
         </plugins>
     </build>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
 
     <dependencies>
         <dependency>
@@ -91,5 +102,5 @@
             <version>2.5</version>
         </dependency>
     </dependencies>
-    
+
 </project>
