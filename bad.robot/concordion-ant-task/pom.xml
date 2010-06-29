@@ -7,6 +7,8 @@
     <artifactId>concordion-ant-task</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!-- Use MAVEN_OPTS to set JVM variables -->
+
     <build>
         <resources>
             <resource>
