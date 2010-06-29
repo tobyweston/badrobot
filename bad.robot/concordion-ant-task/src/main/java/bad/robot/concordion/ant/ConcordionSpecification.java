@@ -64,6 +64,6 @@ public class ConcordionSpecification implements Comparable<ConcordionSpecificati
 
     @Override
     public String toString() {
-        return hashCode() + ": title[" + title + "] group[" + group + "] location[" + location + "]" + " ignore[" + ignore + "]";
+        return ": title[" + title + "] group[" + group + "] location[" + location + "]" + " ignore[" + ignore + "]";
     }
 }
