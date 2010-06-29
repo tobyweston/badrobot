@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="bad.robot.concordion.ant.example" default="generate-overview">
 
-    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask"/>
+    <path id="generate-test-overview-classpath">
+        <fileset dir="dependancies" includes="concordion-ant-task-*.jar"/>
+        <fileset dir="dependancies" includes="freemarker*.jar"/>
+    </path>    
+
+    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpathref="generate-test-overview-classpath"/>
 
     <target name="generate-overview">
         <generate-test-overview template="Overview.ftl" output="Overview.html">
