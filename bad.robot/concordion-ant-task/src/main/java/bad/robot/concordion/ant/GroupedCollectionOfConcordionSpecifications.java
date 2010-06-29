@@ -2,6 +2,7 @@ package bad.robot.concordion.ant;
 
 import java.util.*;
 
+import static bad.robot.concordion.ant.DescendingComparator.descending;
 import static java.util.Arrays.asList;
 
 public class GroupedCollectionOfConcordionSpecifications implements Builder<Map<String, ? extends SortedSet<? extends DuplicateAwareConcordionSpecification>>, RuntimeException>{
@@ -16,7 +17,7 @@ public class GroupedCollectionOfConcordionSpecifications implements Builder<Map<
     }
 
     public Map<String, ? extends SortedSet<DuplicateAwareConcordionSpecification>> build() {
-        Map<String, TreeSet<DuplicateAwareConcordionSpecification>> results = new HashMap<String, TreeSet<DuplicateAwareConcordionSpecification>>();
+        Map<String, TreeSet<DuplicateAwareConcordionSpecification>> results = new TreeMap<String, TreeSet<DuplicateAwareConcordionSpecification>>(descending());
         for (ConcordionSpecification test : tests) {
             boolean duplicate = false;
             for (String group : split(test.getGroup())) {
