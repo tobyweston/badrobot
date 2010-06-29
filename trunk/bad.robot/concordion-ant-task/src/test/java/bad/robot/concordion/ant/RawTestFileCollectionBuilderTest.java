@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JMock.class)
-public class TestFileCollectionBuilderTest {
+public class RawTestFileCollectionBuilderTest {
 
     private final Mockery context = new Mockery();
 
@@ -23,7 +23,7 @@ public class TestFileCollectionBuilderTest {
     private static final RawTestFile TEST_FILE_2 = new RawTestFile(new File("."), "file2");
 
     private final FileScanner scanner = context.mock(FileScanner.class);
-    private RawTestFileCollectionBuilder builder = new RawTestFileCollectionBuilder();
+    private final RawTestFileCollectionBuilder builder = new RawTestFileCollectionBuilder();
 
     @Test
     public void shouldBuildCollection() {

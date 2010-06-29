@@ -46,6 +46,11 @@ public class TestHtmlUnmarshallerTest {
         assertThat(unmarshaller.unmarshall(file("sample.html")).getLocationAsRelativeUrl(), is("sample.html"));
     }
 
+    @Test
+    public void shouldAllowIterationAsASubstituteForGroup() throws IOException {
+        assertThat(unmarshaller.unmarshall(file("noGroup.html")).getGroup(), is("8"));
+    }
+
     private static RawTestFile file(String name) {
         String fullyQualifiedFilename = TestHtmlCollectionBuilderTest.class.getResource(name).getFile();
         String baseDir = fullyQualifiedFilename.replace(name, "");

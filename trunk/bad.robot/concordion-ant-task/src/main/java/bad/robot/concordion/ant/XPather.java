@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class XPather {
+
     private final XPath xpath = XPathFactory.newInstance().newXPath();
     private final Document document;
 
