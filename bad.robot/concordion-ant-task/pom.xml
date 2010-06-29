@@ -59,7 +59,7 @@
                         <phase>test</phase>
                         <configuration>
                             <tasks>
-                                <property name="classpath" refid="maven.runtime.classpath"/>
+                                <property name="classpath" refid="maven.test.classpath"/>
                                 <ant target="generate-overview"/>
                             </tasks>
                         </configuration>
@@ -101,11 +101,13 @@
             <groupId>org.jmock</groupId>
             <artifactId>jmock-junit4</artifactId>
             <version>2.5.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.concordion</groupId>
             <artifactId>concordion</artifactId>
             <version>1.3.2</version>
+            <scope>test</scope>
         </dependency>        
     </dependencies>
 
