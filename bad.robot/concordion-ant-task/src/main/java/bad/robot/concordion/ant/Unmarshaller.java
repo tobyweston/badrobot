@@ -4,5 +4,5 @@ import java.io.IOException;
 
 public interface Unmarshaller<T> {
 
-    T unmarshall(RawTestFile file) throws IOException;
+    T unmarshall(IncludedFile file) throws IOException;
 }

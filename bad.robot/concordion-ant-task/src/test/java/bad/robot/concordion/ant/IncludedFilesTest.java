@@ -15,15 +15,15 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JMock.class)
-public class RawTestFileCollectionBuilderTest {
+public class IncludedFilesTest {
 
     private final Mockery context = new Mockery();
 
-    private static final RawTestFile TEST_FILE_1 = new RawTestFile(new File("."), "file1");
-    private static final RawTestFile TEST_FILE_2 = new RawTestFile(new File("."), "file2");
+    private static final IncludedFile TEST_FILE_1 = new IncludedFile(new File("."), "file1");
+    private static final IncludedFile TEST_FILE_2 = new IncludedFile(new File("."), "file2");
 
     private final FileScanner scanner = context.mock(FileScanner.class);
-    private final RawTestFileCollectionBuilder builder = new RawTestFileCollectionBuilder();
+    private final IncludedFiles builder = new IncludedFiles();
 
     @Test
     public void shouldBuildCollection() {
@@ -31,7 +31,7 @@ public class RawTestFileCollectionBuilderTest {
             atLeast(1).of(scanner).getBasedir(); will(returnValue(new File(".")));
             one(scanner).getIncludedFiles(); will(returnValue(new String[] {"file1", "file2"}));
         }});
-        Set<RawTestFile> set = builder.with(scanner).build();
+        Set<IncludedFile> set = builder.with(scanner).build();
         assertThat(set.size(), is(2));
         assertThat(set, hasItem(TEST_FILE_1));
         assertThat(set, hasItem(TEST_FILE_2));

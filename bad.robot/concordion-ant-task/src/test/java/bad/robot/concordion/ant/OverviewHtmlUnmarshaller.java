@@ -20,17 +20,17 @@ import java.util.List;
 
 class OverviewHtmlUnmarshaller {
 
-    public List<DuplicateAwareTestHtml> getFrom(File file) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+    public List<DuplicateAwareConcordionSpecification> getFrom(File file) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
         Document document = parseDocument(new FileReader(file));
         NodeList nodes = (NodeList) xpath().evaluate("//a", document, XPathConstants.NODESET);
-        List<DuplicateAwareTestHtml> htmls = new ArrayList<DuplicateAwareTestHtml>();
+        List<DuplicateAwareConcordionSpecification> htmls = new ArrayList<DuplicateAwareConcordionSpecification>();
         for (int i = 0; i < nodes.getLength(); i++) {
             String group = nodes.item(i).getAttributes().getNamedItem("group").getNodeValue();
             String location = nodes.item(i).getAttributes().getNamedItem("location").getNodeValue();
             String title = nodes.item(i).getAttributes().getNamedItem("title").getNodeValue();
             String ignore = nodes.item(i).getAttributes().getNamedItem("ignore").getNodeValue();
             String duplicate = nodes.item(i).getAttributes().getNamedItem("duplicate").getNodeValue();
-            htmls.add(new DuplicateAwareTestHtml(new TestHtml(group, title, location, Boolean.valueOf(ignore)), Boolean.valueOf(duplicate)));
+            htmls.add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification(group, title, location, Boolean.valueOf(ignore)), Boolean.valueOf(duplicate)));
         }
         return htmls;
     }

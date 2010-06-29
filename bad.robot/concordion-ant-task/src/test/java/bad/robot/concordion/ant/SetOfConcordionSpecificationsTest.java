@@ -16,50 +16,50 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JMock.class)
-public class TestHtmlCollectionBuilderTest {
+public class SetOfConcordionSpecificationsTest {
 
     private final Mockery context = new Mockery();
 
-    private final TestHtmlCollectionBuilder builder = new TestHtmlCollectionBuilder();
-    private final Unmarshaller<TestHtml> unmarshaller = context.mock(Unmarshaller.class);
+    private final SetOfConcordionSpecifications builder = new SetOfConcordionSpecifications();
+    private final Unmarshaller<ConcordionSpecification> unmarshaller = context.mock(Unmarshaller.class);
 
     @Test
     public void emptyFiles() throws IOException {
-        Set<TestHtml> set = builder.with(unmarshaller).build();
+        Set<ConcordionSpecification> set = builder.with(unmarshaller).build();
         assertThat(set.size(), is(0));
     }
 
     @Test
     public void shouldCallUnmarshaller() throws IOException {
         context.checking(new Expectations(){{
-            one(unmarshaller).unmarshall(testFile("whatever")); will(returnValue(new TestHtml("1", "title", "location", false)));
-            one(unmarshaller).unmarshall(testFile("trevor")); will(returnValue(new TestHtml("1", "title", "location", false)));
+            one(unmarshaller).unmarshall(testFile("whatever")); will(returnValue(new ConcordionSpecification("1", "title", "location", false)));
+            one(unmarshaller).unmarshall(testFile("trevor")); will(returnValue(new ConcordionSpecification("1", "title", "location", false)));
         }});
         builder.with(unmarshaller).with(set("whatever", "trevor")).build();
     }
 
     @Test
     public void shouldUnmarshall() throws IOException {
-        final TestHtml first = new TestHtml("1", "first", "foo", false);
-        final TestHtml second = new TestHtml("2", "second", "bar", false);
+        final ConcordionSpecification first = new ConcordionSpecification("1", "first", "foo", false);
+        final ConcordionSpecification second = new ConcordionSpecification("2", "second", "bar", false);
         context.checking(new Expectations(){{
             one(unmarshaller).unmarshall(testFile("whatever")); will(returnValue(first));
             one(unmarshaller).unmarshall(testFile("trevor")); will(returnValue(second));
         }});
-        Set<TestHtml> set = builder.with(unmarshaller).with(set("whatever", "trevor")).build();
+        Set<ConcordionSpecification> set = builder.with(unmarshaller).with(set("whatever", "trevor")).build();
         assertThat(set.size(), is(2));
         assertThat(set, hasItem(first));
         assertThat(set, hasItem(second));
     }
 
-    private static RawTestFile testFile(String filename) {
-        return new RawTestFile(dummyFile(), filename);
+    private static IncludedFile testFile(String filename) {
+        return new IncludedFile(dummyFile(), filename);
     }
 
-    private Set<RawTestFile> set(String... filenames) {
-        Set<RawTestFile> set = new HashSet<RawTestFile>();
+    private Set<IncludedFile> set(String... filenames) {
+        Set<IncludedFile> set = new HashSet<IncludedFile>();
         for (String filename : filenames)
-            set.add(new RawTestFile(dummyFile(), filename));
+            set.add(new IncludedFile(dummyFile(), filename));
         return set;
     }
 

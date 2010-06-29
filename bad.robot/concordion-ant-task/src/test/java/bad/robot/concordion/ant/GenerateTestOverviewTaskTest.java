@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import static bad.robot.concordion.ant.Assertions.expectingExceptionWithMessage;
+import static bad.robot.concordion.ant.ConcordionSpecificationMatcher.containsAll;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -28,18 +29,19 @@ public class GenerateTestOverviewTaskTest {
     private static final boolean DONT_IGNORE = false;
     private static final boolean IGNORE = true;
 
-    private static final List<DuplicateAwareTestHtml> EXPECTED_HTMLS = new ArrayList<DuplicateAwareTestHtml>() {{
-        add(new DuplicateAwareTestHtml(new TestHtml("69", "Test1", combineWithFileSeperator("src", "test", "resources", "specs", "Test1.html"), DONT_IGNORE)));
-        add(new DuplicateAwareTestHtml(new TestHtml("69", "Test2", combineWithFileSeperator("src", "test", "resources", "specs", "Test2.html"), DONT_IGNORE)));
-        add(new DuplicateAwareTestHtml(new TestHtml("68, 69", "Test3", combineWithFileSeperator("src", "test", "resources", "specs", "overviewpage", "Test3.html"), DONT_IGNORE), DUPLICATE));
-        add(new DuplicateAwareTestHtml(new TestHtml("69", "Test4", combineWithFileSeperator("src", "test", "resources", "specs", "overviewpage", "Test4.html"), DONT_IGNORE)));
-        add(new DuplicateAwareTestHtml(new TestHtml("68, 69", "Test3", combineWithFileSeperator("src", "test", "resources", "specs", "overviewpage", "Test3.html"), DONT_IGNORE)));
-        add(new DuplicateAwareTestHtml(new TestHtml("unknown", "OverViewPage", combineWithFileSeperator("src", "test", "resources", "specs", "overviewpage", "OverViewPage.html"), IGNORE)));
-        add(new DuplicateAwareTestHtml(new TestHtml("unknown", "unknown", combineWithFileSeperator("src", "test", "resources", "specs", "Specs.html"), DONT_IGNORE)));
+    private static final List<DuplicateAwareConcordionSpecification> EXPECTED_HTMLS = new ArrayList<DuplicateAwareConcordionSpecification>() {{
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("69", "Test A", combineWithFileSeparator("src", "test", "resources", "specs", "Test2.html"), DONT_IGNORE)));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("69", "Test B", combineWithFileSeparator("src", "test", "resources", "specs", "Test1.html"), DONT_IGNORE)));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("68, 69", "Test C", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test3.html"), DONT_IGNORE), DUPLICATE));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("68, 69", "Test C", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test3.html"), DONT_IGNORE)));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("69", "Test D", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test4.html"), DONT_IGNORE)));
+//        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("71", "Test D (Duplicate Title)", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test5.html"), DONT_IGNORE)));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("unknown", "Overview page", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "OverViewPage.html"), IGNORE)));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("unknown", "unknown", combineWithFileSeparator("src", "test", "resources", "specs", "Specs.html"), DONT_IGNORE)));
     }};
     private static final String WORKING_FOLDER = ".";
 
-    private static String combineWithFileSeperator(String... resources) {
+    private static String combineWithFileSeparator(String... resources) {
         StringBuilder builder = new StringBuilder();
         for (String resource : resources)
             builder.append(resource).append(File.separator);
@@ -72,8 +74,8 @@ public class GenerateTestOverviewTaskTest {
         GenerateTestOverviewTask task = createTask(WORKING_FOLDER, "**/src/**/specs/**/*.html", target.getAbsolutePath());
         task.execute();
         assertThat(target.exists(), is(true));
-        List<DuplicateAwareTestHtml> results = new OverviewHtmlUnmarshaller().getFrom(target);
-        assertThat(results, TestHtmlMatcher.containsAll(EXPECTED_HTMLS));
+        List<DuplicateAwareConcordionSpecification> results = new OverviewHtmlUnmarshaller().getFrom(target);
+        assertThat(results, containsAll(EXPECTED_HTMLS));
     }
 
     private static GenerateTestOverviewTask createTask(String searchFolder, String includes, String output) {

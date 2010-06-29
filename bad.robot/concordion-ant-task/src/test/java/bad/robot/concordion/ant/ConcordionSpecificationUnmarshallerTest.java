@@ -1,6 +1,5 @@
 package bad.robot.concordion.ant;
 
-import org.jmock.Mockery;
 import org.junit.Test;
 
 import java.io.File;
@@ -9,11 +8,9 @@ import java.io.IOException;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class TestHtmlUnmarshallerTest {
+public class ConcordionSpecificationUnmarshallerTest {
 
-    private final Mockery context = new Mockery();
-
-    private final TestHtmlUnmarshaller unmarshaller = new TestHtmlUnmarshaller();
+    private final ConcordionSpecificationUnmarshaller unmarshaller = new ConcordionSpecificationUnmarshaller();
 
 
     @Test(expected = IOException.class)
@@ -51,14 +48,14 @@ public class TestHtmlUnmarshallerTest {
         assertThat(unmarshaller.unmarshall(file("noGroup.html")).getGroup(), is("8"));
     }
 
-    private static RawTestFile file(String name) {
-        String fullyQualifiedFilename = TestHtmlCollectionBuilderTest.class.getResource(name).getFile();
+    private static IncludedFile file(String name) {
+        String fullyQualifiedFilename = SetOfConcordionSpecificationsTest.class.getResource(name).getFile();
         String baseDir = fullyQualifiedFilename.replace(name, "");
-        return new RawTestFile(new File(baseDir), name);
+        return new IncludedFile(new File(baseDir), name);
     }
 
-    private static RawTestFile testFile(String filename) {
-        return new RawTestFile(dummyFile(), filename);
+    private static IncludedFile testFile(String filename) {
+        return new IncludedFile(dummyFile(), filename);
     }
 
     private static File dummyFile() {

@@ -2,11 +2,12 @@ package bad.robot.concordion.ant;
 
 import java.io.File;
 
-public class RawTestFile {
+public class IncludedFile {
+
     private final File basedir;
     private final String filename;
 
-    public RawTestFile(File basedir, String filename) {
+    public IncludedFile(File basedir, String filename) {
         this.basedir = basedir;
         this.filename = filename;
     }
@@ -28,7 +29,7 @@ public class RawTestFile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        RawTestFile other = (RawTestFile) o;
+        IncludedFile other = (IncludedFile) o;
 
         if (basedir != null) {
             if (!this.getFullyQualifiedFilename().equals(other.getFullyQualifiedFilename())) return false;
