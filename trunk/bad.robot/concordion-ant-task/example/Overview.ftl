@@ -38,8 +38,8 @@
 <ul>
     <#list tests[iteration] as test>
         <#if test.ignore || test.duplicate>
-            <li class="ignored">
-                <a href="${test.locationAsRelativeUrl}">${test.title}</a> (ignored tests show up differently)
+            <li>
+                <a class="ignored" href="${test.locationAsRelativeUrl}">${test.title}</a> (ignored tests show up differently)
             </li>
             <#else>
             <li>

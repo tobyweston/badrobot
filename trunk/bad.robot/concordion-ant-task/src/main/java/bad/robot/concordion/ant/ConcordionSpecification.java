@@ -1,13 +1,13 @@
 package bad.robot.concordion.ant;
 
-public class TestHtml implements Comparable<TestHtml> {
+public class ConcordionSpecification implements Comparable<ConcordionSpecification> {
 
     private final String group;
     private final String title;
     private final String location;
     private final boolean ignore;
 
-    public TestHtml(String group, String title, String location, boolean ignore) {
+    public ConcordionSpecification(String group, String title, String location, boolean ignore) {
         this.group = group;
         this.title = title;
         this.location = location;
@@ -39,12 +39,12 @@ public class TestHtml implements Comparable<TestHtml> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        TestHtml testHtml = (TestHtml) o;
+        ConcordionSpecification specification = (ConcordionSpecification) o;
 
-        if (ignore != testHtml.ignore) return false;
-        if (group != null ? !group.equals(testHtml.group) : testHtml.group != null) return false;
-        if (location != null ? !location.equals(testHtml.location) : testHtml.location != null) return false;
-        if (title != null ? !title.equals(testHtml.title) : testHtml.title != null) return false;
+        if (ignore != specification.ignore) return false;
+        if (group != null ? !group.equals(specification.group) : specification.group != null) return false;
+        if (location != null ? !location.equals(specification.location) : specification.location != null) return false;
+        if (title != null ? !title.equals(specification.title) : specification.title != null) return false;
 
         return true;
     }
@@ -58,13 +58,12 @@ public class TestHtml implements Comparable<TestHtml> {
         return result;
     }
 
-    @Override
-    public int compareTo(TestHtml other) {
+    public int compareTo(ConcordionSpecification other) {
         return this.title.compareTo(other.title);
     }
 
     @Override
     public String toString() {
-        return "title[" + title + "] group[" + group + "] location[" + location + "]" + " ignore[" + ignore + "]";
+        return hashCode() + ": title[" + title + "] group[" + group + "] location[" + location + "]" + " ignore[" + ignore + "]";
     }
 }

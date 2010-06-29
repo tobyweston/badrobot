@@ -1,15 +1,15 @@
 package bad.robot.concordion.ant;
 
-public class DuplicateAwareTestHtml extends TestHtml {
+public class DuplicateAwareConcordionSpecification extends ConcordionSpecification {
     private final Boolean duplicate;
 
-    public DuplicateAwareTestHtml(TestHtml test, boolean duplicate) {
-        super(test.getGroup(), test.getTitle(), test.getLocation(), test.isIgnore());
+    public DuplicateAwareConcordionSpecification(ConcordionSpecification specification, boolean duplicate) {
+        super(specification.getGroup(), specification.getTitle(), specification.getLocation(), specification.isIgnore());
         this.duplicate = duplicate;
     }
 
-    public DuplicateAwareTestHtml(TestHtml testHtml) {
-        this(testHtml, false);
+    public DuplicateAwareConcordionSpecification(ConcordionSpecification specification) {
+        this(specification, false);
     }
 
     public boolean isDuplicate() {
@@ -19,10 +19,10 @@ public class DuplicateAwareTestHtml extends TestHtml {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DuplicateAwareTestHtml)) return false;
+        if (!(o instanceof DuplicateAwareConcordionSpecification)) return false;
         if (!super.equals(o)) return false;
 
-        DuplicateAwareTestHtml that = (DuplicateAwareTestHtml) o;
+        DuplicateAwareConcordionSpecification that = (DuplicateAwareConcordionSpecification) o;
 
         if (duplicate != null ? !duplicate.equals(that.duplicate) : that.duplicate != null) return false;
 
@@ -38,6 +38,6 @@ public class DuplicateAwareTestHtml extends TestHtml {
 
     @Override
     public String toString() {
-        return super.toString() + " duplicate[" + duplicate + "]";
+        return super.toString() + " duplicate[" + duplicate + "]\n";
     }
 }

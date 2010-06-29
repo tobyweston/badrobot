@@ -1,13 +1,12 @@
 package bad.robot.concordion.ant;
 
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,34 +35,30 @@ public class GenerateTestOverviewTask extends Task {
     @Override
     public void execute() throws BuildException {
         assertNotNull(output, template, tests);
-        mergeTemplate(new RawTestFileCollectionBuilder().with(tests.getDirectoryScanner()).build());
+        mergeTemplate(new IncludedFiles().with(tests.getDirectoryScanner()).build());
     }
 
-    private void mergeTemplate(Set<RawTestFile> tests) {
+    private void mergeTemplate(Set<IncludedFile> tests) {
         log(tests);
-        Configuration configuration = new Configuration();
         try {
-            configuration.setDirectoryForTemplateLoading(template.getParentFile());
-            configuration.setObjectWrapper(new DefaultObjectWrapper());
-
-            TestHtmlCollectionBuilder setBuilder = new TestHtmlCollectionBuilder().with(new TestHtmlUnmarshaller()).with(tests);
-            TestHtmlMapBuilder mapBuilder = new TestHtmlMapBuilder().with(setBuilder.build());
-            
-            Map<String, Object> model = new HashMap<String, Object>();
-            model.put("tests", mapBuilder.build());
-            model.put("date", new Date());
-
-            FileWriter writer = new FileWriter(output);
-            configuration.getTemplate(template.getName()).process(model, writer);
-            writer.flush();
+            SetOfConcordionSpecifications set = new SetOfConcordionSpecifications().with(new ConcordionSpecificationUnmarshaller()).with(tests);
+            GroupedCollectionOfConcordionSpecifications group = new GroupedCollectionOfConcordionSpecifications().with(set.build());
+            new FreeMarker(template.getParentFile()).merge(template, createModel(group), new FileWriter(output));
         } catch (Exception e) {
             throw new BuildException(e);
         }
     }
 
-    private void log(Set<RawTestFile> tests) {
+    private static Map<String, Object> createModel(GroupedCollectionOfConcordionSpecifications tests) throws IOException {
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("tests", tests.build());
+        model.put("date", new Date());
+        return model;
+    }
+
+    private void log(Set<IncludedFile> tests) {
         log("looking for files in " + this.tests.getDir().toString() + "...", MSG_VERBOSE);
-        for (RawTestFile test : tests)
+        for (IncludedFile test : tests)
             log("   " + test.getFilename(), MSG_VERBOSE);
     }
 
