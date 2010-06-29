@@ -1,0 +1,33 @@
+<html>
+<head>
+    <title>Adding Group Metadata</title>
+    <meta name="group" content="Grouping Tests"/>
+</head>
+<body>
+
+<p>
+    When you markup a Concordion specification as belonging to a group
+</p>
+
+<div class="example">
+    <pre>    &lt;head&gt;
+        &lt;title&gt;Markup a test with a group&lt;/title&gt;
+        &lt;meta name="group" content="1"/&gt;
+        &lt;link href="../style.css" rel="stylesheet" type="text/css"/&gt;
+    &lt;/head&gt;
+    </pre>
+</div>
+
+<p>
+    The generated overview page will list the test under a group heading along with other tests belonging to the same group.
+</p>
+<p>
+    The generated overview page will include the Concordion <pre>run</pre> command along side the test, for example,
+</p>
+<div class="example">
+    <pre>    &lt;a concordion:run="concordion" href="src/manual/resources/bad/robot/concordion/ant/manual/groupingtests/AddingGroupMeta.html"&gt;Markup a test with a group&lt;/a&gt;
+    </pre>
+</div>
+
+</body>
+</html>

@@ -1,21 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009-2010, bad robot (london) ltd
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <project name="bad.robot.concordion.ant.example" default="generate-overview">
+
+    <property environment="env"/>
 
     <path id="generate-test-overview-classpath">
         <fileset dir="dependancies" includes="concordion-ant-task-*.jar"/>
         <fileset dir="dependancies" includes="freemarker*.jar"/>
     </path>
 
+
     <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpath="${classpath}"/>
 
     <target name="generate-overview">
-        <generate-test-overview template="Overview.ftl" output="Overview.html">
+        <generate-test-overview template="src/manual/resources/Overview.ftl" output="src/manual/resources/Overview.html">
             <fileset dir="${basedir}" includes="**/manual/**/*.html"/>
         </generate-test-overview>
     </target>
 
     <target name="run.acceptance.tests" depends="generate-overview">
         <junit printsummary="yes" haltonfailure="yes">
+            <!--<classpath>-->
+                <!--<fileset includes="${classpath}:${env.ANT_HOME}/lib/ant-junit*.jar"/>-->
+            <!--</classpath>-->
             <formatter type="plain"/>
             <test name="Overview"/>
         </junit>

@@ -1,7 +1,7 @@
 <html xmlns:concordion="http://www.concordion.org/2007/concordion">
 <head>
     <title>Overview</title>
-    <link href="style.css" rel="stylesheet" type="text/css"/>
+    <link href="../../../style.css" rel="stylesheet" type="text/css"/>
     <style>
         p.success {
             padding: 2px;
@@ -36,11 +36,21 @@
     ...
 </p>
 
-<h2>User Manual</h2>
+<#list tests?keys as group>
+<h2>${group}</h2>
 <ul>
-            <li>
-                <a concordion:run="concordion" href="src/manual/resources/bad/robot/concordion/ant/manual/Manual.html">Something</a>
-            </li>
+    <#list tests[group] as test>
+        <#if test.ignore || test.duplicate>
+    <li>
+        <a class="ignored" href="${test.locationAsRelativeUrl}">${test.title}</a> (ignored tests show up differently)
+    </li>
+    <#else>
+    <li>
+        <a concordion:run="concordion" href="${test.locationAsRelativeUrl}">${test.title}</a>
+    </li>
+        </#if>
+    </#list>
 </ul>
+</#list>
 </body>
 </html>
