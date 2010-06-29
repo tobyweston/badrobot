@@ -38,6 +38,6 @@ public class DuplicateAwareConcordionSpecification extends ConcordionSpecificati
 
     @Override
     public String toString() {
-        return super.toString() + " duplicate[" + duplicate + "]\n";
+        return super.toString() + " duplicate[" + duplicate + "]";
     }
 }
