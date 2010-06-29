@@ -115,7 +115,6 @@ public class GenerateTestOverviewTaskTest {
 
     private Callable<Void> executeTask() {
         return new Callable<Void>() {
-            @Override
             public Void call() throws BuildException {
                 task.execute();
                 return null;
