@@ -15,7 +15,6 @@ public class RawTestFileCollectionBuilder implements CollectionBuilder<Set<RawTe
         return this;
     }
 
-    @Override
     public Set<RawTestFile> build() {
         Set<RawTestFile> tests = new HashSet<RawTestFile>();
         for (String filename : scanner.getIncludedFiles()) {

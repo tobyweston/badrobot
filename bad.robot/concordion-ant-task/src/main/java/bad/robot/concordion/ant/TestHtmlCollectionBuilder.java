@@ -22,7 +22,6 @@ public class TestHtmlCollectionBuilder implements CollectionBuilder<SortedSet<Te
         return this;
     }
 
-    @Override
     public SortedSet<TestHtml> build() throws IOException {
         SortedSet<TestHtml> tests = new TreeSet<TestHtml>();
         for (RawTestFile file : files) {
@@ -32,7 +31,6 @@ public class TestHtmlCollectionBuilder implements CollectionBuilder<SortedSet<Te
     }
 
     private static class DefaultUnmarshaller implements Unmarshaller<TestHtml> {
-        @Override
         public TestHtml unmarshall(RawTestFile filename) throws IOException {
             return null;
         }
