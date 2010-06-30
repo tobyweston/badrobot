@@ -5,28 +5,44 @@
 </head>
 <body>
 
+<h1>Adding Group Metadata</h1>
+
+<h2>Given</h2>
 <p>
-    When you markup a Concordion specification as belonging to a group
+    A Concordion specification includes a group meta tag in the head element,
 </p>
 
 <div class="example">
     <pre>    &lt;head&gt;
-        &lt;title&gt;Markup a test with a group&lt;/title&gt;
-        &lt;meta name="group" content="1"/&gt;
-        &lt;link href="../style.css" rel="stylesheet" type="text/css"/&gt;
-    &lt;/head&gt;
+        &lt;title&gt;Adding Group Metadata&lt;/title&gt;
+        &lt;meta name="group" content="Grouping Tests"/&gt;
+    &lt;/head&gt; </pre>
+</div>
+
+<h2>When</h2>
+<p>
+    The overview page is generated,
+</p>
+<h2>Then</h2>
+<p>
+    The generated overview page will list the test under a group heading. The generated overview page will include the
+    Concordion <code>run</code> command along side the test, for example, 
+</p>
+<div class="example">
+    <pre>
+&lt;h2&gt;Grouping Tests&lt;/h2&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;a concordion:run="concordion" href="bad/robot/concordion/ant/manual/groupingtests/AddingGroupMeta.html"&gt;Adding Group Metadata&lt;/a&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;    
     </pre>
 </div>
 
-<p>
-    The generated overview page will list the test under a group heading along with other tests belonging to the same group.
-</p>
-<p>
-    The generated overview page will include the Concordion <pre>run</pre> command along side the test, for example,
-</p>
-<div class="example">
-    <pre>    &lt;a concordion:run="concordion" href="src/manual/resources/bad/robot/concordion/ant/manual/groupingtests/AddingGroupMeta.html"&gt;Markup a test with a group&lt;/a&gt;
-    </pre>
+<div class="information">
+    <ul>
+        <li><a href="../../../../../../Overview.html">Overview</a></li>
+    </ul>
 </div>
 
 </body>
