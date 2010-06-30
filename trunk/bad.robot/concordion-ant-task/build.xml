@@ -19,17 +19,20 @@
 
     <property environment="env"/>
 
-    <path id="generate-test-overview-classpath">
-        <fileset dir="dependancies" includes="concordion-ant-task-*.jar"/>
-        <fileset dir="dependancies" includes="freemarker*.jar"/>
+    <path id="dependencies">
+        <fileset dir="example/dependencies" includes="concordion-ant-task-*.jar"/>
+        <fileset dir="example/dependencies" includes="freemarker*.jar"/>
     </path>
 
 
-    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpath="${classpath}"/>
+    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpathref="dependencies"/>
 
     <target name="generate-overview">
         <generate-test-overview template="src/manual/resources/Overview.ftl" output="src/manual/resources/Overview.html">
-            <fileset dir="${basedir}" includes="**/manual/**/*.html"/>
+            <fileset dir="${basedir}/src/manual/resources">
+                <include name="**/*.html"/>
+                <exclude name="**/Overview.html" />
+            </fileset>
         </generate-test-overview>
     </target>
 
