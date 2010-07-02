@@ -9,7 +9,7 @@
     <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpathref="generate-test-overview-classpath"/>
 
     <target name="generate-overview">
-        <generate-test-overview template="Overview.ftl" output="Overview.html">
+        <generate-test-overview template="OverviewExample.ftl" output="OverviewExample.html">
             <fileset dir="${basedir}" includes="**/specs/**/*.html"/>
         </generate-test-overview>
     </target>
@@ -17,7 +17,7 @@
     <target name="run.acceptance.tests" depends="generate-overview">
         <junit printsummary="yes" haltonfailure="yes">
             <formatter type="plain"/>
-            <test name="Overview"/>
+            <test name="OverviewExample"/>
         </junit>
     </target>
 </project>

@@ -68,4 +68,8 @@ public class GenerateTestOverviewTask extends Task {
                 throw new BuildException("The attributes output and template as well as a nested resource collection must be set");
     }
 
+    public String getOutput() {
+        return output.getAbsolutePath();
+    }
+
 }

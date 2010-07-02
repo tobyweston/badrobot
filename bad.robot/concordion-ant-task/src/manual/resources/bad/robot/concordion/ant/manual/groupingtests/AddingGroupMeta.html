@@ -1,4 +1,4 @@
-<html>
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
 <head>
     <title>Adding Group Metadata</title>
     <meta name="group" content="Grouping Tests"/>
@@ -13,15 +13,16 @@
 </p>
 
 <div class="example">
-    <pre>    &lt;head&gt;
-        &lt;title&gt;Adding Group Metadata&lt;/title&gt;
-        &lt;meta name="group" content="Grouping Tests"/&gt;
-    &lt;/head&gt; </pre>
+<pre>
+&lt;head&gt;
+    &lt;title&gt;Adding Group Metadata&lt;/title&gt;
+    &lt;meta name="group" content="Grouping Tests"/&gt;
+&lt;/head&gt; </pre>
 </div>
 
 <h2>When</h2>
 <p>
-    The overview page is generated,
+    The overview page is generated from <code><span concordion:execute="generateOverview(#TEXT)">AddingGroupMeta.html</span></code> (this page),
 </p>
 <h2>Then</h2>
 <p>
@@ -29,14 +30,14 @@
     Concordion <code>run</code> command along side the test, for example, 
 </p>
 <div class="example">
-    <pre>
+<pre concordion:assertEquals="getOverview()">
 &lt;h2&gt;Grouping Tests&lt;/h2&gt;
 &lt;ul&gt;
     &lt;li&gt;
         &lt;a concordion:run="concordion" href="bad/robot/concordion/ant/manual/groupingtests/AddingGroupMeta.html"&gt;Adding Group Metadata&lt;/a&gt;
     &lt;/li&gt;
 &lt;/ul&gt;    
-    </pre>
+</pre>
 </div>
 
 <div class="information">
