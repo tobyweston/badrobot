@@ -8,6 +8,13 @@
 
 <h2>Recommended Build Process</h2>
 <p>
+    <ol>
+        <li>Clean everything</li>
+        <li>Compile everything</li>
+        <li>Collect Concordion tests into an overview page</li>
+        <li>Run unit (and other non-Concordion tests), exclude Concordion tests (and the overview page)</li>
+        <li>Run the generated Concordion overview page only (and it will run all your Concordion tests collected in step 3.)</li>
+    </ol>
 </p>
 
 <h2>Dependencies</h2>
@@ -20,12 +27,89 @@
 </p>
 
 <h2>Setting up your Build file</h2>
+<h3>Ant</h3>
 <p>
+    Setup your build file with the task
+</p>
+<div class="example">
+    <pre>&lt;taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask"/&gt;</pre>
+</div>
+<p class="idea">
+    (having first copied concordion-ant-task-1.0.jar into $ANT_HOME/lib or reference it in the taskdef above by some
+    other <a href="http://ant.apache.org/manual/Tasks/typedef.html">Ant</a> mechanism)
+</p>
+<p>
+    then generate your overview page during your build using a target similar to below    
+</p>
+<div class="example">
+<pre>
+&lt;target name="generate-overview"&gt;
+    &lt;generate-test-overview template="Overview.ftl" output="Overview.html"&gt;
+        &lt;fileset dir="${basedir}"&gt;
+            &lt;include name="**/*.html"/&gt;
+            &lt;exclude name="**/Overview.html" /&gt;
+        &lt;/fileset&gt;
+    &lt;/generate-test-overview&gt;
+&lt;/target&gt;    
+</pre>    
+</div>
+<p>
+    all that's left is to run your newly generated overview page as a Concordion test. Ensure that you have a
+    corresponding Java fixture on the classpath (annotated with <code>@RunWith(ConcordionRunner.class)</code>), then..
+</p>
+<div class="example">
+<pre>
+&lt;target name="run.acceptance.tests" depends="generate-overview"&gt;
+    &lt;junit printsummary="yes" haltonfailure="yes"&gt;
+        &lt;formatter type="plain"/&gt;
+        &lt;test name="Overview"/&gt; &lt;!-- corresponding java fixture, must match the overview page generated --&gt;
+    &lt;/junit&gt;
+&lt;/target&gt;    
+</pre>
+</div>
+
+<h3>Maven (if you must)</h3>
+<p>
+    If you already have a Maven based build, you can still hook into Ant to call the task. Using a <code>build.xml</code>
+    based on the example above, update your <code>pom</code> with the following
+</p>
+<div class="example">
+<pre>
+...
+&lt;plugin&gt;
+    &lt;artifactId&gt;maven-antrun-plugin&lt;/artifactId&gt;
+    &lt;version&gt;1.4&lt;/version&gt;
+    &lt;executions&gt;
+        &lt;execution&gt;
+            &lt;phase&gt;test&lt;/phase&gt;
+            &lt;configuration&gt;
+                &lt;tasks&gt;
+                    &lt;property name="classpath" refid="maven.test.classpath"/&gt;
+                    &lt;ant target="run.acceptance.tests"/&gt;
+                &lt;/tasks&gt;
+            &lt;/configuration&gt;
+            &lt;goals&gt;
+                &lt;goal&gt;run&lt;/goal&gt;
+            &lt;/goals&gt;
+        &lt;/execution&gt;
+    &lt;/executions&gt;
+&lt;/plugin&gt;
+...    
+</pre>
+</div>
+<p>
+    This will hook the Ant target <code>run.acceptance.tests</code> to the test phase of your Maven build. You must
+    ensure that the Concordion tests are not run as part of the Maven lifecycle else you'll repeat the test execution.
 </p>
 
 <h2>Debugging</h2>
 <p>
+    If things don't work as expected, you can get a little more information out of the Ant task by using <code>-v</code>
+    option to output information about the fileset it's using to look for the tests. For example,
 </p>
+<div class="example">
+<pre>ant -v -f build.xml generate-overview</pre>
+</div>
 
 <div class="information">
     <ul>
