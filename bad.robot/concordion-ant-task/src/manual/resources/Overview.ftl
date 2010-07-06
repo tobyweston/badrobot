@@ -45,21 +45,21 @@
 <#assign ignored = 0>
 <div id="tests">
 <#list tests?keys as group>
-<h2 id="group-${group}">${group}</h2>
+<h2>${group}</h2>
 <ul>
-    <#list tests[group] as test>
-        <#assign counter = counter + 1>
-        <#if test.ignore || test.duplicate>
-            <#assign ignored = ignored + 1>
-            <li id="ignored-test-${ignored}">
-                <a class="ignored" href="${test.locationAsRelativeUrl}">${test.title}</a> (ignored tests show up differently)
-            </li>
-            <#else>
-            <li id="test-${counter}">
-                <a concordion:run="concordion" href="${test.locationAsRelativeUrl}">${test.title}</a>
-            </li>
-        </#if>
-    </#list>
+<#list tests[group] as test>
+<#assign counter = counter + 1>
+<#if test.ignore || test.duplicate>
+    <#assign ignored = ignored + 1>
+    <li>
+        <a class="ignored" href="${test.locationAsRelativeUrl}">${test.title}</a> (ignored tests show up differently)
+    </li>
+<#else>
+    <li>
+        <a concordion:run="concordion" href="${test.locationAsRelativeUrl}">${test.title}</a>
+    </li>
+</#if>
+</#list>
 </ul>
 </#list>
 </div>

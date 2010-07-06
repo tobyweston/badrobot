@@ -2,6 +2,7 @@ package bad.robot.concordion.ant.manual.groupingtests;
 
 import bad.robot.concordion.ant.GenerateTestOverviewTask;
 
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 
 import static bad.robot.concordion.ant.manual.groupingtests.TaskFactory.createTask;
@@ -15,7 +16,7 @@ public class GenerateTestOverviewFixture {
         task.execute();
     }
 
-    public String getOverviewGroupSection() throws IOException {
+    public String getOverviewGroupSection() throws IOException, TransformerException {
         return new PageReader(task.getOutput()).groupSectionAsString();
     }
 
