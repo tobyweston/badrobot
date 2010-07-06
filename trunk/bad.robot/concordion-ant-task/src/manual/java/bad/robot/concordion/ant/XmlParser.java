@@ -25,7 +25,9 @@ public class XmlParser {
 
     public XmlParser(File file) throws IOException {
         try {
-            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.parse(file);
         } catch (ParserConfigurationException e) {
             throw new IOException(e);
@@ -53,7 +55,7 @@ public class XmlParser {
         return list;
     }
 
-    private String prettyPrint(Node node) throws TransformerException {
+    private static String prettyPrint(Node node) throws TransformerException {
         StringWriter writer = new StringWriter();
         Transformer transformer = TransformerFactory.newInstance().newTransformer();
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -61,13 +63,15 @@ public class XmlParser {
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         transformer.transform(new DOMSource(node), new StreamResult(writer));
-        return writer.toString().replaceAll("\r\n\r\n", "\r\n");
+        return tidyUp(writer.toString());
     }
 
-    private String tidy(String s) {
-        s = s.replaceAll("\n", "");
-        s = s.replaceAll("\r", "");
-        return s;
+    private static String tidyUp(String string) {
+        return string
+                .replaceAll("\r\n\r\n", "\r\n")
+                .replaceFirst("<div id=\"tests\">", "")
+                .replaceFirst("</div>", "")
+                .replaceAll("xmlns:concordion=\"http://www.concordion.org/2007/concordion\"", "");
     }
 
 }

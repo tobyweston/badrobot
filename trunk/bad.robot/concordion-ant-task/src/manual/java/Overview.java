@@ -1,8 +1,8 @@
-import org.concordion.api.Unimplemented;
+import org.concordion.api.ExpectedToPass;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
 @RunWith(ConcordionRunner.class)
-@Unimplemented
+@ExpectedToPass
 public class Overview {
 }
