@@ -4,6 +4,7 @@ import org.concordion.api.Unimplemented;
 import org.concordion.integration.junit4.ConcordionRunner;
 import org.junit.runner.RunWith;
 
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 
 @RunWith(ConcordionRunner.class)
@@ -16,8 +17,10 @@ public class AddingGroupMeta {
         fixture.generateOverviewFullPage(page);
     }
 
-    public String getOverview() throws IOException {
-        return fixture.getOverviewGroupSection();
+    public String getOverview() throws IOException, TransformerException {
+        String s = fixture.getOverviewGroupSection();
+        System.out.println("s = " + s); 
+        return s;
     }
 
 }
