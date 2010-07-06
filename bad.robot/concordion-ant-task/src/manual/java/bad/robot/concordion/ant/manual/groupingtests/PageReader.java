@@ -13,6 +13,11 @@ class PageReader {
 
     public PageReader(String page) {
         this.page = page;
+        try {
+            System.out.println(asString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String asString() throws IOException {
@@ -27,7 +32,4 @@ class PageReader {
         return new XmlParser(new File(page)).getTestSection();
     }
 
-    private static String htmlFriendly(String section) {
-        return section.replace("<", "&lt;").replace(">", "&rt");
-    }
 }
