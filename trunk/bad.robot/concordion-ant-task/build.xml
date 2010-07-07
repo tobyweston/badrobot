@@ -37,10 +37,11 @@
     </target>
 
     <target name="run.acceptance.tests" depends="generate-overview">
+        <echo message="${classpath}"/>
         <junit printsummary="yes" haltonfailure="yes">
-            <!--<classpath>-->
-                <!--<fileset includes="${classpath}:${env.ANT_HOME}/lib/ant-junit*.jar"/>-->
-            <!--</classpath>-->
+            <classpath>
+                <fileset dir="${basedir}" includes="${classpath}"/>
+            </classpath>
             <formatter type="plain"/>
             <test name="Overview"/>
         </junit>
