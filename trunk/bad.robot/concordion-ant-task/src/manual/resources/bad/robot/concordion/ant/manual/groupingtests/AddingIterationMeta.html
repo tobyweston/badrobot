@@ -1,0 +1,51 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<head>
+    <title>Adding Iteration Metadata</title>
+    <meta name="group" content="Grouping Tests"/>
+</head>
+<body>
+
+<h1>Adding Iteration Metadata</h1>
+
+<h2>Given</h2>
+<p>
+    A Concordion specification includes an iteration meta tag in the head element,
+</p>
+
+<div class="example">
+<pre>
+&lt;head&gt;
+    &lt;title&gt;Adding Iteration  Metadata&lt;/title&gt;
+    &lt;meta name="iteration" content="Grouping Tests By Iteration"/&gt;
+&lt;/head&gt; </pre>
+</div>
+
+<h2>When</h2>
+<p>
+    The overview page is generated from <code><span concordion:execute="generateOverview(#TEXT)">AddingIterationMeta.html</span></code> (this page),
+</p>
+<h2>Then</h2>
+<p>
+    The iteration tag acts as an alias for the group tag (see <a href="AddingGroupMeta.html">Adding Group Meta</a>) and
+    so the generated overview page will list the test under a group heading. The generated overview page will include the
+    Concordion <code>run</code> command along side the test, for example,
+</p>
+<div class="example">
+<pre concordion:assertEquals="getOverview()">
+&lt;h2&gt;Grouping Tests&lt;/h2&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;a concordion:run="concordion" href="AddingIterationMeta.html"&gt;Adding Iteration Metadata&lt;/a&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+</pre>
+</div>
+
+<div class="information">
+    <ul>
+        <li><a href="../../../../../../Overview.html">Overview</a></li>
+    </ul>
+</div>
+
+</body>
+</html>
