@@ -1,6 +1,6 @@
 package bad.robot.concordion.ant.manual.groupingtests;
 
-import bad.robot.concordion.ant.XmlParser;
+import bad.robot.concordion.ant.PageParser;
 
 import javax.xml.transform.TransformerException;
 import java.io.*;
@@ -13,11 +13,6 @@ class PageReader {
 
     public PageReader(String page) {
         this.page = page;
-        try {
-            System.out.println(asString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public String asString() throws IOException {
@@ -29,7 +24,7 @@ class PageReader {
     }
 
     public String groupSectionAsString() throws IOException, TransformerException {
-        return new XmlParser(new File(page)).getTestSection();
+        return new PageParser(new File(page)).getTestSection();
     }
 
 }
