@@ -52,7 +52,7 @@
 <#if test.ignore || test.duplicate>
     <#assign ignored = ignored + 1>
     <li>
-        <a class="ignored" href="${test.locationAsRelativeUrl}">${test.title}</a> (ignored tests show up differently)
+        <a class="ignored" href="${test.locationAsRelativeUrl}">${test.title}</a>
     </li>
 <#else>
     <li>
