@@ -67,11 +67,19 @@ public class XmlParser {
     }
 
     private static String tidyUp(String string) {
-        return string
-                .replaceAll("\r\n\r\n", "\r\n")
-                .replaceFirst("<div id=\"tests\">", "")
-                .replaceFirst("</div>", "")
-                .replaceAll("xmlns:concordion=\"http://www.concordion.org/2007/concordion\"", "");
+        return stripNamespace(stripDivSection(stripNewlinesForWindows(string)));
     }
 
+    private static String stripNewlinesForWindows(String string) {
+        return string.replaceAll("\r\n\r\n", "\r\n");
+    }
+
+    private static String stripDivSection(String string) {
+        return string.replaceFirst("<div id=\"tests\">", "").replaceFirst("</div>", "");
+    }
+
+    private static String stripNamespace(String string) {
+        return string.replaceFirst("xmlns:concordion=\"http://www.concordion.org/2007/concordion\"", "");
+    }
+    
 }
