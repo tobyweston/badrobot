@@ -61,7 +61,7 @@
                             <tasks>
                                 <property name="classpath" refid="maven.test.classpath"/>
                                 <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="maven.test.classpath"/>
-                                <ant target="run.acceptance.tests"/>
+                                <ant target="generate-overview"/>
                             </tasks>
                         </configuration>
                         <goals>
