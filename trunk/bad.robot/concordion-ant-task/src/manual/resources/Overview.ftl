@@ -45,7 +45,7 @@
 <#assign ignored = 0>
 <div id="tests">
 <#list tests?keys as group>
-<h2>${group}</h2>
+<h2>${group?capitalize}</h2>
 <ul>
 <#list tests[group] as test>
 <#assign counter = counter + 1>
