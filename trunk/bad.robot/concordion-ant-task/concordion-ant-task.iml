@@ -16,8 +16,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="Maven: org.apache.ant:ant:1.8.0" level="project" />
     <orderEntry type="library" exported="" name="Maven: org.apache.ant:ant-launcher:1.8.0" level="project" />
-    <orderEntry type="library" exported="" name="Maven: org.freemarker:freemarker:2.3.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.ant:ant-junit:1.8.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
+    <orderEntry type="library" exported="" name="Maven: org.freemarker:freemarker:2.3.16" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jmock:jmock:2.5.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-library:1.1" level="project" />
