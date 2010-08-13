@@ -24,10 +24,13 @@
         <fileset dir="example/dependencies" includes="freemarker*.jar"/>
     </path>
 
+    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpath="${classpath.as.supplied.by.maven}"/>
 
-    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpathref="dependencies"/>
+    <target name="check.dependencies" unless="classpath.as.supplied.by.maven">
+        <fail message="Missing dependencies, run using Maven instead (*blush*) or switch to use classpathref='dependencies'"/>
+    </target>
 
-    <target name="generate-overview">
+    <target name="generate-overview" depends="check.dependencies">
         <generate-test-overview template="src/manual/resources/Overview.ftl" output="src/manual/resources/Overview.html">
             <fileset dir="${basedir}/src/manual/resources">
                 <include name="**/*.html"/>
@@ -37,13 +40,19 @@
     </target>
 
     <target name="run.acceptance.tests" depends="generate-overview">
-        <echo message="${classpath}"/>
+        <echo message="XXXX ${basedir}"/>
+        <echo message=""/>
+        <echo message=""/>
+        <echo message="${classpath.as.supplied.by.maven}"/>
+        <echo message=""/>
+        <echo message=""/>
         <junit printsummary="yes" haltonfailure="yes">
             <classpath>
-                <fileset dir="${basedir}" includes="${classpath}"/>
+                <fileset dir="${basedir}" includes="${classpath.as.supplied.by.maven}"/>
             </classpath>
             <formatter type="plain"/>
             <test name="Overview"/>
         </junit>
     </target>
+
 </project>
