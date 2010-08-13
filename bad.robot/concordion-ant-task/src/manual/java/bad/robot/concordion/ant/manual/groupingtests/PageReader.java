@@ -8,7 +8,7 @@ import java.io.*;
 import static bad.robot.concordion.ant.FileUtils.read;
 
 class PageReader {
-    
+      
     private final String page;
 
     public PageReader(String page) {
@@ -27,4 +27,7 @@ class PageReader {
         return new PageParser(new File(page)).getTestSection();
     }
 
+    public String groupSectionAsList() throws IOException {
+        return new PageParser(new File(page)).getTestSectionSummarisedRenameMe();
+    }
 }
