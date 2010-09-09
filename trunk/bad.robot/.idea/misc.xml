@@ -28,6 +28,7 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/concordion-ant-task/pom.xml" />
         <option value="$PROJECT_DIR$/ddd/pom.xml" />
+        <option value="$PROJECT_DIR$/bod/pom.xml" />
       </list>
     </option>
   </component>
