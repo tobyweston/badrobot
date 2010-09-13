@@ -37,7 +37,7 @@ public class PageParser {
         return prettyPrint(first(tag("div", document)));
     }
 
-    public String getTestSectionSummarisedRenameMe() {
+    public String getTestSectionSummarised() {
         return asString(tag("h2", document));
     }
 
