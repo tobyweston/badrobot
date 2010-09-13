@@ -11,8 +11,8 @@ public class GenerateTestOverviewFixture {
              
     private GenerateTestOverviewTask task;
 
-    public void generateOverviewFullPage(final String page) throws IOException {
-        task = createTask(page, "Overview.ftl");
+    public void generateOverviewFullPage(String... pages) throws IOException {
+        task = createTask("Overview.ftl", pages);
         task.execute();
     }
 
