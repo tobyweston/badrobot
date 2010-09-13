@@ -28,6 +28,6 @@ class PageReader {
     }
 
     public String groupSectionAsList() throws IOException {
-        return new PageParser(new File(page)).getTestSectionSummarisedRenameMe();
+        return new PageParser(new File(page)).getTestSectionSummarised();
     }
 }

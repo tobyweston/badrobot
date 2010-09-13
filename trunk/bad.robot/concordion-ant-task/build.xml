@@ -17,8 +17,6 @@
 
 <project name="bad.robot.concordion.ant.example" default="generate-overview">
 
-    <property environment="env"/>
-
     <path id="dependencies">
         <fileset dir="example/dependencies" includes="concordion-ant-task-*.jar"/>
         <fileset dir="example/dependencies" includes="freemarker*.jar"/>
@@ -40,12 +38,6 @@
     </target>
 
     <target name="run.acceptance.tests" depends="generate-overview">
-        <echo message="XXXX ${basedir}"/>
-        <echo message=""/>
-        <echo message=""/>
-        <echo message="${classpath.as.supplied.by.maven}"/>
-        <echo message=""/>
-        <echo message=""/>
         <junit printsummary="yes" haltonfailure="yes">
             <classpath>
                 <fileset dir="${basedir}" includes="${classpath.as.supplied.by.maven}"/>
