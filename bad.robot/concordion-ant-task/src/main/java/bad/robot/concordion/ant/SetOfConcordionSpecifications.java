@@ -10,15 +10,14 @@ import static java.util.Collections.emptySet;
 public class SetOfConcordionSpecifications implements CollectionBuilder<SortedSet<ConcordionSpecification>, IOException> {
 
     private Set<IncludedFile> files = emptySet();
-    private Unmarshaller<ConcordionSpecification> unmarshaller = new DefaultUnmarshaller();
+    private final Unmarshaller<ConcordionSpecification> unmarshaller;
+
+    public SetOfConcordionSpecifications(Unmarshaller<ConcordionSpecification> unmarshaller) {
+        this.unmarshaller = unmarshaller;
+    }
 
     public SetOfConcordionSpecifications with(Set<IncludedFile> files) {
         this.files = files;
-        return this;
-    }
-
-    public SetOfConcordionSpecifications with(Unmarshaller<ConcordionSpecification> unmarshaller) {
-        this.unmarshaller = unmarshaller;
         return this;
     }
 
@@ -26,17 +25,12 @@ public class SetOfConcordionSpecifications implements CollectionBuilder<SortedSe
         SortedSet<ConcordionSpecification> tests = new TreeSet<ConcordionSpecification>();
         for (IncludedFile file : files) {
             ConcordionSpecification html = unmarshaller.unmarshall(file);
-            if (tests.contains(html))
-                System.err.printf("WARNING! Concordion specification with \"%s\" as a title already exsists (%s)%n", html.getTitle(), html.getLocation());
-            tests.add(html);
+            if (tests.contains(html)) {
+                tests.add(new ConcordionSpecification(html.getGroup(), html.getTitle() + " (duplicated test title)", html.getLocation(), html.isIgnore()));
+            } else
+                tests.add(html);
         }
         return tests;
-    }
-
-    private static class DefaultUnmarshaller implements Unmarshaller<ConcordionSpecification> {
-        public ConcordionSpecification unmarshall(IncludedFile filename) throws IOException {
-            return null;
-        }
     }
 
 }
