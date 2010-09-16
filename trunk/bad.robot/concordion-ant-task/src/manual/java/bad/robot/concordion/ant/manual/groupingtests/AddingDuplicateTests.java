@@ -13,8 +13,8 @@ public class AddingDuplicateTests {
 
     private final GenerateTestOverviewFixture fixture = new GenerateTestOverviewFixture();
 
-    public void generateOverview(String duplicate) throws IOException {
-        fixture.generateOverviewFullPage(duplicate, duplicate);
+    public void generateOverview(String test) throws IOException {
+        fixture.generateOverviewFullPage(test, "AddingGroupMeta.html");
     }
 
     public String getOverview() throws IOException, TransformerException {

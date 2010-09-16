@@ -20,12 +20,12 @@ public class SetOfConcordionSpecificationsTest {
 
     private final Mockery context = new Mockery();
 
-    private final SetOfConcordionSpecifications builder = new SetOfConcordionSpecifications();
     private final Unmarshaller<ConcordionSpecification> unmarshaller = context.mock(Unmarshaller.class);
+    private final SetOfConcordionSpecifications builder = new SetOfConcordionSpecifications(unmarshaller);
 
     @Test
-    public void emptyFiles() throws IOException {
-        Set<ConcordionSpecification> set = builder.with(unmarshaller).build();
+    public void shouldUnmarshallWhenNoSetIsSupplied() throws IOException {
+        Set<ConcordionSpecification> set = builder.build();
         assertThat(set.size(), is(0));
     }
 
@@ -35,7 +35,7 @@ public class SetOfConcordionSpecificationsTest {
             one(unmarshaller).unmarshall(testFile("whatever")); will(returnValue(new ConcordionSpecification("1", "title", "location", false)));
             one(unmarshaller).unmarshall(testFile("trevor")); will(returnValue(new ConcordionSpecification("1", "title", "location", false)));
         }});
-        builder.with(unmarshaller).with(set("whatever", "trevor")).build();
+        builder.with(set("whatever", "trevor")).build();
     }
 
     @Test
@@ -46,7 +46,7 @@ public class SetOfConcordionSpecificationsTest {
             one(unmarshaller).unmarshall(testFile("whatever")); will(returnValue(first));
             one(unmarshaller).unmarshall(testFile("trevor")); will(returnValue(second));
         }});
-        Set<ConcordionSpecification> set = builder.with(unmarshaller).with(set("whatever", "trevor")).build();
+        Set<ConcordionSpecification> set = builder.with(set("whatever", "trevor")).build();
         assertThat(set.size(), is(2));
         assertThat(set, hasItem(first));
         assertThat(set, hasItem(second));

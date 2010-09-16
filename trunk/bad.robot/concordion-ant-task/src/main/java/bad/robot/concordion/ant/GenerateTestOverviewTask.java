@@ -41,7 +41,7 @@ public class GenerateTestOverviewTask extends Task {
     private void mergeTemplate(Set<IncludedFile> tests) {
         log(tests);
         try {
-            SetOfConcordionSpecifications set = new SetOfConcordionSpecifications().with(new ConcordionSpecificationUnmarshaller()).with(tests);
+            SetOfConcordionSpecifications set = new SetOfConcordionSpecifications(new ConcordionSpecificationUnmarshaller()).with(tests);
             GroupedCollectionOfConcordionSpecifications group = new GroupedCollectionOfConcordionSpecifications().with(set.build());
             new FreeMarker(template.getParentFile()).merge(template, createModel(group), new FileWriter(output));
         } catch (Exception e) {

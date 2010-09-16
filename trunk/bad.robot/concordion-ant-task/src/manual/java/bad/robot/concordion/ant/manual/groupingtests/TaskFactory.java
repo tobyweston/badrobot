@@ -41,28 +41,46 @@ public class TaskFactory {
         return builder.toString();
     }
 
-    private static File getParentFolder(String[] pages) {
-        Set<File> files = new HashSet<File>();
+    private static File getParentFolder(String... pages) {
+        Set<File> folders = new HashSet<File>();
         for (String page : pages)
-            files.add(first(findRecursively(workingFolder(), matching(page))));
-        if (files.size() != 1)
+            folders.add(first(findRecursively(workingFolder(), matching(page))).getParentFile());
+        if (folders.size() != 1)
             throw new RuntimeException("incorrect number of folders found, you can only test Concordion specfications from the same folder");
-        return files.toArray(new File[]{})[0].getParentFile();
+        return first(folders);
 
     }
 
+    private static <T> int count(Iterable<T> iterable, Counter<T> counter) {
+        int count = 0;
+        for (T t : iterable) {
+            if (counter.increment(t))
+                count++;
+        }
+        return count;
+    }
+
+    private interface Counter<T> {
+
+        boolean increment(T t);
+
+    }
     private static FilenameFilter matching(final String page) {
         return new FilenameFilter() {
             public boolean accept(File folder, String target) {
-                return page.equals(target);
+                return page.equals(target);// && folder.getAbsolutePath().contains("resources");
             }
         };
     }
 
-    private static File first(List<File> files) {
-        if (files.isEmpty())
+    private static <T> T first(List<T> objects) {
+        if (objects.isEmpty())
             throw new IllegalStateException(format("couldn't find file looking recursively from %s", workingFolder().getAbsolutePath()));
-        return files.get(0);
+        return objects.get(0);
+    }
+
+    private static <T> T first(Set<T> objects) {
+        return (T) objects.toArray()[0];
     }
 
 }
