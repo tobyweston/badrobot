@@ -6,6 +6,7 @@ import org.junit.internal.matchers.TypeSafeMatcher;
 import java.util.List;
 
 public class ConcordionSpecificationMatcher extends TypeSafeMatcher<List<DuplicateAwareConcordionSpecification>> {
+
     private final List<DuplicateAwareConcordionSpecification> expected;
 
     public static ConcordionSpecificationMatcher containsAll(List<DuplicateAwareConcordionSpecification> expected) {
