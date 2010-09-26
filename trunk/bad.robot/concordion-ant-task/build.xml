@@ -37,6 +37,13 @@
         </generate-test-overview>
     </target>
 
+    <!--
+    set the concordion output folder to overwrite the "manual" folder by Mvn configuataion.
+    In IDEA, under Maven (settings) setup a Runner with
+    -Dconcordion.output.dir=/Users/toby/Workspace/bad.robot/concordion-ant-task/manual
+    this will change it for everything though so grrr. Setting a jvmarg below doesnt work,
+    double grrr.
+    -->
     <target name="run.acceptance.tests" depends="generate-overview">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath>
