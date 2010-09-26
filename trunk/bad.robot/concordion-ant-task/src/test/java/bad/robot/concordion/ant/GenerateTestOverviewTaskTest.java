@@ -35,7 +35,7 @@ public class GenerateTestOverviewTaskTest {
         add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("68, 69", "Test C", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test3.html"), DONT_IGNORE), DUPLICATE));
         add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("68, 69", "Test C", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test3.html"), DONT_IGNORE)));
         add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("69", "Test D", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test4.html"), DONT_IGNORE)));
-//        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("71", "Test D (Duplicate Title)", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test5.html"), DONT_IGNORE)));
+        add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("71", "Test D (duplicated test title)", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "Test5.html"), DONT_IGNORE)));
         add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("unknown", "Overview page", combineWithFileSeparator("src", "test", "resources", "specs", "overviewpage", "OverViewPage.html"), IGNORE)));
         add(new DuplicateAwareConcordionSpecification(new ConcordionSpecification("unknown", "unknown", combineWithFileSeparator("src", "test", "resources", "specs", "Specs.html"), DONT_IGNORE)));
     }};
