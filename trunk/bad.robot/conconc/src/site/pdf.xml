@@ -1,0 +1,41 @@
+<!--
+  ~ Copyright (c) 2009-2010, bad robot (london) ltd
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<document xmlns="http://maven.apache.org/DOCUMENT/1.0.1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/DOCUMENT/1.0.1 http://maven.apache.org/xsd/document-1.0.1.xsd"
+          outputName="concurrency-control-${project.version}">
+
+    <meta/>
+
+    <toc name="Table of Contents">
+        <item name="Introduction" ref="introduction.html"/>
+        <item name="Shared Memory" ref="shared.html"/>
+        <item name="Problem Definition" ref="problem.html"/>
+        <item name="Alternative Solutions" ref="solution.html"/>
+        <item name="Conclusions" ref="conclusions.html"/>
+    </toc>
+
+    <cover>
+        <coverTitle>Optimistic and Pessimistic Concurrency Control with Shared Memory Models</coverTitle>
+        <coverType>An analysis of modern concurrency control mechanisms</coverType>
+        <coverSubTitle>v. ${project.version}</coverSubTitle>
+        <projectName>${project.name}</projectName>
+        <companyName>Toby Weston</companyName>
+        <coverdate>October 2010</coverdate>
+        <author>Toby Weston</author>
+    </cover>
+</document>
