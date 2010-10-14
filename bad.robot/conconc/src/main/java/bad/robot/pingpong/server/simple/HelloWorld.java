@@ -29,7 +29,7 @@ import static com.google.code.tempusfugit.temporal.StopWatch.start;
 import static com.google.code.tempusfugit.temporal.Timeout.timeout;
 import static com.google.code.tempusfugit.temporal.WaitFor.waitUntil;
 
-public class HelloWorld {
+class HelloWorld {
 
     public void hello(Request request, Response response) {
         PrintStream body = null;
