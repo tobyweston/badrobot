@@ -22,6 +22,7 @@ import org.apache.commons.modeler.Registry;
 import javax.management.ObjectName;
 
 class JmxManager implements Management {
+    
     public void registerComponent(Object bean, ObjectName objectName, String type) throws Exception {
         Registry.getRegistry().registerComponent(bean, objectName, type);
     }
