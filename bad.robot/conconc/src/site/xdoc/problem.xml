@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009-2010, bad robot (london) ltd
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+    <properties>
+        <title>Example Problem</title>
+        <author>Toby Weston</author>
+    </properties>
+
+    <body>
+
+        <section name="Example Problem">
+            <p>
+                In order to better contrast the concurrency control mechanisms available, I had to come up with a
+                concurrency problem that was meaty enough to represent real-world experiences. I ended up choosing a
+                problem around request statistics.
+            </p>
+
+            <subsection name="Request Statistics">
+                <p>
+                    In typical client-server software, multiple clients make requests to a centralised server to achieve
+                    some business goal. This gives a good opportunity to encounter concurrency issues as multiple
+                    clients might be interested in the same kinds of things represented on the server. In our case,
+                    we're interested in recording statistics around generic requests that clients make. In a web
+                    application, this might represent the request-response cycle and in our case, we're interested in
+                    recording how long requests take to complete and respond to the client. We're interested in
+                    performance monitoring our client-server application.
+                </p>
+                <p>
+                    Specifically then, the problem is
+                </p>
+                <blockquote>
+                    "Given a new web-application, we would like to record request statistics against specific services
+                    so that we can understand typical response times and set achievable service level agreements with
+                    my customer."
+                </blockquote>
+            </subsection>
+
+            <subsection name="The Ping Server">
+                <p>
+                    The web-application that we're interested in is called <i>PingPong</i> represents a server that
+                    responds to HTTP requests the URL <code>/ping</code> with a HTTP message of 200 OK.
+                </p>
+                <p>
+                    Expanding the problem description, we'd like to record the following information about requests
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Total, communicative number of <code>ping</code> requests
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Total, communicative number of failed <code>ping</code> requests (those that response with HTTP 5xx)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Total, communicative number of successful <code>ping</code> requests
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The mean response time for <code>ping</code> requests
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Throughput of <code>ping</code> requests in requests per second
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Longest response time of <code>ping</code> requests
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The most recent response time for a <code>ping</code> request (to highlight the variance that
+                            would be smoothed by showing mean response times above)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Total, communicative response time for all <code>ping</code> requests
+                        </p>
+                    </li>
+                </ul>
+                
+                <p>
+                    In addition, we would also like to
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Reset the counters at any time
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Allow counter retrieval and reset from distributed machine
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Allow a sliding window implementation to better highlight rapid trend changes
+                        </p>
+                    </li>
+                </ul>
+
+                <p>
+                    For the purpose of this exercise, we're not interested in measuring requests statistics from the
+                    client and as such aren't interested in non-server side errors that can not response with an HTTP
+                    error code of 5xx. For example, we're not interested in time out of connection failures.
+                </p>
+            </subsection>
+
+        </section>
+
+    </body>
+
+</document>

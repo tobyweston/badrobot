@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2009-2010, bad robot (london) ltd                         
+  ~                                                                         
+  ~ Licensed under the Apache License, Version 2.0 (the "License");         
+  ~ you may not use this file except in compliance with the License.        
+  ~ You may obtain a copy of the License at                                 
+  ~                                                                         
+  ~      http://www.apache.org/licenses/LICENSE-2.0                         
+  ~                                                                         
+  ~ Unless required by applicable law or agreed to in writing, software     
+  ~ distributed under the License is distributed on an "AS IS" BASIS,       
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and     
+  ~ limitations under the License.
+  -->
+
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+    <properties>
+        <title>Introduction</title>
+        <author>Toby Weston</author>
+    </properties>
+
+    <body>
+
+        <section name="Introduction">
+
+            <subsection name="Abstract">
+                <p>
+                    In shared memory models, multiple concurrent processes may compete for access to common memory and
+                    so must provide ways to protect the integrity of that shared memory. The concurrency control
+                    mechanisms to achieve this can be categorised as either optimistic in nature or pessimistic.
+                    Languages such as Java have typically offered pessimistic approaches; guarded memory that requires a
+                    lot of effort from the developer, is difficult to prove as correct and is often difficult to
+                    implement and still maintain good object oriented principles. Optimistic mechanisms promise to
+                    simplify the development process but as a relatively new approach have had little mainstream
+                    adoption.
+                </p>
+                <p>
+                    As the acceleration of processor power predicted by Moore's Law reaches its peak, the utilisation of
+                    multi-core processors predicted by Amdahl's Law becomes more and more important. The current trend
+                    towards functional / object oriented hybrid languages and their impact on concurrent programming, it
+                    seems obvious that concurrency is set to be an even bigger part of modern software development.
+                    Concurrent programming has always been difficult, mostly because of the traditional shared memory
+                    model. This paper aims to explore the problem, describing characteristics of concurrency control in
+                    shared memory systems, comparing optimistic and pessimistic approaches using a real world example
+                    and attempting to comment of the current state and appropriateness of technology choices.
+                </p>
+            </subsection>
+
+            <subsection name="Goals">
+                <ul>
+                    <li>
+                        <p>
+                            Describe the shared memory model and appropriate concurrency control mechanisms.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Present alternative implementations of a common concurrency problem; a typical pessimistic,
+                            lock based synchronisation solution and a optimistic, software transactional memory based
+                            solution.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Demonstrate a real-world usage examples, to help better understand the concurrency control
+                            mechanisms and provide a reference to interested readers.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Present conclusions / experience report.
+                        </p>
+                    </li>
+                </ul>
+            </subsection>
+        </section>
+
+    </body>
+
+</document>
