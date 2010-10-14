@@ -17,9 +17,6 @@
 package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.server.Server;
-import org.simpleframework.http.Request;
-import org.simpleframework.http.Response;
-import org.simpleframework.http.core.Container;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 import org.simpleframework.util.thread.Scheduler;
@@ -51,10 +48,4 @@ public class SimpleServer implements Server {
         new SimpleServer().start();
     }
 
-    private static class SerialContainer implements Container {
-        public void handle(Request request, Response response) {
-            System.out.printf("Handler thread %s%n", Thread.currentThread().getName());
-            new HelloWorld().hello(request, response);
-        }
-    }
 }

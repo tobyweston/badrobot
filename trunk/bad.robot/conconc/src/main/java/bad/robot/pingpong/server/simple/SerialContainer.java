@@ -20,22 +20,10 @@ import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 
-import java.util.concurrent.Executor;
-
-class AsynchronousContainer implements Container {
-
-    private final Executor scheduler;
-
-    public AsynchronousContainer(Executor scheduler) {
-        this.scheduler = scheduler;
-    }
-
-    public void handle(final Request request, final Response response) {
+class SerialContainer implements Container {
+    
+    public void handle(Request request, Response response) {
         System.out.printf("Handler thread %s%n", Thread.currentThread().getName());
-        scheduler.execute(new Runnable() {
-            public void run() {
-                new HelloWorld().hello(request, response);
-            }
-        });
+        new HelloWorld().hello(request, response);
     }
 }
