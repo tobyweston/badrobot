@@ -30,7 +30,7 @@ class HelloWorld extends GrizzlyAdapter {
         try {
             response.getWriter().println(format("hello world (%s)", request.getMethod()));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 }
