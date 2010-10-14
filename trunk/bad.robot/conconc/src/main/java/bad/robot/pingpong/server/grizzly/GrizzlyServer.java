@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.server;
+package bad.robot.pingpong.server.grizzly;
 
-import com.sun.grizzly.http.Management;
+import bad.robot.pingpong.server.Server;
 import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
-import com.sun.grizzly.tcp.http11.GrizzlyRequest;
-import com.sun.grizzly.tcp.http11.GrizzlyResponse;
-import org.apache.commons.modeler.Registry;
 
-import javax.management.ObjectName;
 import java.io.IOException;
-
-import static java.lang.String.format;
 
 public class GrizzlyServer implements Server {
 
@@ -51,24 +44,4 @@ public class GrizzlyServer implements Server {
         new GrizzlyServer().start();
     }
 
-    private static class JmxManager implements Management {
-        public void registerComponent(Object bean, ObjectName objectName, String type) throws Exception {
-            Registry.getRegistry().registerComponent(bean, objectName, type);
-        }
-
-        public void unregisterComponent(ObjectName objectName) throws Exception {
-            Registry.getRegistry().unregisterComponent(objectName);
-        }
-    }
-
-    private static class HelloWorld extends GrizzlyAdapter {
-        @Override
-        public void service(GrizzlyRequest request, GrizzlyResponse response) {
-            try {
-                response.getWriter().println(format("hello world (%s)", request.getMethod()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }
