@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.server;
+package bad.robot.pingpong.server.simple;
 
+import bad.robot.pingpong.server.Server;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
 import org.simpleframework.http.core.Container;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
+import org.simpleframework.util.thread.Scheduler;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
 public class SimpleServer implements Server {
 
-    private Connection connection;
+    private final Connection connection;
+    private final Scheduler scheduler = new Scheduler(5);
 
     public SimpleServer() throws IOException {
-        connection = new SocketConnection(new HelloWorld());
+        connection = new SocketConnection(new AsynchronousContainer(scheduler));
     }
 
     public void start() throws IOException {
@@ -42,34 +44,17 @@ public class SimpleServer implements Server {
 
     public void stop() throws IOException {
         connection.close();
-    }
-
-    public static class HelloWorld implements Container {
-
-        public void handle(Request request, Response response) {
-            PrintStream body = null;
-            try {
-                body = response.getPrintStream();
-                long time = System.currentTimeMillis();
-
-                response.set("Content-Type", "text/plain");
-                response.set("Server", "HelloWorld/1.0 (Simple 4.0)");
-                response.setDate("Date", time);
-                response.setDate("Last-Modified", time);
-
-                body.println("Hello World");
-
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
-            } finally {
-                if (body != null)
-                    body.close();
-            }
-        }
+        scheduler.stop();
     }
 
     public static void main(String... args) throws IOException {
         new SimpleServer().start();
+    }
+
+    private static class SerialContainer implements Container {
+        public void handle(Request request, Response response) {
+            System.out.printf("Handler thread %s%n", Thread.currentThread().getName());
+            new HelloWorld().hello(request, response);
+        }
     }
 }
