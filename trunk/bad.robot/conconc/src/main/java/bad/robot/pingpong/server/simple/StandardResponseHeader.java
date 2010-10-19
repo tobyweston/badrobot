@@ -16,28 +16,29 @@
 
 package bad.robot.pingpong.server.simple;
 
-import org.simpleframework.http.Request;
+import bad.robot.pingpong.transport.ResponseCode;
 import org.simpleframework.http.Response;
-import org.simpleframework.http.core.Container;
 
-import java.util.concurrent.Executor;
+import java.util.Date;
 
-class AsynchronousContainer implements Container {
+import static com.google.code.tempusfugit.temporal.DefaultClock.now;
 
-    private final Executor scheduler;
-    private final Container delegate;
+public class StandardResponseHeader implements ResponseHeaderSetter {
 
-    public AsynchronousContainer(Executor scheduler, Container delegate) {
-        this.scheduler = scheduler;
-        this.delegate = delegate;
+    private StandardResponseHeader() {
     }
 
-    public void handle(final Request request, final Response response) {
-        System.out.printf("Handler thread %s%n", Thread.currentThread().getName());
-        scheduler.execute(new Runnable() {
-            public void run() {
-                delegate.handle(request, response);
-            }
-        });
+    public static StandardResponseHeader standardResponseHeaders() {
+        return new StandardResponseHeader();
     }
+
+    @Override
+    public void setOn(Response response, ResponseCode code) {
+        Date now = now().create();
+        response.set("Content-Type", "text/plain");
+        response.set("Server", "PingPong/1.0");
+        response.setDate("Date", now.getTime());
+        response.setDate("Last-Modified", now.getTime());
+    }
+
 }

@@ -16,41 +16,38 @@
 
 package bad.robot.pingpong.server.simple;
 
+import bad.robot.pingpong.UncheckedException;
+import bad.robot.pingpong.server.StandardPing;
 import com.google.code.tempusfugit.temporal.StopWatch;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
+import org.simpleframework.http.core.Container;
 
 import java.io.IOException;
 import java.io.PrintStream;
 
+import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
+import static bad.robot.pingpong.transport.ResponseCode.OK;
 import static com.google.code.tempusfugit.temporal.DefaultClock.now;
-import static com.google.code.tempusfugit.temporal.Duration.seconds;
-import static com.google.code.tempusfugit.temporal.StopWatch.start;
-import static com.google.code.tempusfugit.temporal.Timeout.timeout;
-import static com.google.code.tempusfugit.temporal.WaitFor.waitUntil;
 
-class HelloWorld {
+class Ping implements Container {
 
-    public void hello(Request request, Response response) {
+    @Override
+    public void handle(Request request, Response response) {
         PrintStream body = null;
         try {
+            StopWatch watch = StopWatch.start(now());
+            standardResponseHeaders().setOn(response, OK);
             body = response.getPrintStream();
-            StopWatch watch = start(now());
-            response.set("Content-Type", "text/plain");
-            response.set("Server", "HelloWorld/1.0 (Simple 4.0)");
-            response.setDate("Date", watch.markAndGetTotalElapsedTime().inMillis());
-            waitUntil(timeout(seconds(10)));
-            response.setDate("Last-Modified", watch.markAndGetTotalElapsedTime().inMillis());
-            body.printf("Hello World (took %dms)%n", response.getDate("Last-Modified"));
+            body.print(new StandardPing().ping());
             System.out.printf("Processed on %s, after %s%n", Thread.currentThread().getName(), watch.markAndGetTotalElapsedTime());
         }
         catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedException(e);
         } finally {
             if (body != null)
                 body.close();
         }
     }
+
 }

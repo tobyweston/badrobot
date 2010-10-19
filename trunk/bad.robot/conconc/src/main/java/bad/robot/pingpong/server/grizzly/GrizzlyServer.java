@@ -26,7 +26,7 @@ public class GrizzlyServer implements Server {
     private final GrizzlyWebServer server = new GrizzlyWebServer(8080, "pingpong");
 
     public GrizzlyServer() {
-        server.addGrizzlyAdapter(new HelloWorld(), new String[]{"/"});
+        server.addGrizzlyAdapter(new Ping(), new String[]{"/"});
         server.enableJMX(new JmxManager());
         server.getStatistics().startGatheringStatistics();
         

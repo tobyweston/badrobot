@@ -14,23 +14,8 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.server.grizzly;
+package bad.robot.pingpong.server;
 
-import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
-import com.sun.grizzly.tcp.http11.GrizzlyRequest;
-import com.sun.grizzly.tcp.http11.GrizzlyResponse;
-
-import java.io.IOException;
-
-import static java.lang.String.format;
-
-class HelloWorld extends GrizzlyAdapter {
-    @Override
-    public void service(GrizzlyRequest request, GrizzlyResponse response) {
-        try {
-            response.getWriter().println(format("hello world (%s)", request.getMethod()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+public interface Ping {
+    String ping();
 }
