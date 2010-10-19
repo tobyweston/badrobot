@@ -16,36 +16,74 @@
 
 package bad.robot.pingpong.server.simple;
 
+import bad.robot.pingpong.UncheckedException;
+import bad.robot.pingpong.instrument.InstrumentingThreadFactory;
+import bad.robot.pingpong.memory.shared.pessimistic.GuardedThreadStatistics;
 import bad.robot.pingpong.server.Server;
+import org.simpleframework.http.Address;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.simpleframework.http.resource.Resource;
+import org.simpleframework.http.resource.ResourceContainer;
+import org.simpleframework.http.resource.ResourceEngine;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
-import org.simpleframework.util.thread.Scheduler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
+import java.util.concurrent.ExecutorService;
+
+import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
+import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class SimpleServer implements Server {
 
     private final Connection connection;
-    private final Scheduler scheduler = new Scheduler(5);
+    private final ExecutorService threads = newFixedThreadPool(5, new InstrumentingThreadFactory(new GuardedThreadStatistics()));
 
     public SimpleServer() throws IOException {
-        connection = new SocketConnection(new AsynchronousContainer(scheduler));
+        connection = new SocketConnection(new AsynchronousContainer(threads, new ResourceContainer(new ResourceEngine() {
+            @Override
+            public Resource resolve(Address target) {
+                if (target.getPath().getPath().equals("/pingpong"))
+                    return new PingResource();
+                return new NotFoundResource();
+            }
+        })));
     }
 
     public void start() throws IOException {
-        SocketAddress address = new InetSocketAddress(8080);
-        connection.connect(address);
+        connection.connect(new InetSocketAddress(8080));
     }
 
     public void stop() throws IOException {
         connection.close();
-        scheduler.stop();
+        threads.shutdown();
     }
 
     public static void main(String... args) throws IOException {
         new SimpleServer().start();
+    }
+
+    private static class NotFoundResource implements Resource {
+        @Override
+        public void handle(Request request, Response response) {
+            try {
+                standardResponseHeaders().setOn(response, NOT_FOUND);
+                response.close();
+            } catch (IOException e) {
+                throw new UncheckedException();
+            }
+        }
+
+    }
+
+    private static class PingResource implements Resource {
+        @Override
+        public void handle(Request request, Response response) {
+            new Ping().handle(request, response);
+        }
     }
 
 }

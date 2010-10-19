@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.server.simple;
+package bad.robot.pingpong.server.grizzly;
 
-import org.simpleframework.http.Request;
-import org.simpleframework.http.Response;
-import org.simpleframework.http.core.Container;
+import bad.robot.pingpong.server.StandardPing;
+import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
+import com.sun.grizzly.tcp.http11.GrizzlyRequest;
+import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 
-class SerialContainer implements Container {
-    
-    public void handle(Request request, Response response) {
-        System.out.printf("Handler thread %s%n", Thread.currentThread().getName());
-        new HelloWorld().hello(request, response);
+import java.io.IOException;
+
+class Ping extends GrizzlyAdapter {
+    @Override
+    public void service(GrizzlyRequest request, GrizzlyResponse response) {
+        try {
+            response.getWriter().print(new StandardPing().ping());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
