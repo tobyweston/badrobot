@@ -35,6 +35,7 @@ public class StandardResponseHeader implements ResponseHeaderSetter {
     @Override
     public void setOn(Response response, ResponseCode code) {
         Date now = now().create();
+        response.setCode(code.getCode());
         response.set("Content-Type", "text/plain");
         response.set("Server", "PingPong/1.0");
         response.setDate("Date", now.getTime());
