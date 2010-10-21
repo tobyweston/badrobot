@@ -17,17 +17,23 @@
 package bad.robot.pingpong.server;
 
 import bad.robot.pingpong.server.simple.SimpleServer;
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.net.www.http.HttpClient;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.List;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static bad.robot.pingpong.Matchers.hasContent;
+import static bad.robot.pingpong.Matchers.hasStatus;
+import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
+import static bad.robot.pingpong.transport.ResponseCode.OK;
+import static org.junit.Assert.assertThat;
 
 public class PingIntegrationTest {
 
@@ -40,17 +46,25 @@ public class PingIntegrationTest {
     }
 
     @Test
-    public void shouldPing() throws IOException {
-        HttpClient http = HttpClient.New(new URL("http://localhost:8080"));
-        InputStream stream = http.getInputStream();
-        OutputStream output = http.getOutputStream();
-        IOUtils.write("hello", output);
-        List response = IOUtils.readLines(stream);
-        System.out.println(response.size());
+    public void shouldPong() throws IOException, URISyntaxException {
+        HttpGet get = new HttpGet(new URI("http://localhost:8080/pingpong"));
+        HttpClient http = new DefaultHttpClient();
+        HttpResponse response = http.execute(get);
+        assertThat(response, hasStatus(OK));
+        assertThat(response, hasContent("pong"));
     }
-    
+
+    @Test
+    public void shouldReturn404NotFound() throws IOException, URISyntaxException {
+        HttpGet get = new HttpGet(new URI("http://localhost:8080/not/found"));
+        HttpClient http = new DefaultHttpClient();
+        HttpResponse response = http.execute(get);
+        assertThat(response, hasStatus(NOT_FOUND));
+    }
+
     @After
     public void stop() throws IOException {
         server.stop();
     }
+
 }
