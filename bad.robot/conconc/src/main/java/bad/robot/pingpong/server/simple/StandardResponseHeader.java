@@ -21,8 +21,6 @@ import org.simpleframework.http.Response;
 
 import java.util.Date;
 
-import static com.google.code.tempusfugit.temporal.DefaultClock.now;
-
 public class StandardResponseHeader implements ResponseHeaderSetter {
 
     private StandardResponseHeader() {
@@ -34,7 +32,7 @@ public class StandardResponseHeader implements ResponseHeaderSetter {
 
     @Override
     public void setOn(Response response, ResponseCode code) {
-        Date now = now().create();
+        Date now = new Date();
         response.setCode(code.getCode());
         response.set("Content-Type", "text/plain");
         response.set("Server", "PingPong/1.0");
