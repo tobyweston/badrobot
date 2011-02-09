@@ -18,6 +18,7 @@ package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.UncheckedException;
 import bad.robot.pingpong.server.StandardPing;
+import com.google.code.tempusfugit.temporal.DefaultDateFactory;
 import com.google.code.tempusfugit.temporal.StopWatch;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -28,7 +29,6 @@ import java.io.PrintStream;
 
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
 import static bad.robot.pingpong.transport.ResponseCode.OK;
-import static com.google.code.tempusfugit.temporal.DefaultClock.now;
 
 class Ping implements Container {
 
@@ -36,7 +36,7 @@ class Ping implements Container {
     public void handle(Request request, Response response) {
         PrintStream body = null;
         try {
-            StopWatch watch = StopWatch.start(now());
+            StopWatch watch = StopWatch.start(new DefaultDateFactory());
             standardResponseHeaders().setOn(response, OK);
             body = response.getPrintStream();
             body.print(new StandardPing().ping());
