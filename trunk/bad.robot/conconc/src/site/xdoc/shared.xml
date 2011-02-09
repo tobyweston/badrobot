@@ -43,7 +43,7 @@
 
             <subsection name="Alternatives">
                 <p>
-                    Distributed Memory is the idea in multi-core processors (or in single-core multiple processor
+                    Distributed Memory is the idea that in multi-core processors (or in single-core multiple processor
                     systems), each core/processor has local memory and works on it with exclusivity. If a task is
                     required to collaborate with other core's memory, it must communicate with them as an external
                     resource.

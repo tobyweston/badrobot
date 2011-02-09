@@ -50,14 +50,15 @@
                 <blockquote>
                     "Given a new web-application, we would like to record request statistics against specific services
                     so that we can understand typical response times and set achievable service level agreements with
-                    my customer."
+                    customers."
                 </blockquote>
             </subsection>
 
             <subsection name="The Ping Server">
                 <p>
-                    The web-application that we're interested in is called <i>PingPong</i> represents a server that
-                    responds to HTTP requests the URL <code>/ping</code> with a HTTP message of 200 OK.
+                    The web-application that we're interested in is called <i>PingPong</i>. It is a server that
+                    responds to HTTP <code>GET</code> requests to the URL <code>/ping</code> with a HTTP message of 200
+                    OK.
                 </p>
                 <p>
                     Expanding the problem description, we'd like to record the following information about requests
@@ -129,8 +130,8 @@
 
                 <p>
                     For the purpose of this exercise, we're not interested in measuring requests statistics from the
-                    client and as such aren't interested in non-server side errors that can not response with an HTTP
-                    error code of 5xx. For example, we're not interested in time out of connection failures.
+                    client or non-server side generated errors (errors that can not be represented by the server with
+                    HTTP 5xx error codes). For example, we're not interested in timeout of connection failures.
                 </p>
             </subsection>
 
