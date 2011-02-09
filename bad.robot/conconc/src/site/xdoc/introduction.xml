@@ -42,13 +42,18 @@
                 </p>
                 <p>
                     As the acceleration of processor power predicted by Moore's Law reaches its peak, the utilisation of
-                    multi-core processors predicted by Amdahl's Law becomes more and more important. The current trend
+                    multi-core processors predicted by Amdahl's Law becomes more and more important. With the current trend
                     towards functional / object oriented hybrid languages and their impact on concurrent programming, it
                     seems obvious that concurrency is set to be an even bigger part of modern software development.
                     Concurrent programming has always been difficult, mostly because of the traditional shared memory
                     model. This paper aims to explore the problem, describing characteristics of concurrency control in
                     shared memory systems, comparing optimistic and pessimistic approaches using a real world example
                     and attempting to comment of the current state and appropriateness of technology choices.
+                </p>
+                <p>
+                    Distributed models avoid contention as they don't actually share memory, each process works on its
+                    own local heap. Other techniques such as the actor model or message passing effectively
+                    simulate a distributed model and so are out of scope for this discussion.
                 </p>
             </subsection>
 
