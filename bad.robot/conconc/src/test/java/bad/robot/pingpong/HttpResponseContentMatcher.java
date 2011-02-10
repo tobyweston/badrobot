@@ -38,9 +38,7 @@ public class HttpResponseContentMatcher extends TypeSafeMatcher<HttpResponse> {
     @Override
     public boolean matchesSafely(HttpResponse response) {
         try {
-            String string = IOUtils.toString(response.getEntity().getContent());
-            System.out.println("\"" + string + "\"");
-            return content.equals(string);
+            return content.equals(IOUtils.toString(response.getEntity().getContent()));
         } catch (IOException e) {
             return false;
         }
