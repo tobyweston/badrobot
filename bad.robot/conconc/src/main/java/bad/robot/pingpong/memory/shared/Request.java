@@ -19,6 +19,6 @@ package bad.robot.pingpong.memory.shared;
 
 public interface Request {
 
-    void increment(Counter counter);
+    void increment(Counter<?> counter);
     
 }

@@ -5,57 +5,57 @@ import org.junit.Test;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public class GuardedThreadStatisticsTest {
+public class GuardedThreadCounterTest {
 
-    private final GuardedThreadStatistics statistics = new GuardedThreadStatistics();
+    private final GuardedThreadCounter counter = new GuardedThreadCounter();
 
     @Test
     public void shouldInitialiseThreadCounts() {
-        assertThat(statistics.getActiveThreads(), is(0L));
+        assertThat(counter.getActiveThreads(), is(0L));
     }
 
     @Test
     public void shouldIncrementActiveThreadCount() {
         incrementActiveThreads(by(3));
-        assertThat(statistics.getActiveThreads(), is(3L));
+        assertThat(counter.getActiveThreads(), is(3L));
     }
 
     @Test
     public void shouldIncrementThreadCount() {
         incrementThreads(by(4));
-        assertThat(statistics.getThreadCount(), is(4L));
+        assertThat(counter.getThreadCount(), is(4L));
     }
 
     @Test
     public void shouldDecrementActiveThreadCount() {
         incrementActiveThreads(by(5));
-        assertThat(statistics.getActiveThreads(), is(5L));
+        assertThat(counter.getActiveThreads(), is(5L));
         decrementActiveThreads(by(5));
-        assertThat(statistics.getActiveThreads(), is(0L));
+        assertThat(counter.getActiveThreads(), is(0L));
     }
 
     @Test
     public void shouldResetCounts() {
         incrementActiveThreads(by(8));
         incrementThreads(by(5));
-        statistics.reset();
-        assertThat(statistics.getActiveThreads(), is(0L));
-        assertThat(statistics.getThreadCount(), is(0L));
+        counter.reset();
+        assertThat(counter.getActiveThreads(), is(0L));
+        assertThat(counter.getThreadCount(), is(0L));
     }
 
     private void incrementActiveThreads(int by) {
         for (int i = 0; i < by; i++)
-            statistics.incrementActiveThreads();
+            counter.incrementActiveThreads();
     }
 
     private void decrementActiveThreads(int by)  {
         for (int i = 0; i < by; i++)
-            statistics.decrementActiveThreads();
+            counter.decrementActiveThreads();
     }
 
     private void incrementThreads(int by)  {
         for (int i = 0; i < by; i++)
-            statistics.incrementThreadCount();
+            counter.incrementThreadCount();
     }
 
     private static int by(int count) {

@@ -14,29 +14,21 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.memory.shared.pessimistic;
+package bad.robot.pingpong.memory.shared;
 
-import bad.robot.pingpong.memory.shared.Counter;
+@Shared
+public interface ThreadCounter {
 
-import java.util.concurrent.atomic.AtomicLong;
+    long getActiveThreads();
 
-public abstract class LongCounter implements Counter<Long> {
+    long getThreadCount();
 
-    private static AtomicLong value = new AtomicLong();
+    void reset();
 
-    public void increment() {
-        value.incrementAndGet();
-    }
+    void incrementActiveThreads();
 
-    public void decrement() {
-        value.decrementAndGet();
-    }
+    void decrementActiveThreads();
 
-    public Long get() {
-        return value.get();
-    }
+    void incrementThreadCount();
 
-    public void reset() {
-        value = new AtomicLong();
-    }
 }

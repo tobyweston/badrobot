@@ -16,15 +16,15 @@
 
 package bad.robot.pingpong.instrument;
 
-import bad.robot.pingpong.memory.shared.ThreadStatistics;
+import bad.robot.pingpong.memory.shared.ThreadCounter;
 
 import java.util.concurrent.ThreadFactory;
 
 public class InstrumentingThreadFactory implements ThreadFactory {
 
-    private final ThreadStatistics statistics;
+    private final ThreadCounter statistics;
 
-    public InstrumentingThreadFactory(ThreadStatistics statistics) {
+    public InstrumentingThreadFactory(ThreadCounter statistics) {
         this.statistics = statistics;
     }
 

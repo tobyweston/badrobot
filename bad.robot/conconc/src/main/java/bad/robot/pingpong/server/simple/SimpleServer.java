@@ -18,7 +18,7 @@ package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.UncheckedException;
 import bad.robot.pingpong.instrument.InstrumentingThreadFactory;
-import bad.robot.pingpong.memory.shared.pessimistic.GuardedThreadStatistics;
+import bad.robot.pingpong.memory.shared.pessimistic.GuardedThreadCounter;
 import bad.robot.pingpong.server.Server;
 import org.simpleframework.http.Address;
 import org.simpleframework.http.Request;
@@ -40,7 +40,7 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 public class SimpleServer implements Server {
 
     private final Connection connection;
-    private final ExecutorService threads = newFixedThreadPool(5, new InstrumentingThreadFactory(new GuardedThreadStatistics()));
+    private final ExecutorService threads = newFixedThreadPool(5, new InstrumentingThreadFactory(new GuardedThreadCounter()));
 
     public SimpleServer() throws IOException {
         connection = new SocketConnection(new AsynchronousContainer(threads, new ResourceContainer(new ResourceEngine() {
