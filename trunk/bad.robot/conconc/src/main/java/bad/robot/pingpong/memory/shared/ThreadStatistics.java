@@ -21,8 +21,6 @@ public interface ThreadStatistics {
 
     long getActiveThreads();
 
-    long getFinishedThreads();
-
     long getThreadCount();
 
     void reset();

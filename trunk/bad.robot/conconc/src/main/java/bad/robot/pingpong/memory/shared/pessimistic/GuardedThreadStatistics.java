@@ -19,32 +19,39 @@ package bad.robot.pingpong.memory.shared.pessimistic;
 import bad.robot.pingpong.memory.shared.ThreadStatistics;
 
 public class GuardedThreadStatistics implements ThreadStatistics {
-    
-    public long getActiveThreads() {
-        return 0;
-    }
 
-    public long getFinishedThreads() {
-        return 0;
-    }
+    private long activeThreads;
+    private long threadCount;
 
-    public long getThreadCount() {
-        return 0;
-    }
-
-    public void reset() {
-
-    }
-
+    @Override
     public void incrementActiveThreads() {
-
+        activeThreads++;
     }
 
+    @Override
     public void decrementActiveThreads() {
-
+        activeThreads--;
     }
 
+    @Override
     public void incrementThreadCount() {
-
+        threadCount++;
     }
+
+    @Override
+    public long getActiveThreads() {
+        return activeThreads;
+    }
+
+    @Override
+    public long getThreadCount() {
+        return threadCount;
+    }
+
+    @Override
+    public void reset() {
+        threadCount = 0;
+        activeThreads = 0;
+    }
+
 }
