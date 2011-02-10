@@ -23,7 +23,7 @@ public interface Counter<T> {
 
     void decrement();
 
-    T get();
+    Long get();
 
     void reset();
 

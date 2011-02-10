@@ -16,42 +16,48 @@
 
 package bad.robot.pingpong.memory.shared.pessimistic;
 
-import bad.robot.pingpong.memory.shared.ThreadStatistics;
+import bad.robot.pingpong.memory.shared.ThreadCounter;
+import com.google.code.tempusfugit.concurrency.annotations.Not;
+import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
-public class GuardedThreadStatistics implements ThreadStatistics {
+import java.util.concurrent.atomic.AtomicLong;
 
-    private long activeThreads;
-    private long threadCount;
+@Not(ThreadSafe.class)
+public class GuardedThreadCounter implements ThreadCounter {
+
+    private final AtomicLong activeThreads = new AtomicLong();
+    private final AtomicLong threadCount = new AtomicLong();
 
     @Override
     public void incrementActiveThreads() {
-        activeThreads++;
+        activeThreads.getAndIncrement();
     }
 
     @Override
     public void decrementActiveThreads() {
-        activeThreads--;
+        activeThreads.getAndDecrement();
     }
 
     @Override
     public void incrementThreadCount() {
-        threadCount++;
+        threadCount.getAndIncrement();
     }
 
     @Override
     public long getActiveThreads() {
-        return activeThreads;
+        return activeThreads.get();
     }
 
     @Override
     public long getThreadCount() {
-        return threadCount;
+        return threadCount.get();
     }
 
     @Override
     public void reset() {
-        threadCount = 0;
-        activeThreads = 0;
+        threadCount.set(0);
+        activeThreads.set(0);
     }
+
 
 }

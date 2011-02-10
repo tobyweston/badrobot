@@ -1,6 +1,6 @@
 package bad.robot.pingpong.instrument;
 
-import bad.robot.pingpong.memory.shared.ThreadStatistics;
+import bad.robot.pingpong.memory.shared.ThreadCounter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
@@ -11,7 +11,7 @@ import org.junit.runner.RunWith;
 public class InstrumentingThreadFactoryTest {
 
     private final Mockery context = new Mockery();
-    private final ThreadStatistics statistics = context.mock(ThreadStatistics.class);
+    private final ThreadCounter statistics = context.mock(ThreadCounter.class);
     private final InstrumentingThreadFactory factory = new InstrumentingThreadFactory(statistics);
 
     @Test
