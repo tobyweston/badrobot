@@ -1,16 +1,16 @@
 package bad.robot.pingpong;
 
-import com.google.code.tempusfugit.concurrency.ThreadUtils;
-
-import java.util.Random;
-
+import static bad.robot.pingpong.UpTo.upTo;
+import static com.google.code.tempusfugit.concurrency.ThreadUtils.sleep;
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 
 public class Introduce {
 
-    private static final Random random = new Random();
-
     public static void jitter() {
-        ThreadUtils.sleep(millis(random.nextInt(5)));
+        jitter(upTo(millis(5)));
+    }
+
+    public static void jitter(UpTo upTo) {
+        sleep(upTo.duration());
     }
 }

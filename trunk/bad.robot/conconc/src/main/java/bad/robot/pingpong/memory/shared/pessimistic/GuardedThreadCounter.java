@@ -16,31 +16,72 @@
 
 package bad.robot.pingpong.memory.shared.pessimistic;
 
+import bad.robot.pingpong.UncheckedException;
 import bad.robot.pingpong.memory.shared.ThreadCounter;
+import com.google.code.tempusfugit.concurrency.Callable;
+import com.google.code.tempusfugit.concurrency.Interruptible;
 import com.google.code.tempusfugit.concurrency.annotations.Not;
 import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.google.code.tempusfugit.concurrency.ExecuteUsingLock.execute;
+import static com.google.code.tempusfugit.concurrency.ThreadUtils.resetInterruptFlagWhen;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Not(ThreadSafe.class)
 public class GuardedThreadCounter implements ThreadCounter {
 
     private final AtomicLong activeThreads = new AtomicLong();
     private final AtomicLong threadCount = new AtomicLong();
+    private final Lock lock = new ReentrantLock();
+
+    private final Callable<Long, UncheckedException> incrementActiveThreads = new Callable<Long, UncheckedException>() {
+        @Override
+        public Long call() throws UncheckedException {
+            return activeThreads.getAndIncrement();
+        }
+    };
+
+    private Callable<Long, UncheckedException> decrementActiveThreads = new Callable<Long, UncheckedException>() {
+        @Override
+        public Long call() throws UncheckedException {
+            return activeThreads.getAndDecrement();
+        }
+    };
+
+    private final Callable<Void, UncheckedException> incrementCreatedThreads = new Callable<Void, UncheckedException>() {
+        @Override
+        public Void call() throws UncheckedException {
+            threadCount.getAndIncrement();
+            return null;
+        }
+    };
+
+    private final Callable<Boolean, UncheckedException> reset = new Callable<Boolean, UncheckedException>() {
+        @Override
+        public Boolean call() throws UncheckedException {
+            threadCount.set(0);
+            activeThreads.set(0);
+            return true;
+        }
+    };
 
     @Override
     public void incrementActiveThreads() {
-        activeThreads.getAndIncrement();
+        execute(incrementActiveThreads).using(lock);
     }
 
     @Override
     public void decrementActiveThreads() {
-        activeThreads.getAndDecrement();
+        execute(decrementActiveThreads).using(lock);
     }
 
     @Override
-    public void incrementThreadCount() {
-        threadCount.getAndIncrement();
+    public void incrementCreatedThreads() {
+        execute(incrementCreatedThreads).using(lock);
     }
 
     @Override
@@ -55,8 +96,17 @@ public class GuardedThreadCounter implements ThreadCounter {
 
     @Override
     public void reset() {
-        threadCount.set(0);
-        activeThreads.set(0);
+        if (acquired(lock))
+            execute(reset).using(lock);
+    }
+
+    private static Boolean acquired(final Lock lock) {
+        return resetInterruptFlagWhen(new Interruptible<Boolean>() {
+            @Override
+            public Boolean call() throws InterruptedException {
+                return lock.tryLock(10, MILLISECONDS);
+            }
+        });
     }
 
 
