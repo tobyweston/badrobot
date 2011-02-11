@@ -1,5 +1,4 @@
 /*
-
  * Copyright (c) 2009-2011, bad robot (london) ltd
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
