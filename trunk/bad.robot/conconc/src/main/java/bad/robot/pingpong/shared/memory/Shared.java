@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.memory.shared;
+package bad.robot.pingpong.shared.memory;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
@@ -25,7 +25,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Instances of {@link bad.robot.pingpong.memory.shared.Shared} require some form of concurrency
+ * Instances of {@link bad.robot.pingpong.shared.memory.Shared} require some form of concurrency
  * control to ensure that they can be updated and read in a concurrent context whilst maintaining
  * data integrity and invariants.
  */

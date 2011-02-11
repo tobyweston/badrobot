@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.memory.shared.pessimistic;
+package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.UncheckedException;
-import bad.robot.pingpong.memory.shared.ThreadCounter;
 import com.google.code.tempusfugit.concurrency.Callable;
 import com.google.code.tempusfugit.concurrency.Interruptible;
 import com.google.code.tempusfugit.concurrency.annotations.Not;
@@ -32,7 +31,7 @@ import static com.google.code.tempusfugit.concurrency.ThreadUtils.resetInterrupt
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Not(ThreadSafe.class)
-public class GuardedThreadCounter implements ThreadCounter {
+public class GuardedThreadCounter implements bad.robot.pingpong.shared.memory.ThreadCounter {
 
     private final AtomicLong activeThreads = new AtomicLong();
     private final AtomicLong threadCount = new AtomicLong();

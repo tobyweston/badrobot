@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.memory.shared;
+package bad.robot.pingpong.shared.memory;
 
-@Shared
-public interface Counter<T> {
 
-    void increment();
+public interface Request {
 
-    void decrement();
-
-    Long get();
-
-    void reset();
-
+    void increment(Counter<?> counter);
+    
 }

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.instrument;
+package bad.robot.pingpong.instrumentation.threads;
 
-import bad.robot.pingpong.memory.shared.ThreadCounter;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 
 import java.util.concurrent.ThreadFactory;
 

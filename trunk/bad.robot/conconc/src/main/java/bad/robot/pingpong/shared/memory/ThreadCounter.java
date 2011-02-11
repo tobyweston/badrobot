@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.memory.shared;
+package bad.robot.pingpong.shared.memory;
 
+@Shared
+@Deprecated
+public interface ThreadCounter {
 
-public interface Request {
+    long getActiveThreads();
 
-    void increment(Counter<?> counter);
-    
+    long getThreadCount();
+
+    void reset();
+
+    void incrementActiveThreads();
+
+    void decrementActiveThreads();
+
+    void incrementCreatedThreads();
+
 }

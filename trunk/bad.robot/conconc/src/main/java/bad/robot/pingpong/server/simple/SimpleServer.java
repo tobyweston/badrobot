@@ -17,9 +17,9 @@
 package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.UncheckedException;
-import bad.robot.pingpong.instrument.InstrumentingThreadFactory;
-import bad.robot.pingpong.memory.shared.pessimistic.GuardedThreadCounter;
+import bad.robot.pingpong.instrumentation.threads.InstrumentingThreadFactory;
 import bad.robot.pingpong.server.Server;
+import bad.robot.pingpong.shared.memory.pessimistic.GuardedThreadCounter;
 import org.simpleframework.http.Address;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
