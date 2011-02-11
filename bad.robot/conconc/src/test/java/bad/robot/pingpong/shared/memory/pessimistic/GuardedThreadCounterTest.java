@@ -1,4 +1,4 @@
-package bad.robot.pingpong.memory.shared.pessimistic;
+package bad.robot.pingpong.shared.memory.pessimistic;
 
 import org.junit.Test;
 

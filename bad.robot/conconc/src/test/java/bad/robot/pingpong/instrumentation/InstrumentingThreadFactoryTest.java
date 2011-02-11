@@ -1,6 +1,7 @@
-package bad.robot.pingpong.instrument;
+package bad.robot.pingpong.instrumentation;
 
-import bad.robot.pingpong.memory.shared.ThreadCounter;
+import bad.robot.pingpong.instrumentation.threads.InstrumentingThreadFactory;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
