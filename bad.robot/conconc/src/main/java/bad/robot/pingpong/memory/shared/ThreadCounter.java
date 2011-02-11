@@ -29,6 +29,6 @@ public interface ThreadCounter {
 
     void decrementActiveThreads();
 
-    void incrementThreadCount();
+    void incrementCreatedThreads();
 
 }

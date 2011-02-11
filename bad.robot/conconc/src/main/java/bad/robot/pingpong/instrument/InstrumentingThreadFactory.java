@@ -22,24 +22,24 @@ import java.util.concurrent.ThreadFactory;
 
 public class InstrumentingThreadFactory implements ThreadFactory {
 
-    private final ThreadCounter statistics;
+    private final ThreadCounter counter;
 
-    public InstrumentingThreadFactory(ThreadCounter statistics) {
-        this.statistics = statistics;
+    public InstrumentingThreadFactory(ThreadCounter counter) {
+        this.counter = counter;
     }
 
     public Thread newThread(final Runnable runnable) {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
-                    statistics.incrementActiveThreads();
+                    counter.incrementActiveThreads();
                     runnable.run();
                 } finally {
-                    statistics.decrementActiveThreads();
+                    counter.decrementActiveThreads();
                 }
             }
         });
-        statistics.incrementThreadCount();
+        counter.incrementCreatedThreads();
         return thread;
     }
 }

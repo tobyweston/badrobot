@@ -55,7 +55,7 @@ public class GuardedThreadCounterTest {
 
     private void incrementThreads(int by)  {
         for (int i = 0; i < by; i++)
-            counter.incrementThreadCount();
+            counter.incrementCreatedThreads();
     }
 
     private static int by(int count) {

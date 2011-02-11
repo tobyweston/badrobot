@@ -11,15 +11,15 @@ import org.junit.runner.RunWith;
 public class InstrumentingThreadFactoryTest {
 
     private final Mockery context = new Mockery();
-    private final ThreadCounter statistics = context.mock(ThreadCounter.class);
-    private final InstrumentingThreadFactory factory = new InstrumentingThreadFactory(statistics);
+    private final ThreadCounter counter = context.mock(ThreadCounter.class);
+    private final InstrumentingThreadFactory factory = new InstrumentingThreadFactory(counter);
 
     @Test
     public void willDelegateToRunnable() {
         final Runnable runnable = context.mock(Runnable.class);
         context.checking(new Expectations(){{
             one(runnable).run();
-            ignoring(statistics);
+            ignoring(counter);
         }});
         factory.newThread(runnable).run();
     }
@@ -27,9 +27,9 @@ public class InstrumentingThreadFactoryTest {
     @Test
     public void willIncrementActiveThreadCountWhenStarted() {
         context.checking(new Expectations(){{
-            one(statistics).incrementActiveThreads();
-            ignoring(statistics).decrementActiveThreads();
-            ignoring(statistics).incrementThreadCount();
+            one(counter).incrementActiveThreads();
+            ignoring(counter).decrementActiveThreads();
+            ignoring(counter).incrementCreatedThreads();
         }});
         factory.newThread(stub()).run();
     }
@@ -37,9 +37,9 @@ public class InstrumentingThreadFactoryTest {
     @Test
     public void willDecrementActiveThreadCountWhenDone() {
         context.checking(new Expectations(){{
-            ignoring(statistics).incrementActiveThreads();
-            one(statistics).decrementActiveThreads();
-            ignoring(statistics).incrementThreadCount();
+            ignoring(counter).incrementActiveThreads();
+            one(counter).decrementActiveThreads();
+            ignoring(counter).incrementCreatedThreads();
         }});
         factory.newThread(stub()).run();
     }
@@ -49,9 +49,9 @@ public class InstrumentingThreadFactoryTest {
         final Runnable runnable = context.mock(Runnable.class);
         context.checking(new Expectations() {{
             one(runnable).run(); will(throwException(new RuntimeException()));
-            ignoring(statistics).incrementActiveThreads();
-            one(statistics).decrementActiveThreads();
-            ignoring(statistics).incrementThreadCount();
+            ignoring(counter).incrementActiveThreads();
+            one(counter).decrementActiveThreads();
+            ignoring(counter).incrementCreatedThreads();
         }});
         factory.newThread(runnable).run();
     }
@@ -59,9 +59,9 @@ public class InstrumentingThreadFactoryTest {
     @Test
     public void willIncrementThreadCount() {
         context.checking(new Expectations(){{
-            never(statistics).incrementActiveThreads();
-            never(statistics).decrementActiveThreads();
-            one(statistics).incrementThreadCount();
+            never(counter).incrementActiveThreads();
+            never(counter).decrementActiveThreads();
+            one(counter).incrementCreatedThreads();
         }});
         factory.newThread(stub());
     }
