@@ -18,27 +18,38 @@ package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.shared.memory.ThreadCount;
 import bad.robot.pingpong.shared.memory.ThreadFactoryObserver;
+import com.google.code.tempusfugit.concurrency.Callable;
+import com.google.code.tempusfugit.concurrency.Interruptible;
+import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
+import static com.google.code.tempusfugit.concurrency.ExecuteUsingLock.execute;
+import static com.google.code.tempusfugit.concurrency.ThreadUtils.resetInterruptFlagWhen;
+
+@ThreadSafe
 public class ThreadCounter implements ThreadFactoryObserver, ThreadCount {
 
     private final AtomicLong activeThreads = new AtomicLong();
     private final AtomicLong createdThreads = new AtomicLong();
+    private final ReentrantLock lock = new ReentrantLock();
 
     @Override
     public void threadCreated() {
-        createdThreads.getAndIncrement();
+        execute(threadCreated).using(lock);
     }
 
     @Override
     public void threadStarted() {
-        activeThreads.getAndIncrement();
+        execute(threadStarted).using(lock);
     }
 
     @Override
     public void threadTerminated() {
-        activeThreads.getAndDecrement();
+        execute(threadTerminated).using(lock);
     }
 
     @Override
@@ -53,7 +64,50 @@ public class ThreadCounter implements ThreadFactoryObserver, ThreadCount {
 
     @Override
     public void reset() {
-        activeThreads.set(0);
-        createdThreads.set(0);
+        if (acquired(lock))
+            execute(reset).using(lock);
     }
+
+    private Callable<Void, RuntimeException> threadCreated = new Callable<Void, RuntimeException>() {
+        @Override
+        public Void call() throws RuntimeException {
+            createdThreads.getAndIncrement();
+            return null;
+        }
+    };
+
+    private Callable<Void, RuntimeException> threadStarted = new Callable<Void, RuntimeException>() {
+        @Override
+        public Void call() throws RuntimeException {
+            activeThreads.getAndIncrement();
+            return null;
+        }
+    };
+
+    private Callable<Void, RuntimeException> threadTerminated = new Callable<Void, RuntimeException>() {
+        @Override
+        public Void call() throws RuntimeException {
+            activeThreads.getAndDecrement();
+            return null;
+        }
+    };
+
+    private Callable<Void, RuntimeException> reset = new Callable<Void, RuntimeException>() {
+        @Override
+        public Void call() throws RuntimeException {
+            activeThreads.set(0);
+            createdThreads.set(0);
+            return null;
+        }
+    };
+
+    private static Boolean acquired(final Lock lock) {
+        return resetInterruptFlagWhen(new Interruptible<Boolean>() {
+            @Override
+            public Boolean call() throws InterruptedException {
+                return lock.tryLock(10, TimeUnit.MILLISECONDS);
+            }
+        });
+    }
+
 }
