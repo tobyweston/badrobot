@@ -18,9 +18,8 @@ package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.UncheckedException;
 import bad.robot.pingpong.server.Server;
-import bad.robot.pingpong.shared.memory.ObservableThreadFactory;
-import bad.robot.pingpong.shared.memory.pessimistic.LockingGuard;
-import bad.robot.pingpong.shared.memory.pessimistic.ThreadCounter;
+import bad.robot.pingpong.shared.memory.ExecutorServiceFactory;
+import bad.robot.pingpong.shared.memory.pessimistic.PessimisticExecutorServiceFactory;
 import org.simpleframework.http.Address;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -33,18 +32,17 @@ import org.simpleframework.transport.connect.SocketConnection;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.locks.ReentrantLock;
 
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class SimpleServer implements Server {
 
     private final Connection connection;
-    private final ExecutorService threads = newFixedThreadPool(5, new ObservableThreadFactory(new ThreadCounter(new LockingGuard(new ReentrantLock()))));
+    private final ExecutorService threads;
 
-    public SimpleServer() throws IOException {
+    public SimpleServer(ExecutorServiceFactory factory) throws IOException {
+        threads = factory.create();
         connection = new SocketConnection(new AsynchronousContainer(threads, new ResourceContainer(new ResourceEngine() {
             @Override
             public Resource resolve(Address target) {
@@ -65,7 +63,7 @@ public class SimpleServer implements Server {
     }
 
     public static void main(String... args) throws IOException {
-        new SimpleServer().start();
+        new SimpleServer(new PessimisticExecutorServiceFactory()).start();
     }
 
     private static class NotFoundResource implements Resource {
@@ -78,7 +76,6 @@ public class SimpleServer implements Server {
                 throw new UncheckedException();
             }
         }
-
     }
 
     private static class PingResource implements Resource {
