@@ -17,6 +17,7 @@
 package bad.robot.pingpong.server;
 
 import bad.robot.pingpong.server.simple.SimpleServer;
+import bad.robot.pingpong.shared.memory.pessimistic.PessimisticExecutorServiceFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -41,7 +42,7 @@ public class PingIntegrationTest {
 
     @Before
     public void start() throws IOException {
-        server = new SimpleServer();
+        server = new SimpleServer(new PessimisticExecutorServiceFactory());
         server.start();
     }
 
