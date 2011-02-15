@@ -21,34 +21,35 @@ import bad.robot.pingpong.shared.memory.ThreadFactoryObserver;
 import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
-import static bad.robot.pingpong.shared.memory.pessimistic.AcquireLock.acquired;
 import static bad.robot.pingpong.shared.memory.pessimistic.Decrement.decrement;
 import static bad.robot.pingpong.shared.memory.pessimistic.Increment.increment;
 import static bad.robot.pingpong.shared.memory.pessimistic.Reset.resetOf;
-import static com.google.code.tempusfugit.concurrency.ExecuteUsingLock.execute;
 
 @ThreadSafe
 public class ThreadCounter implements ThreadFactoryObserver, ThreadCount {
 
     private final AtomicLong activeThreads = new AtomicLong();
     private final AtomicLong createdThreads = new AtomicLong();
-    private final ReentrantLock lock = new ReentrantLock();
+    private final Guard guard;
+
+    public ThreadCounter(Guard guard) {
+        this.guard = guard;
+    }
 
     @Override
     public void threadCreated() {
-        execute(increment(createdThreads)).using(lock);
+        guard.execute(increment(createdThreads));
     }
 
     @Override
     public void threadStarted() {
-        execute(increment(activeThreads)).using(lock);
+        guard.execute(increment(activeThreads));
     }
 
     @Override
     public void threadTerminated() {
-        execute(decrement(activeThreads)).using(lock);
+        guard.execute(decrement(activeThreads));
     }
 
     @Override
@@ -63,9 +64,8 @@ public class ThreadCounter implements ThreadFactoryObserver, ThreadCount {
 
     @Override
     public void reset() {
-        if (acquired(lock))
-            execute(resetOf(activeThreads, createdThreads)).using(lock);
+        if (guard.guarding())
+            guard.execute(resetOf(activeThreads, createdThreads));
     }
-
 
 }

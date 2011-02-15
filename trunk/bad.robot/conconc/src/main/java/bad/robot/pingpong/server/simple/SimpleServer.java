@@ -19,6 +19,7 @@ package bad.robot.pingpong.server.simple;
 import bad.robot.pingpong.UncheckedException;
 import bad.robot.pingpong.server.Server;
 import bad.robot.pingpong.shared.memory.ObservableThreadFactory;
+import bad.robot.pingpong.shared.memory.pessimistic.LockingGuard;
 import bad.robot.pingpong.shared.memory.pessimistic.ThreadCounter;
 import org.simpleframework.http.Address;
 import org.simpleframework.http.Request;
@@ -32,6 +33,7 @@ import org.simpleframework.transport.connect.SocketConnection;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
@@ -40,7 +42,7 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 public class SimpleServer implements Server {
 
     private final Connection connection;
-    private final ExecutorService threads = newFixedThreadPool(5, new ObservableThreadFactory(new ThreadCounter()));
+    private final ExecutorService threads = newFixedThreadPool(5, new ObservableThreadFactory(new ThreadCounter(new LockingGuard(new ReentrantLock()))));
 
     public SimpleServer() throws IOException {
         connection = new SocketConnection(new AsynchronousContainer(threads, new ResourceContainer(new ResourceEngine() {

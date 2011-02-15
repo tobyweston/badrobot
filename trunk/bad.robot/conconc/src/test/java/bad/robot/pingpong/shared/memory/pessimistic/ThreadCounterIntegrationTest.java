@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(ConcurrentTestRunner.class)
 public class ThreadCounterIntegrationTest {
 
-    private static final ThreadCounter counter = new ThreadCounter();
+    private static final ThreadCounter counter = new ThreadCounter(new Unguarded());
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
