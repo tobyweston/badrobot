@@ -19,39 +19,41 @@ package bad.robot.pingpong.shared.memory.pessimistic;
 import bad.robot.pingpong.shared.memory.ThreadCount;
 import bad.robot.pingpong.shared.memory.ThreadFactoryObserver;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 public class ThreadCounter implements ThreadFactoryObserver, ThreadCount {
 
-    private long activeThreads;
-    private long createdThreads;
+    private final AtomicLong activeThreads = new AtomicLong();
+    private final AtomicLong createdThreads = new AtomicLong();
 
     @Override
     public void threadCreated() {
-        createdThreads++;
+        createdThreads.getAndIncrement();
     }
 
     @Override
     public void threadStarted() {
-        activeThreads++;
+        activeThreads.getAndIncrement();
     }
 
     @Override
     public void threadTerminated() {
-        activeThreads--;
+        activeThreads.getAndDecrement();
     }
 
     @Override
     public long getActiveCount() {
-        return activeThreads;
+        return activeThreads.get();
     }
 
     @Override
     public long getCreatedCount() {
-        return createdThreads;
+        return createdThreads.get();
     }
 
     @Override
     public void reset() {
-        activeThreads = 0;
-        createdThreads = 0;
+        activeThreads.set(0);
+        createdThreads.set(0);
     }
 }

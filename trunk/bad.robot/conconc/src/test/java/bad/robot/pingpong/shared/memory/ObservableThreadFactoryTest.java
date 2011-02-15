@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.instrumentation;
+package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.instrumentation.threads.InstrumentingThreadFactory;
-import bad.robot.pingpong.shared.memory.ThreadCounter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
@@ -25,60 +23,60 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(JMock.class)
-public class InstrumentingThreadFactoryTest {
+public class ObservableThreadFactoryTest {
 
     private final Mockery context = new Mockery();
-    private final ThreadCounter counter = context.mock(ThreadCounter.class);
-    private final InstrumentingThreadFactory factory = new InstrumentingThreadFactory(counter);
+    private final ThreadFactoryObserver observer = context.mock(ThreadFactoryObserver.class);
+    private final ObservableThreadFactory factory = new ObservableThreadFactory(observer);
 
     @Test
     public void willDelegateToRunnable() {
         final Runnable runnable = context.mock(Runnable.class);
         context.checking(new Expectations(){{
             one(runnable).run();
-            ignoring(counter);
+            ignoring(observer);
         }});
         factory.newThread(runnable).run();
     }
     
     @Test
-    public void willIncrementActiveThreadCountWhenStarted() {
+    public void willNotifyThreadStarted() {
         context.checking(new Expectations(){{
-            one(counter).incrementActiveThreads();
-            ignoring(counter).decrementActiveThreads();
-            ignoring(counter).incrementCreatedThreads();
+            one(observer).threadStarted();
+            ignoring(observer).threadTerminated();
+            ignoring(observer).threadCreated();
         }});
         factory.newThread(stub()).run();
     }
 
     @Test
-    public void willDecrementActiveThreadCountWhenDone() {
+    public void willNotifyThreadTermination() {
         context.checking(new Expectations(){{
-            ignoring(counter).incrementActiveThreads();
-            one(counter).decrementActiveThreads();
-            ignoring(counter).incrementCreatedThreads();
+            ignoring(observer).threadStarted();
+            one(observer).threadTerminated();
+            ignoring(observer).threadCreated();
         }});
         factory.newThread(stub()).run();
     }
 
     @Test (expected = RuntimeException.class)
-    public void willDecrementActiveThreadCountWhenExceptionOccurs() {
+    public void willNotifyThreadTerminationOnException() {
         final Runnable runnable = context.mock(Runnable.class);
         context.checking(new Expectations() {{
             one(runnable).run(); will(throwException(new RuntimeException()));
-            ignoring(counter).incrementActiveThreads();
-            one(counter).decrementActiveThreads();
-            ignoring(counter).incrementCreatedThreads();
+            ignoring(observer).threadStarted();
+            one(observer).threadTerminated();
+            ignoring(observer).threadCreated();
         }});
         factory.newThread(runnable).run();
     }
 
     @Test
-    public void willIncrementThreadCount() {
+    public void willNotifyThreadCreated() {
         context.checking(new Expectations(){{
-            never(counter).incrementActiveThreads();
-            never(counter).decrementActiveThreads();
-            one(counter).incrementCreatedThreads();
+            never(observer).threadStarted();
+            never(observer).threadTerminated();
+            one(observer).threadCreated();
         }});
         factory.newThread(stub());
     }

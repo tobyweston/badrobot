@@ -23,52 +23,49 @@ import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
 import com.google.code.tempusfugit.concurrency.annotations.Repeating;
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static bad.robot.pingpong.UpTo.upTo;
-import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(ConcurrentTestRunner.class)
-@Ignore
-public class GuardedThreadCounterInvariantIntegrationTest {
+public class ThreadCounterIntegrationTest {
 
-    private static final GuardedThreadCounter counter = new GuardedThreadCounter();
+    private static final ThreadCounter counter = new ThreadCounter();
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
 
     @Test
     @Repeating
-    @Concurrent
-    public void incrementActiveThreadCounters() {
-        counter.incrementActiveThreads();
+    @Concurrent(count = 50)
+    public void notifyThreadStarted() {
+        counter.threadStarted();
         Introduce.jitter();
     }
 
     @Test
     @Repeating
-    @Concurrent
-    public void incrementThreadCount() {
-        counter.incrementCreatedThreads();
+    @Concurrent(count = 10)
+    public void notifyThreadTerminated() {
+        counter.threadTerminated();
         Introduce.jitter();
     }
 
     @Test
-    public void resetCounters() {
-        Introduce.jitter(upTo(millis(100)));
-        counter.reset();
+    @Repeating
+    @Concurrent(count = 50)
+    public void notifyThreadCreated() {
+        counter.threadCreated();
+        Introduce.jitter();
     }
 
     @AfterClass
-    public static void verifyActiveAndTotalCountsAreResetAtomically() {
-        String message = "total and active thread counts should be the same, otherwise a race condition exists";
-        assertThat(message, counter.getThreadCount(), is(counter.getActiveThreads()));
+    public static void verifyCounter() {
+        assertThat(counter.getActiveCount(), is(4000L));
+        assertThat(counter.getCreatedCount(), is(5000L));
     }
-
 
 }
