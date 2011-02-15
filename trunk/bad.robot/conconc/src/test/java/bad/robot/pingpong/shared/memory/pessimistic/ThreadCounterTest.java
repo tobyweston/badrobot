@@ -46,6 +46,12 @@ public class ThreadCounterTest {
     }
 
     @Test
+    public void shouldIncrementCreatedCount() {
+        incrementThreadsBy(6);
+        assertThat(counter.getCreatedCount(), is(6L));
+    }
+
+    @Test
     public void shouldResetCounts() {
         incrementActiveThreadsBy(8);
         incrementThreadsBy(5);
