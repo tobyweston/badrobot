@@ -23,7 +23,7 @@ import static org.junit.Assert.assertThat;
 
 public class ThreadCounterTest {
 
-    private final ThreadCounter counter = new ThreadCounter();
+    private final ThreadCounter counter = new ThreadCounter(new Unguarded());
 
     @Test
     public void shouldInitialiseCounts() {
