@@ -23,8 +23,6 @@ public interface Counter {
 
     void decrement();
 
-    Long get();
-
     void reset();
 
 }

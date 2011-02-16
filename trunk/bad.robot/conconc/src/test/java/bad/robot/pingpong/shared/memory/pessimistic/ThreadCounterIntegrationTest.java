@@ -34,7 +34,9 @@ import static org.junit.Assert.assertThat;
 @RunWith(ConcurrentTestRunner.class)
 public class ThreadCounterIntegrationTest {
 
-    private static final ThreadCounter counter = new ThreadCounter(unguarded(), new AtomicLongCounterFactory());
+    private static final AtomicLongCounter createdCount = new AtomicLongCounter();
+    private static final AtomicLongCounter activeCount = new AtomicLongCounter();
+    private static final ThreadCounter counter = new ThreadCounter(unguarded(), activeCount, createdCount);
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
@@ -65,8 +67,8 @@ public class ThreadCounterIntegrationTest {
 
     @AfterClass
     public static void verifyCounter() {
-        assertThat(counter.getActiveCount(), is(4000L));
-        assertThat(counter.getCreatedCount(), is(5000L));
+        assertThat(activeCount.get(), is(4000L));
+        assertThat(createdCount.get(), is(5000L));
     }
 
 }

@@ -1,15 +1,13 @@
-package bad.robot.pingpong.shared.memory;
+package bad.robot.pingpong.shared.memory.pessimistic;
 
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-public abstract class AbstractCounterTest {
-    
-    private final Counter counter = createCounterUnderTest();
+public class AtomicLongCounterTest {
 
-    protected abstract Counter createCounterUnderTest();
+    private final AtomicLongCounter counter = new AtomicLongCounter();
 
     @Test
     public void shouldInitialise() {
@@ -34,4 +32,5 @@ public abstract class AbstractCounterTest {
         counter.reset();
         assertThat(counter.get(), is(0L));
     }
+
 }
