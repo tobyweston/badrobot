@@ -12,6 +12,6 @@ public class PessimisticExecutorServiceFactory implements ExecutorServiceFactory
 
     @Override
     public ExecutorService create() {
-        return newFixedThreadPool(5, new ObservableThreadFactory(new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounterFactory())));
+        return newFixedThreadPool(5, new ObservableThreadFactory(new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter())));
     }
 }

@@ -14,7 +14,7 @@ public class ThreadCounterInvariantTest {
 
     private final Mockery context = new Mockery();
     private final Lock lock = context.mock(Lock.class);
-    private final ThreadCounter counter = new ThreadCounter(new LockingGuard(lock), new AtomicLongCounterFactory());
+    private final ThreadCounter counter = new ThreadCounter(new LockingGuard(lock), new AtomicLongCounter(), new AtomicLongCounter());
 
     @Test
     public void shouldLockOnWrites() throws Exception {
@@ -36,15 +36,6 @@ public class ThreadCounterInvariantTest {
             one(lock).unlock();
         }});
         counter.reset();
-    }
-
-    @Test
-    public void shouldNotLockOnReads() {
-        context.checking(new Expectations(){{
-            never(lock);
-        }});
-        counter.getCreatedCount();
-        counter.getActiveCount();
     }
 
 }

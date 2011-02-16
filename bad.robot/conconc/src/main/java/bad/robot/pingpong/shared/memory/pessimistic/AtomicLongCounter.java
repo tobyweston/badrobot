@@ -19,12 +19,11 @@ public class AtomicLongCounter implements Counter {
     }
 
     @Override
-    public Long get() {
-        return count.get();
-    }
-
-    @Override
     public void reset() {
         count.set(0);
+    }
+
+    public Long get() {
+        return count.get();
     }
 }

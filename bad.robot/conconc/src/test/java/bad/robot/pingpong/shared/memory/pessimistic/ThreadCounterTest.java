@@ -17,7 +17,6 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.shared.memory.Counter;
-import bad.robot.pingpong.shared.memory.CounterFactory;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
@@ -26,14 +25,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 @RunWith(JMock.class)
 public class ThreadCounterTest {
 
     private final Mockery context = new Mockery();
-    private final CounterFactory factory = context.mock(CounterFactory.class, "factory");
     private final Counter activeThreads = context.mock(Counter.class, "active");
     private final Counter createdThreads = context.mock(Counter.class, "created");
 
@@ -41,27 +37,7 @@ public class ThreadCounterTest {
 
     @Before
     public void setupCounter() {
-        context.checking(new Expectations(){{
-            one(factory).create(); will(returnValue(activeThreads));
-            one(factory).create(); will(returnValue(createdThreads));
-        }});
-        counter = new ThreadCounter(unguarded(), factory);
-    }
-
-    @Test
-    public void shouldGetActiveThreads() {
-        context.checking(new Expectations(){{
-            one(activeThreads).get(); will(returnValue(1L));
-        }});
-        assertThat(counter.getActiveCount(), is(1L));
-    }
-
-    @Test
-    public void shouldGetCreatedThreads() {
-        context.checking(new Expectations(){{
-            one(createdThreads).get(); will(returnValue(2L));
-        }});
-        assertThat(counter.getCreatedCount(), is(2L));
+        counter = new ThreadCounter(unguarded(), activeThreads, createdThreads);
     }
 
     @Test
@@ -96,5 +72,4 @@ public class ThreadCounterTest {
         }});
         counter.reset();
     }
-
 }
