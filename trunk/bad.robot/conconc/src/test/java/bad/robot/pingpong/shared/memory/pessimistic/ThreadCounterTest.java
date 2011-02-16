@@ -16,63 +16,85 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
+import bad.robot.pingpong.shared.memory.Counter;
+import bad.robot.pingpong.shared.memory.CounterFactory;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.jmock.integration.junit4.JMock;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(JMock.class)
 public class ThreadCounterTest {
 
-    private final ThreadCounter counter = new ThreadCounter(new Unguarded());
+    private final Mockery context = new Mockery();
+    private final CounterFactory factory = context.mock(CounterFactory.class, "factory");
+    private final Counter activeThreads = context.mock(Counter.class, "active");
+    private final Counter createdThreads = context.mock(Counter.class, "created");
+
+    private ThreadCounter counter;
+
+    @Before
+    public void setupCounter() {
+        context.checking(new Expectations(){{
+            one(factory).create(); will(returnValue(activeThreads));
+            one(factory).create(); will(returnValue(createdThreads));
+        }});
+        counter = new ThreadCounter(unguarded(), factory);
+    }
 
     @Test
-    public void shouldInitialiseCounts() {
-        assertThat(counter.getActiveCount(), is(0L));
-        assertThat(counter.getCreatedCount(), is(0L));
+    public void shouldGetActiveThreads() {
+        context.checking(new Expectations(){{
+            one(activeThreads).get(); will(returnValue(1L));
+        }});
+        assertThat(counter.getActiveCount(), is(1L));
+    }
+
+    @Test
+    public void shouldGetCreatedThreads() {
+        context.checking(new Expectations(){{
+            one(createdThreads).get(); will(returnValue(2L));
+        }});
+        assertThat(counter.getCreatedCount(), is(2L));
     }
 
     @Test
     public void shouldIncrementActiveCount() {
-        incrementActiveThreadsBy(3);
-        assertThat(counter.getActiveCount(), is(3L));
+        context.checking(new Expectations() {{
+            one(activeThreads).increment();
+        }});
+        counter.threadStarted();
     }
 
     @Test
     public void shouldDecrementActiveThreadCount() {
-        incrementActiveThreadsBy(5);
-        assertThat(counter.getActiveCount(), is(5L));
-        decrementActiveThreadsBy(5);
-        assertThat(counter.getActiveCount(), is(0L));
+        context.checking(new Expectations() {{
+            one(activeThreads).decrement();
+        }});
+        counter.threadTerminated();
     }
 
     @Test
     public void shouldIncrementCreatedCount() {
-        incrementThreadsBy(6);
-        assertThat(counter.getCreatedCount(), is(6L));
+        context.checking(new Expectations(){{
+            one(createdThreads).increment();
+        }});
+        counter.threadCreated();
     }
 
     @Test
     public void shouldResetCounts() {
-        incrementActiveThreadsBy(8);
-        incrementThreadsBy(5);
+        context.checking(new Expectations(){{
+            one(activeThreads).reset();
+            one(createdThreads).reset();
+        }});
         counter.reset();
-        assertThat(counter.getActiveCount(), is(0L));
-        assertThat(counter.getCreatedCount(), is(0L));
-    }
-
-    private void incrementActiveThreadsBy(int by) {
-        for (int i = 0; i < by; i++)
-            counter.threadStarted();
-    }
-
-    private void decrementActiveThreadsBy(int by)  {
-        for (int i = 0; i < by; i++)
-            counter.threadTerminated();
-    }
-
-    private void incrementThreadsBy(int by)  {
-        for (int i = 0; i < by; i++)
-            counter.threadCreated();
     }
 
 }

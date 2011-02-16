@@ -16,25 +16,27 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
+import bad.robot.pingpong.shared.memory.Counter;
+import bad.robot.pingpong.shared.memory.CounterFactory;
 import bad.robot.pingpong.shared.memory.ThreadCount;
 import bad.robot.pingpong.shared.memory.ThreadFactoryObserver;
 import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
-import java.util.concurrent.atomic.AtomicLong;
-
-import static bad.robot.pingpong.shared.memory.pessimistic.Decrement.decrement;
-import static bad.robot.pingpong.shared.memory.pessimistic.Increment.increment;
-import static bad.robot.pingpong.shared.memory.pessimistic.Reset.resetOf;
+import static bad.robot.pingpong.shared.memory.Decrement.decrement;
+import static bad.robot.pingpong.shared.memory.Increment.increment;
+import static bad.robot.pingpong.shared.memory.Reset.resetOf;
 
 @ThreadSafe
 public class ThreadCounter implements ThreadFactoryObserver, ThreadCount {
 
-    private final AtomicLong activeThreads = new AtomicLong();
-    private final AtomicLong createdThreads = new AtomicLong();
+    private final Counter activeThreads;
+    private final Counter createdThreads;
     private final Guard guard;
 
-    public ThreadCounter(Guard guard) {
+    public ThreadCounter(Guard guard, CounterFactory factory) {
         this.guard = guard;
+        this.activeThreads = factory.create();
+        this.createdThreads = factory.create();
     }
 
     @Override

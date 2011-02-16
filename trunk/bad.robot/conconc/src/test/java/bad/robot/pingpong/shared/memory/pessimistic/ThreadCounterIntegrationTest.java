@@ -27,13 +27,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(ConcurrentTestRunner.class)
 public class ThreadCounterIntegrationTest {
 
-    private static final ThreadCounter counter = new ThreadCounter(new Unguarded());
+    private static final ThreadCounter counter = new ThreadCounter(unguarded(), new AtomicLongCounterFactory());
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
