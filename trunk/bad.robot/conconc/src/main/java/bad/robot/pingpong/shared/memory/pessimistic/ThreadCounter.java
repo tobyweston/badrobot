@@ -17,7 +17,7 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.shared.memory.Counter;
-import bad.robot.pingpong.shared.memory.ThreadFactoryObserver;
+import bad.robot.pingpong.shared.memory.ThreadObserver;
 import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
 import static bad.robot.pingpong.shared.memory.Decrement.decrement;
@@ -25,7 +25,7 @@ import static bad.robot.pingpong.shared.memory.Increment.increment;
 import static bad.robot.pingpong.shared.memory.Reset.resetOf;
 
 @ThreadSafe
-public class ThreadCounter implements ThreadFactoryObserver {
+public class ThreadCounter implements ThreadObserver {
 
     private final Counter activeThreads;
     private final Counter createdThreads;

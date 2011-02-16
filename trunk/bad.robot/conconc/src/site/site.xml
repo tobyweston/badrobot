@@ -39,7 +39,9 @@
             <item name="Introduction" href="introduction.html"/>
             <item name="Shared Memory" href="shared.html"/>
             <item name="Example Problem" href="problem.html"/>
-            <item name="Solutions" href="solution.html"/>
+            <item name="Solutions" href="solution.html" collapse="true">
+                <item name="Instrumenting Thread Usage" href="thread_counter.html" />
+            </item>
             <item name="Conclusions" href="conclusions.html"/>
         </menu>
         <menu ref="reports"/>

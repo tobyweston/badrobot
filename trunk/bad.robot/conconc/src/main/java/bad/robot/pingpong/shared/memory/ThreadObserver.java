@@ -16,7 +16,7 @@
 
 package bad.robot.pingpong.shared.memory;
 
-public interface ThreadFactoryObserver {
+public interface ThreadObserver {
 
     void threadCreated();
 

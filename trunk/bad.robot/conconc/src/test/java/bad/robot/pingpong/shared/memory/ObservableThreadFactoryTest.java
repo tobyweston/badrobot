@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 public class ObservableThreadFactoryTest {
 
     private final Mockery context = new Mockery();
-    private final ThreadFactoryObserver observer = context.mock(ThreadFactoryObserver.class);
+    private final ThreadObserver observer = context.mock(ThreadObserver.class);
     private final ObservableThreadFactory factory = new ObservableThreadFactory(observer);
 
     @Test
