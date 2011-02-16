@@ -20,9 +20,9 @@ import java.util.concurrent.ThreadFactory;
 
 public class ObservableThreadFactory implements ThreadFactory {
 
-    private final ThreadFactoryObserver observer;
+    private final ThreadObserver observer;
 
-    public ObservableThreadFactory(ThreadFactoryObserver observer) {
+    public ObservableThreadFactory(ThreadObserver observer) {
         this.observer = observer;
     }
 

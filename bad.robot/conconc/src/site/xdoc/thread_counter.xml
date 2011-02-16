@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009-2011, bad robot (london) ltd
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+    <properties>
+        <title>Thread Counter</title>
+        <author>Toby Weston</author>
+    </properties>
+
+    <body>
+
+        <section name="Instrumenting Thread Usage">
+
+            <p>
+                One area that was identified as an opportunity to explore shared access was around instrumenting thread
+                usage within the system. The requirement being around understanding the cumulative number of threads created
+                and the currently active threads (threads started but not yet terminated).
+            </p>
+
+            <subsection name="Shared Infrastructure">
+                <p>
+                    The ultimate goal was to create alternative implementations of something that can be used to
+                    instrument thread usage within the system, one pessimistic / lock based implementation and an alternative
+                    optimistic implementation. It makes sense if these competing implementations follow a similar
+                    approach so that they can be swapped easily for comparison.
+                </p>
+                <p>
+                    The role of collecting or processing this information can be seen in terms of an
+                    <i>observer</i>, for example,
+                </p>
+<source>
+public interface ThreadObserver {
+    void threadCreated();
+    void threadStarted();
+    void threadTerminated();
+}
+</source>
+            <p>
+                Java's <code>ThreadFactory</code> is a natural place to make observations about thread activity. All that
+                would be required is for the application to be wired up to use the following thread factory and we can
+                start our instrumentation.
+            </p>
+<source>
+public class ObservableThreadFactory implements ThreadFactory {
+
+    private final ThreadObserver observer;
+
+    public ObservableThreadFactory(ThreadObserver observer) {
+        this.observer = observer;
+    }
+
+    @Override
+    public Thread newThread(final Runnable runnable) {
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                try {
+                    <b>observer.threadStarted();</b>
+                    runnable.run();
+                } finally {
+                    <b>observer.threadTerminated();</b>
+                }
+            }
+        });
+        <b>observer.threadCreated();</b>
+        return thread;
+    }
+}
+</source>
+
+
+            </subsection>
+
+            <subsection name="Pessimistic / Lock Based Synchronisation">
+                <p>
+
+                </p>
+<source>
+public class ThreadCounter implements ThreadFactoryObserver {
+
+    private long activeThreads;
+    private long createdThreads;
+
+    @Override
+    public void threadCreated() {
+        createdThreads++;
+    }
+
+    @Override
+    public void threadStarted() {
+        activeThreads++;
+    }
+
+    @Override
+    public void threadTerminated() {
+        activeThreads--;
+    }
+
+    @Override
+    public long getActiveCount() {
+        return activeThreads;
+    }
+
+    @Override
+    public long getCreatedCount() {
+        return createdThreads;
+    }
+
+    @Override
+    public void reset() {
+        activeThreads = 0;
+        createdThreads = 0;
+    }
+}
+</source>
+            </subsection>
+
+
+            <subsection name="Optimistic / Software Transaction Memory">
+            </subsection>
+
+        </section>
+
+    </body>
+
+</document>
