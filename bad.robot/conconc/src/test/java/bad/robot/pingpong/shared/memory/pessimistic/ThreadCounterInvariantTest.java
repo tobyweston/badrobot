@@ -14,7 +14,7 @@ public class ThreadCounterInvariantTest {
 
     private final Mockery context = new Mockery();
     private final Lock lock = context.mock(Lock.class);
-    private final ThreadCounter counter = new ThreadCounter(new LockingGuard(lock));
+    private final ThreadCounter counter = new ThreadCounter(new LockingGuard(lock), new AtomicLongCounterFactory());
 
     @Test
     public void shouldLockOnWrites() throws Exception {
@@ -30,7 +30,8 @@ public class ThreadCounterInvariantTest {
     @Test
     public void shouldLockForResetAndSoMaintainInvariant() throws InterruptedException {
         context.checking(new Expectations() {{
-            one(lock).tryLock(with(any(Long.class)), with(any(TimeUnit.class))); will(returnValue(true));
+            one(lock).tryLock(with(any(Long.class)), with(any(TimeUnit.class)));
+            will(returnValue(true));
             one(lock).lock();
             one(lock).unlock();
         }});

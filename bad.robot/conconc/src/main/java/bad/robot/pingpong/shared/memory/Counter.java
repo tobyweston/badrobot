@@ -17,7 +17,7 @@
 package bad.robot.pingpong.shared.memory;
 
 @Shared
-public interface Counter<T> {
+public interface Counter {
 
     void increment();
 
