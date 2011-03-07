@@ -197,6 +197,10 @@ public class ThreadCounterTest {
             <code>notifyThreadStarted</code> would run, then <code>notifyThreadTerminated</code> and so on). Adding
             the <code>@RunWith</code> means that each test method is kicked off in its own thread at roughly the same time.
         </p>
+        <p>
+            Separating a functionally correctness test from a thread-safety style test meant that the two concerns could
+            stay separate during testing and development.
+        </p>
 <source>
 @RunWith(<b>ConcurrentTestRunner.class</b>)
 public class ThreadCounterIntegrationTest {
@@ -232,25 +236,38 @@ public class ThreadCounterIntegrationTest {
 
     @AfterClass
     public static void verifyCounter() {
-        assertThat(activeCount.get(), is(4000L));
-        assertThat(createdCount.get(), is(5000L));
+        assertThat(counter.getCreatedCount(), is(5000L));
+        assertThat(counter.getActiveCount(), is(4000L));
     }
 }
 </source>
-            <h4>Testing Invariants</h4>
-            <p>
-                The above test is designed to load the class under test so heavily that it is <i>reasonably likely</i> to
-                fail the assertions (in <code>verifyCounter()</code>). It doesn't however test the invariant around the
-                <code>reset</code> method. It could be argued that if <code>reset</code> is called, it should reset both
-                <code>activeThreads</code> and <code>createdThreads</code> atomically. That is to say, no additional updates
-                should be allowed to either variable until both have been set to zero.
-            </p>
-            <p>
-                Testing the invariant directly proved too difficult to do, it was just too hard to simulate the race
-                condition between resetting and setting multiple variables. However, as well see, the natural progression
-                of the implementation lead to an alternative strategy which ensures the invariant in maintained.
-            </p>
+        <p>
+            The call to <code>Introduce.jitter()</code> introduces a pseudo-random delay of up to five milliseconds.
+            This is designed to try and avoid deterministic behaviour and exaggerate the affect of the tests.
+        </p>
+        <p>
+            The first assertion is expecting a created count of five thousand (having called <code>threadCreated</code> one
+            hundred times over fifty threads). The second assertion also ensures that <code>threadTerminated</code> affects
+            the active count (it will be run one hundred times over ten threads). The default number of repetitions from
+            the <code>RepeatingRule</code> is one hundred.
+        </p>
+        <h4>Testing Invariants</h4>
+        <p>
+            The above test is designed to load the class under test so heavily that it is <i>reasonably likely</i> to
+            fail the assertions (in <code>verifyCounter()</code>). It doesn't however test the invariant around the
+            <code>reset</code> method. It could be argued that if <code>reset</code> is called, it should reset both
+            <code>activeThreads</code> and <code>createdThreads</code> atomically. That is to say, no additional updates
+            should be allowed to either variable until both have been set to zero.
+        </p>
+        <p>
+            Testing the invariant directly proved too difficult to do, it was just too hard to simulate the race
+            condition between resetting and setting multiple variables. However, as well see, the natural progression
+            of the implementation lead to an alternative strategy which ensures the invariant is maintained.
+        </p>
 
+
+
+            
             <subsection name="Optimistic / Software Transaction Memory">
             </subsection>
 
