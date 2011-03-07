@@ -16,6 +16,11 @@
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>akka.repository</id>
+            <name>Akka Maven Repository</name>
+            <url>http://scalablesolutions.se/akka/repository</url>
+        </repository>
     </repositories>
 
     <build>
@@ -85,6 +90,12 @@
             <artifactId>httpclient</artifactId>
             <version>4.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>se.scalablesolutions.akka</groupId>
+            <artifactId>akka-stm</artifactId>
+            <version>1.0-RC3</version>
+        </dependency>
+
     </dependencies>
-    
+
 </project>
