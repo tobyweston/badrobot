@@ -1,26 +1,23 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
+import com.google.code.tempusfugit.concurrency.Callable;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-
 @RunWith(JMock.class)
 public class ThreadCounterInvariantTest {
 
     private final Mockery context = new Mockery();
-    private final Lock lock = context.mock(Lock.class);
-    private final ThreadCounter counter = new ThreadCounter(new LockingGuard(lock), new AtomicLongCounter(), new AtomicLongCounter());
+    private final Guard guard = context.mock(Guard.class);
+    private final ThreadCounter counter = new ThreadCounter(guard, new AtomicLongCounter(), new AtomicLongCounter());
 
     @Test
-    public void shouldLockOnWrites() throws Exception {
+    public void shouldMakeGuardedCallOnWrites() throws Exception {
         context.checking(new Expectations() {{
-            exactly(3).of(lock).lock();
-            exactly(3).of(lock).unlock();
+            exactly(3).of(guard).execute(with(any(Callable.class)));
         }});
         counter.threadCreated();
         counter.threadStarted();
@@ -28,12 +25,20 @@ public class ThreadCounterInvariantTest {
     }
 
     @Test
-    public void shouldLockForResetAndSoMaintainInvariant() throws InterruptedException {
+    public void shouldMakeGuardedCallForResetAndSoMaintainInvariant() throws Exception {
         context.checking(new Expectations() {{
-            one(lock).tryLock(with(any(Long.class)), with(any(TimeUnit.class)));
+            one(guard).guarding();
             will(returnValue(true));
-            one(lock).lock();
-            one(lock).unlock();
+            one(guard).execute(with(any(Callable.class)));
+        }});
+        counter.reset();
+    }
+
+    @Test
+    public void shouldNotAttemptGuardedCall() throws Exception {
+        context.checking(new Expectations() {{
+            one(guard).guarding(); will(returnValue(false));
+            never(guard).execute(with(any(Callable.class)));
         }});
         counter.reset();
     }

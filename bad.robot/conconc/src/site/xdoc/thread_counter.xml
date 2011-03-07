@@ -72,29 +72,36 @@ public class ObservableThreadFactory implements ThreadFactory {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 try {
-                    <b>observer.threadStarted();</b>
+                    <b><font color="red">observer.threadStarted();</font></b>
                     runnable.run();
                 } finally {
-                    <b>observer.threadTerminated();</b>
+                    <b><font color="red">observer.threadTerminated();</font></b>
                 }
             }
         });
-        <b>observer.threadCreated();</b>
+        <b><font color="red">observer.threadCreated();</font></b>
         return thread;
     }
 }
 </source>
-
+            <p>
+                Note that the class is easily tested using mock objects.
+            </p>
 
             </subsection>
 
             <subsection name="Pessimistic / Lock Based Synchronisation">
+            <p>
+                This section talks about the lock based implementation an observer called <code>ThreadCounter</code> and
+                its evolution.
+            </p>
                 <h4>Basic Implementation</h4>
                 <p>
-                    A naive implementation of the <code>ThreadCounter</code> might look like this
+                    A naive implementation of the <code>ThreadCounter</code> class might look like this
                 </p>
 <source>
-public class ThreadCounter implements ThreadFactoryObserver {
+@Not(ThreadSafe.class)
+public class ThreadCounter implements ThreadObserver {
 
     private long activeThreads;
     private long createdThreads;
@@ -161,6 +168,12 @@ public class ThreadCounterTest {
     }
 
     @Test
+    public void shouldIncrementCreatedCount() {
+        incrementThreadsBy(6);
+        assertThat(counter.getCreatedCount(), is(6L));
+    }
+
+    @Test
     public void shouldResetCounts() {
         incrementActiveThreadsBy(8);
         incrementThreadsBy(5);
@@ -202,13 +215,13 @@ public class ThreadCounterTest {
             stay separate during testing and development.
         </p>
 <source>
-@RunWith(<b>ConcurrentTestRunner.class</b>)
+@RunWith(<b><font color="red">ConcurrentTestRunner.class</font></b>)
 public class ThreadCounterIntegrationTest {
 
     private static final ThreadCounter counter = new ThreadCounter();
 
-    @Rule public <b>ConcurrentRule</b> concurrent = new ConcurrentRule();
-    @Rule public <b>RepeatingRule</b> repeating = new RepeatingRule();
+    @Rule public <b><font color="red">ConcurrentRule</font></b> concurrent = new ConcurrentRule();
+    @Rule public <b><font color="red">RepeatingRule</font></b> repeating = new RepeatingRule();
 
     @Test
     @Repeating
@@ -264,12 +277,667 @@ public class ThreadCounterIntegrationTest {
             condition between resetting and setting multiple variables. However, as well see, the natural progression
             of the implementation lead to an alternative strategy which ensures the invariant is maintained.
         </p>
+        <h4>Making <code>ThreadCounter</code> Thread Safe</h4>
+        <p>
+            Making the class thread safe (and passing the previous tests) was pretty straight forward using the <code>AtomicLong</code>
+            class.
+        </p>
+<source>
+@ThreadSafe
+public class ThreadCounter implements ThreadObserver {
 
+    private final <b><font color="red">AtomicLong</font></b> activeThreads = new AtomicLong();
+    private final <b><font color="red">AtomicLong</font></b> createdThreads = new AtomicLong();
 
+    @Override
+    public void threadCreated() {
+        createdThreads.getAndIncrement();
+    }
 
+    @Override
+    public void threadStarted() {
+        activeThreads.getAndIncrement();
+    }
+
+    @Override
+    public void threadTerminated() {
+        activeThreads.getAndDecrement();
+    }
+
+    @Override
+    public long getActiveCount() {
+        return activeThreads.get();
+    }
+
+    @Override
+    public long getCreatedCount() {
+        return createdThreads.get();
+    }
+
+    @Override
+    public void reset() {
+        activeThreads.set(0);
+        createdThreads.set(0);
+    }
+}
+</source>
+         <p>
+             At this point, the class is thread safe but the invariant around the <code>reset</code> method is still
+             not maintained (or tested). A simple fix might be to use the <code>synchronized</code> keyword on <i>all</i>
+             of the methods (at which point, we'd no longer need to the <code>AtomicLong</code>s). This is explored in
+             the below.
+         </p>
+            <h4>Maintaining the Invariant</h4>
+         <p>
+            An initial revision to guarding access to the state to maintain the invariant is shown below. 
+         </p>
+<source>
+@ThreadSafe
+public class ThreadCounter implements ThreadObserver {
+
+    private final AtomicLong activeThreads = new AtomicLong();
+    private final AtomicLong createdThreads = new AtomicLong();
+    private final ReentrantLock lock = new ReentrantLock();
+
+    @Override
+    public void threadCreated() {
+        execute(threadCreated).using(lock);
+    }
+
+    @Override
+    public void threadStarted() {
+        execute(threadStarted).using(lock);
+    }
+
+    @Override
+    public void threadTerminated() {
+        execute(threadTerminated).using(lock);
+    }
+
+    @Override
+    public long getActiveCount() {
+        return activeThreads.get();
+    }
+
+    @Override
+    public long getCreatedCount() {
+        return createdThreads.get();
+    }
+
+    @Override
+    public void reset() {
+        if (acquired(lock))
+            execute(reset).using(lock);
+    }
+
+    private Callable&lt;Void, RuntimeException&gt; threadCreated = new Callable&lt;Void, RuntimeException&gt;() {
+        @Override
+        public Void call() throws RuntimeException {
+            createdThreads.getAndIncrement();
+            return null;
+        }
+    };
+
+    private Callable&lt;Void, RuntimeException&gt; threadStarted = new Callable&lt;Void, RuntimeException&gt;() {
+        @Override
+        public Void call() throws RuntimeException {
+            activeThreads.getAndIncrement();
+            return null;
+        }
+    };
+
+    private Callable&lt;Void, RuntimeException&gt; threadTerminated = new Callable&lt;Void, RuntimeException&gt;() {
+        @Override
+        public Void call() throws RuntimeException {
+            activeThreads.getAndDecrement();
+            return null;
+        }
+    };
+
+    private Callable&lt;Void, RuntimeException&gt; reset = new Callable&lt;Void, RuntimeException&gt;() {
+        @Override
+        public Void call() throws RuntimeException {
+            activeThreads.set(0);
+            createdThreads.set(0);
+            return null;
+        }
+    };
+
+    private static Boolean acquired(final Lock lock) {
+        return resetInterruptFlagWhen(new Interruptible&lt;Boolean&gt;() {
+            @Override
+            public Boolean call() throws InterruptedException {
+                return lock.tryLock(10, TimeUnit.MILLISECONDS);
+            }
+        });
+    }
+}
+</source>
+            <p>
+                This revision attempts to maintain the invariant using Java <code>Lock</code>s and at the same encapsulate
+                the use of the locks in a separate class (<code>ExecuteUsingLock</code>) to ensure consistent behaviour. The
+                unfortunate verbosity of using <code>Callable</code> objects to achieve this is addressed later. For now,
+                the helper class looks like this
+            </p>
+<source>
+public class ExecuteUsingLock&lt;T, E extends Exception&gt; {
+
+    private final Callable&lt;T, E&gt; callable;
+
+    private ExecuteUsingLock(Callable&lt;T, E&gt; callable) {
+        this.callable = callable;
+    }
+
+    public static &lt;T, E extends Exception&gt; ExecuteUsingLock&lt;T, E&gt; execute(Callable&lt;T, E&gt; callable) {
+        return new ExecuteUsingLock&lt;T, E&gt;(callable);
+    }
+
+    public T using(Lock lock) throws E {
+        try {
+            lock.lock();
+            return callable.call();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</source>
+        <p>
+            By using the same lock to guard all the write methods, we're effectively implementing a class equivilant to
+            one that synchronises on all the write methods. It becomes more serial than previous revisions (ie, you
+            can't call <code>threadStarted</code> at the same time as <code>threadTerminated</code>). It's up to you, to
+            decide if that's a big deal or not.
+        </p>
+        <p>
+            The <code>reset</code> method has been implemented to try and acquire the lock before actually executing the
+            reset functionality. This is an attempt to optimise the reset and isn't really necessary unless you've
+            tested and identified it as a bottleneck. It's here really as part of the academic exercise.
+        </p>
+        <p>
+            As the same lock is used when writing (including the reset), there's no need to lock on the read
+            as the underlying <code>AtomicLong</code> will ensure visibility of any successful writes. As discussed, we
+            could avoid the use of locks completely by synchronising all the methods and if we dropped the <code>AtomicLong</code>s
+            in favour of <code>long</code>s, we could make the variables <code>volatile</code> to ensure visibility. These
+            alternatives are roughly equivalent but by exposing the lock in this revision we can create a test using mock
+            objects that separates the synchronisation policy from the functionality of the class.
+        </p>
             
-            <subsection name="Optimistic / Software Transaction Memory">
-            </subsection>
+        <h4>Tidying Up</h4>
+        <p>
+            A quick tidy up saw me push the anonymous <code>Callable</code> objects into their own classes and reduce the
+            noice in the <code>ThreadCounter</code>.
+        </p>
+<source>
+@ThreadSafe
+public class ThreadCounter implements ThreadObserver {
+
+    private final AtomicLong activeThreads = new AtomicLong();
+    private final AtomicLong createdThreads = new AtomicLong();
+    private final ReentrantLock lock = new ReentrantLock();
+
+    @Override
+    public void threadCreated() {
+        execute(increment(createdThreads)).using(lock);
+    }
+
+    @Override
+    public void threadStarted() {
+        execute(increment(activeThreads)).using(lock);
+    }
+
+    @Override
+    public void threadTerminated() {
+        execute(decrement(activeThreads)).using(lock);
+    }
+
+    @Override
+    public long getActiveCount() {
+        return activeThreads.get();
+    }
+
+    @Override
+    public long getCreatedCount() {
+        return createdThreads.get();
+    }
+
+    @Override
+    public void reset() {
+        if (acquired(lock))
+            execute(resetOf(activeThreads, createdThreads)).using(lock);
+    }
+}
+</source>
+<source>
+public class Increment implements Callable&lt;Void, RuntimeException&gt; {
+
+    private final AtomicLong counter;
+
+    public static Increment increment(AtomicLong counter) {
+        return new Increment(counter);
+    }
+
+    private Increment(AtomicLong counter) {
+        this.counter = counter;
+    }
+
+    @Override
+    public Void call() throws RuntimeException {
+        counter.getAndIncrement();
+        return null;
+    }
+}
+</source>
+<source>
+public class AcquireLock {
+
+    public static Boolean acquired(final Lock lock) {
+        return resetInterruptFlagWhen(new Interruptible&lt;Boolean&gt;() {
+            @Override
+            public Boolean call() throws InterruptedException {
+                return lock.tryLock(10, MILLISECONDS);
+            }
+        });
+    }
+}
+</source>
+<source>
+public class Reset implements Callable&lt;Void, RuntimeException&gt; {
+
+    private final List&lt;AtomicLong&gt; counters;
+
+    public static Reset resetOf(AtomicLong... counters) {
+        return new Reset(counters);
+    }
+
+    private Reset(AtomicLong... counters) {
+        this.counters = asList(counters);
+    }
+
+    @Override
+    public Void call() throws RuntimeException {
+        for (AtomicLong counter : counters)
+            counter.set(0);
+        return null;
+    }
+}    
+</source>
+
+        <h4>Building out the <code>Guard</code> Interface</h4>
+        <p>
+            There are some limitations with the current implementation, notably the inability to test the invariant. We
+            also know that we ultimately want to create a counter that isn't limited to a pessimistic locking strategy.
+            The idea of <i>guarding</i> shared memory seems to be abstract enough to imply non-lock based solutions, so
+            I created a basic <code>Gaurd</code> interface.
+        </p>
+<source>
+public interface Guard {
+
+    &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E;
+
+    Boolean guarding();
+}
+</source>
+        <p>
+            The basic lock based implementation of which is shown below
+        </p>
+<source>
+public class LockingGuard implements Guard {
+
+    private final Lock lock;
+
+    public LockingGuard(Lock lock) {
+        this.lock = lock;
+    }
+
+    @Override
+    public &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E {
+        try {
+            lock.lock();
+            return callable.call();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public Boolean guarding() {
+        return acquired(lock);
+    }
+}    
+</source>
+        <p>
+            This opens several opportunities for the improving the current implementation, specifically around testing
+            individual components in isolation and finally creating a test to ensure the invariant in maintained. The first
+            step is to refactor the <code>ThreadCounter</code> to use the <code>Guard</code>.
+        </p>
+<source>
+@ThreadSafe
+public class ThreadCounter implements ThreadObserver {
+
+    private final AtomicLong activeThreads = new AtomicLong();
+    private final AtomicLong createdThreads = new AtomicLong();
+    private final Guard guard;
+
+    public ThreadCounter(Guard guard) {
+        this.guard = guard;
+    }
+
+    @Override
+    public void threadCreated() {
+        guard.execute(increment(createdThreads));
+    }
+
+    @Override
+    public void threadStarted() {
+        guard.execute(increment(activeThreads));
+    }
+
+    @Override
+    public void threadTerminated() {
+        guard.execute(decrement(activeThreads));
+    }
+
+    @Override
+    public long getActiveCount() {
+        return activeThreads.get();
+    }
+
+    @Override
+    public long getCreatedCount() {
+        return createdThreads.get();
+    }
+
+    @Override
+    public void reset() {
+        if (guard.guarding())
+            guard.execute(resetOf(activeThreads, createdThreads));
+    }
+}
+</source>
+        <p>
+            and in order to test the original <code>ThreadCounterTest</code> (which shouldn't be concerned with thread 
+            safety), a dummy <code>Guard</code> is implemented. Notice this just delegates to the <code>Callable</code>
+            object.
+        </p>
+<source>
+public class Unguarded implements Guard {
+
+    public static Guard unguarded() {
+        return new Unguarded();
+    }
+
+    @Override
+    public &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E {
+        return callable.call();
+    }
+
+    @Override
+    public Boolean guarding() {
+        return true;
+    }
+}    
+</source>
+    <p>
+        This allows the original test to be unaffected
+    </p>
+<source>
+public class ThreadCounterTest {
+    
+    private final ThreadCounter counter = new ThreadCounter(unguarded());
+    ...
+}
+</source>
+    <p>
+        We can also change tact when it comes to testing the invariant. Rather than try and reproduce the race condition,
+        it's sufficient to ensure that the same <code>Guard</code> is used for write and reset methods. Assuming the
+        runtime guard implementation has been tested, a test to ensure the same guard is used for all of the methods
+        ensures the invariant will be maintained. This is very implementation specific but given the race condition
+        proved too difficult to reproduce, it's a sensible compromise.
+    </p>
+
+<source>
+@RunWith(JMock.class)
+public class ThreadCounterInvariantTest {
+
+    private final Mockery context = new Mockery();
+    private final Guard guard = context.mock(Guard.class);
+    private final ThreadCounter counter = new ThreadCounter(guard, new AtomicLongCounter(), new AtomicLongCounter());
+
+    @Test
+    public void shouldMakeGuardedCallOnWrites() throws Exception {
+        context.checking(new Expectations() {{
+            exactly(3).of(guard).execute(with(any(Callable.class)));
+        }});
+        counter.threadCreated();
+        counter.threadStarted();
+        counter.threadTerminated();
+    }
+
+    @Test
+    public void shouldMakeGuardedCallForResetAndSoMaintainInvariant() throws Exception {
+        context.checking(new Expectations() {{
+            one(guard).guarding(); will(returnValue(true));
+            one(guard).execute(with(any(Callable.class)));
+        }});
+        counter.reset();
+    }
+
+    @Test
+    public void shouldNotAttemptGuardedCall() throws Exception {
+        context.checking(new Expectations() {{
+            one(guard).guarding(); will(returnValue(false));
+            never(guard).execute(with(any(Callable.class)));
+        }});
+        counter.reset();
+    }
+}
+</source>
+        <h4>Taking it Further with <code>Counter</code>s</h4>
+        <p>
+            Using the <code>Guard</code> abstraction is interesting but doesn't give us very much other than allowing
+            alternative guard implementations. The current <code>LockGuard</code> uses a <code>Lock</code>
+            and we could supply an alternative that uses <code>synchronized</code> but we don't gain much. As long as
+            we use the same guard instance, we'll get consistent behaviour between implementations. For example,
+        </p>
+<source>
+public class SynchronisingGuard implements Guard {
+
+    public static Guard synchronised() {
+        return new SynchronisingGuard();
+    }
+
+    @Override
+    public synchronized &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E {
+        return callable.call();
+    }
+
+    @Override
+    public Boolean guarding() {
+        return true;
+    }
+}    
+</source>
+        <p>
+            What might be more useful is to come up with a <code>Counter</code> abstract to separate the increment and
+            decrement functions from the classes that use them from the guarding policy that controls their access. For
+            example,
+        </p>
+<source>
+public interface Counter {
+    void increment();
+    void decrement();
+    Long get();
+    void reset();
+}
+</source>
+        <p>
+            With an example implementation of
+        </p>
+<source>
+public class LongCounter implements Counter {
+
+    private Long count = new Long(0);
+
+    @Override
+    public void increment() {
+        count++;
+    }
+
+    @Override
+    public void decrement() {
+        count--;
+    }
+
+    @Override
+    public Long get() {
+        return count;
+    }
+
+    @Override
+    public void reset() {
+        count = new Long(0);
+    }
+}
+</source>
+        <p>
+            or an atomic version
+        </p>
+<source>
+public class AtomicLongCounter implements Counter {
+
+    private volatile final AtomicLong count = new AtomicLong();
+
+    @Override
+    public void increment() {
+        count.getAndIncrement();
+    }
+
+    @Override
+    public void decrement() {
+        count.getAndDecrement();
+    }
+
+    @Override
+    public void reset() {
+        count.set(0);
+    }
+
+    public Long get() {
+        return count.get();
+    }
+}
+</source>
+        <p>
+            Which means we can change the <code>ThreadCounter</code> to take the dependencies on construction.
+        </p>
+<source>
+@ThreadSafe
+public class ThreadCounter implements ThreadObserver {
+
+    private final Counter activeThreads;
+    private final Counter createdThreads;
+    private final Guard guard;
+
+    public ThreadCounter(Guard guard, Counter activeThreads, Counter createdThreads) {
+        this.guard = guard;
+        this.activeThreads = activeThreads;
+        this.createdThreads = createdThreads;
+    }
+
+    ...
+}
+</source>
+        <p>
+            We can therefore construct a <code>ThreadCounter</code> with different semantics when it comes to use from
+            a concurrent context. For example,
+        </p>
+<source>
+new ThreadCounter(new LockingGuard(new ReentrantLock()), new LongCounter(), new LongCounter());
+</source>
+        <p>
+            creates a thread safe thread counter using the reentrant lock to ensure the invariant around reset is maintained.
+            The visibility of writes against the (non-thread safe) <code>LongCounter</code> can be ensured by the
+            <code>volatile</code> keyword in <code>LongCounter</code>.
+        </p>
+<source>
+new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
+</source>
+        <p>
+            The above statement creates a thread counter which is thread safe (by virtue of the <code>AtomicLongCounter</code>s)
+            but doesn't maintain the invariant. The unguarded <code>Guard</code> doesn't include any synchronisation.
+        </p>
+<source>
+new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
+</source>
+        <p>
+            The above statement is roughly equivalent, it creates a thread safe thread counter but uses a Java monitor
+            rather than a <code>Lock</code> for its guarding policy. It maintains the invariant as before. The
+            <code>synchronised</code> method is the static creation method for <code>SynchronisingGuard</code> class.
+        </p>
+<source>
+new ThreadCounter(unguarded(), new LongCounter(), new LongCounter());
+</source>
+        <p>
+           The above statement creates a non-thread safe version.
+        </p>
+
+        <p>
+            The original functionality test can also be updated to use mocks (as the increment functionality can be
+            tested separately in the <code>Counter</code> implementations. For example, using JMock, we can ensure
+            increment and decrement functionality is called against a <code>Counter</code> instance.
+        </p>
+<source>
+@RunWith(JMock.class)
+public class ThreadCounterTest {
+
+    private final Mockery context = new Mockery();
+    private final Counter activeThreads = context.mock(Counter.class, "active");
+    private final Counter createdThreads = context.mock(Counter.class, "created");
+
+    private ThreadCounter counter;
+
+    @Before
+    public void setupCounter() {
+        counter = new ThreadCounter(unguarded(), activeThreads, createdThreads);
+    }
+
+    @Test
+    public void shouldIncrementActiveCount() {
+        context.checking(new Expectations() {{
+            one(activeThreads).increment();
+        }});
+        counter.threadStarted();
+    }
+
+    @Test
+    public void shouldDecrementActiveThreadCount() {
+        context.checking(new Expectations() {{
+            one(activeThreads).decrement();
+        }});
+        counter.threadTerminated();
+    }
+
+    @Test
+    public void shouldIncrementCreatedCount() {
+        context.checking(new Expectations(){{
+            one(createdThreads).increment();
+        }});
+        counter.threadCreated();
+    }
+
+    @Test
+    public void shouldResetCounts() {
+        context.checking(new Expectations(){{
+            one(activeThreads).reset();
+            one(createdThreads).reset();
+        }});
+        counter.reset();
+    }
+}
+</source>
+
+        <subsection name="Optimistic / Software Transaction Memory">
+        </subsection>
 
         </section>
 
