@@ -89,8 +89,9 @@ public class ObservableThreadFactory implements ThreadFactory {
             </subsection>
 
             <subsection name="Pessimistic / Lock Based Synchronisation">
+                <h4>Basic Implementation</h4>
                 <p>
-
+                    A naive implementation of the <code>ThreadCounter</code> might look like this
                 </p>
 <source>
 public class ThreadCounter implements ThreadFactoryObserver {
@@ -131,7 +132,124 @@ public class ThreadCounter implements ThreadFactoryObserver {
 }
 </source>
             </subsection>
+            <p>
+                The basic test below shows the implementation to be correct (at least in a non-concurrent context).
+            </p>
+<source>
+public class ThreadCounterTest {
 
+    private final ThreadCounter counter = new ThreadCounter();
+
+    @Test
+    public void shouldInitialiseCounts() {
+        assertThat(counter.getActiveCount(), is(0L));
+        assertThat(counter.getCreatedCount(), is(0L));
+    }
+
+    @Test
+    public void shouldIncrementActiveCount() {
+        incrementActiveThreadsBy(3);
+        assertThat(counter.getActiveCount(), is(3L));
+    }
+
+    @Test
+    public void shouldDecrementActiveThreadCount() {
+        incrementActiveThreadsBy(5);
+        assertThat(counter.getActiveCount(), is(5L));
+        decrementActiveThreadsBy(5);
+        assertThat(counter.getActiveCount(), is(0L));
+    }
+
+    @Test
+    public void shouldResetCounts() {
+        incrementActiveThreadsBy(8);
+        incrementThreadsBy(5);
+        counter.reset();
+        assertThat(counter.getActiveCount(), is(0L));
+        assertThat(counter.getCreatedCount(), is(0L));
+    }
+
+    private void incrementActiveThreadsBy(int amount) {
+        for (int i = 0; i &lt; amount; i++)
+            counter.threadStarted();
+    }
+
+    private void decrementActiveThreadsBy(int amount)  {
+        for (int i = 0; i &lt; amount; i++)
+            counter.threadTerminated();
+    }
+
+    private void incrementThreadsBy(int amount)  {
+        for (int i = 0; i &lt; amount; i++)
+            counter.threadCreated();
+    }
+}
+</source>
+        <h4>Testing Thread Safety</h4>
+        <p>
+            The next test shows that it isn't correct from a concurrent context. Here, the
+            <a href="http://code.google.com/p/tempus-fugit/wiki/Documentation?tm=6">tempus-fugit</a> micro-library
+            is used to run each test method repeatedly over several threads. Specifically, each of the test methods are
+            run one hundred times (thanks to the <code>RepeatingRule</code> rule) in fifty threads
+            (thanks to the <code>ConcurrentRule</code> rule along with the <code>count</code> variable).
+            To kick this off for each test method at the <i>same time</i>, the <code>ConcurrentTestRunner</code> is used.
+            Otherwise, each of the test methods will run in their own threads, repeatedly but in sequence (ie,
+            <code>notifyThreadStarted</code> would run, then <code>notifyThreadTerminated</code> and so on). Adding
+            the <code>@RunWith</code> means that each test method is kicked off in its own thread at roughly the same time.
+        </p>
+<source>
+@RunWith(<b>ConcurrentTestRunner.class</b>)
+public class ThreadCounterIntegrationTest {
+
+    private static final ThreadCounter counter = new ThreadCounter();
+
+    @Rule public <b>ConcurrentRule</b> concurrent = new ConcurrentRule();
+    @Rule public <b>RepeatingRule</b> repeating = new RepeatingRule();
+
+    @Test
+    @Repeating
+    @Concurrent(count = 50)
+    public void notifyThreadStarted() {
+        counter.threadStarted();
+        Introduce.jitter();
+    }
+
+    @Test
+    @Repeating
+    @Concurrent(count = 10)
+    public void notifyThreadTerminated() {
+        counter.threadTerminated();
+        Introduce.jitter();
+    }
+
+    @Test
+    @Repeating
+    @Concurrent(count = 50)
+    public void notifyThreadCreated() {
+        counter.threadCreated();
+        Introduce.jitter();
+    }
+
+    @AfterClass
+    public static void verifyCounter() {
+        assertThat(activeCount.get(), is(4000L));
+        assertThat(createdCount.get(), is(5000L));
+    }
+}
+</source>
+            <h4>Testing Invariants</h4>
+            <p>
+                The above test is designed to load the class under test so heavily that it is <i>reasonably likely</i> to
+                fail the assertions (in <code>verifyCounter()</code>). It doesn't however test the invariant around the
+                <code>reset</code> method. It could be argued that if <code>reset</code> is called, it should reset both
+                <code>activeThreads</code> and <code>createdThreads</code> atomically. That is to say, no additional updates
+                should be allowed to either variable until both have been set to zero.
+            </p>
+            <p>
+                Testing the invariant directly proved too difficult to do, it was just too hard to simulate the race
+                condition between resetting and setting multiple variables. However, as well see, the natural progression
+                of the implementation lead to an alternative strategy which ensures the invariant in maintained.
+            </p>
 
             <subsection name="Optimistic / Software Transaction Memory">
             </subsection>
