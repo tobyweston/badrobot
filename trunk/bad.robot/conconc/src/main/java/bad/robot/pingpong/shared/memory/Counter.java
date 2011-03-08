@@ -25,4 +25,5 @@ public interface Counter {
 
     void reset();
 
+    Long get();
 }

@@ -1,16 +1,17 @@
 package bad.robot.pingpong.shared.memory.optimistic;
 
-import org.junit.Ignore;
+import bad.robot.pingpong.shared.memory.pessimistic.ThreadCounter;
 import org.junit.Test;
 
 import java.util.concurrent.TimeoutException;
 
+import static bad.robot.pingpong.shared.memory.optimistic.OptimisticExecutorServiceFactory.OptimisticThreadCounters;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class ThreadCounterTest {
 
-    private final ThreadCounter counter = new ThreadCounter();
+    private final ThreadCounter counter = OptimisticThreadCounters.createNonThreadSafeCounter();
 
     @Test
     public void shouldIncrementActiveCount() {
@@ -35,8 +36,11 @@ public class ThreadCounterTest {
     }
 
     @Test
-    @Ignore
     public void shouldResetCounts() {
-//        counter.reset();
+        counter.threadCreated();
+        counter.threadStarted();
+        counter.reset();
+        assertThat(counter.getActiveThreads(), is(0L));
+        assertThat(counter.getCreatedThreads(), is(0L));
     }
 }

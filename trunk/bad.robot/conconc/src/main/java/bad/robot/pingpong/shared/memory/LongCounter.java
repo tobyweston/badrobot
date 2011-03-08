@@ -15,11 +15,12 @@ public class LongCounter implements Counter {
     }
 
     @Override
-    public void reset() {
-        count = 0;
-    }
-
     public Long get() {
         return count;
+    }
+
+    @Override
+    public void reset() {
+        count = 0;
     }
 }
