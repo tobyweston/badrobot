@@ -20,6 +20,7 @@ public class PessimisticExecutorServiceFactory implements ExecutorServiceFactory
     }
 
     public static class ThreadCounterBuilder {
+
         static ThreadCounter createLockBasedThreadSafeCounter() {
             return new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
         }
