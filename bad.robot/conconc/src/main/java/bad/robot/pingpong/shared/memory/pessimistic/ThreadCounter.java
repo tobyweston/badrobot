@@ -52,6 +52,14 @@ public class ThreadCounter implements ThreadObserver {
         guard.execute(decrement(activeThreads));
     }
 
+    public Long getActiveThreads() {
+        return activeThreads.get();
+    }
+
+    public Long getCreatedThreads() {
+        return createdThreads.get();
+    }
+
     public void reset() {
         if (guard.guarding())
             guard.execute(resetOf(activeThreads, createdThreads));

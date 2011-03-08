@@ -27,8 +27,7 @@ public class ThreadCounterInvariantTest {
     @Test
     public void shouldMakeGuardedCallForResetAndSoMaintainInvariant() throws Exception {
         context.checking(new Expectations() {{
-            one(guard).guarding();
-            will(returnValue(true));
+            one(guard).guarding(); will(returnValue(true));
             one(guard).execute(with(any(Callable.class)));
         }});
         counter.reset();
