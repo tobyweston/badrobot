@@ -23,4 +23,6 @@ package bad.robot.pingpong.shared.memory;
  */
 public interface Observable extends ThreadCounterMBean {
 
+    // yuk, methods should be here not on the super. groan.
+
 }
