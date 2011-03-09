@@ -16,60 +16,17 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
-import bad.robot.pingpong.Introduce;
+import bad.robot.pingpong.shared.memory.AbstractThreadCounterIntegrationTest;
 import bad.robot.pingpong.shared.memory.ThreadCounter;
-import com.google.code.tempusfugit.concurrency.ConcurrentRule;
-import com.google.code.tempusfugit.concurrency.ConcurrentTestRunner;
-import com.google.code.tempusfugit.concurrency.RepeatingRule;
-import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
-import com.google.code.tempusfugit.concurrency.annotations.Repeating;
-import org.junit.AfterClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.BeforeClass;
 
 import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
-@RunWith(ConcurrentTestRunner.class)
-public class ThreadCounterIntegrationTest {
+public class ThreadCounterIntegrationTest extends AbstractThreadCounterIntegrationTest {
 
-    private static final AtomicLongCounter createdCount = new AtomicLongCounter();
-    private static final AtomicLongCounter activeCount = new AtomicLongCounter();
-    private static final ThreadCounter counter = new ThreadCounter(unguarded(), activeCount, createdCount);
-
-    @Rule public ConcurrentRule concurrent = new ConcurrentRule();
-    @Rule public RepeatingRule repeating = new RepeatingRule();
-
-    @Test
-    @Repeating
-    @Concurrent(count = 50)
-    public void notifyThreadStarted() {
-        counter.threadStarted();
-        Introduce.jitter();
-    }
-
-    @Test
-    @Repeating
-    @Concurrent(count = 10)
-    public void notifyThreadTerminated() {
-        counter.threadTerminated();
-        Introduce.jitter();
-    }
-
-    @Test
-    @Repeating
-    @Concurrent(count = 50)
-    public void notifyThreadCreated() {
-        counter.threadCreated();
-        Introduce.jitter();
-    }
-
-    @AfterClass
-    public static void verifyCounter() {
-        assertThat(activeCount.get(), is(4000L));
-        assertThat(createdCount.get(), is(5000L));
+    @BeforeClass
+    public static void createThreadCounter() {
+        counter = new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
     }
 
 }
