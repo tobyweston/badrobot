@@ -1,8 +1,7 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
-import bad.robot.pingpong.shared.memory.ExecutorServiceFactory;
-import bad.robot.pingpong.shared.memory.LongCounter;
-import bad.robot.pingpong.shared.memory.ObservableThreadFactory;
+import bad.robot.pingpong.server.Jmx;
+import bad.robot.pingpong.shared.memory.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
@@ -16,24 +15,26 @@ public class PessimisticExecutorServiceFactory implements ExecutorServiceFactory
 
     @Override
     public ExecutorService create() {
-        return newFixedThreadPool(5, new ObservableThreadFactory(createLockBasedThreadSafeCounter()));
+        ThreadObserver observer = createLockBasedThreadSafeCounter();
+        Jmx.register(observer);
+        return newFixedThreadPool(5, new ObservableThreadFactory(observer));
     }
 
     public static class PessimisticThreadCounters {
 
-        static ThreadCounter createLockBasedThreadSafeCounter() {
+        static ThreadObserver createLockBasedThreadSafeCounter() {
             return new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
         }
 
-        static ThreadCounter createSynchronisedCounter() {
+        static ThreadObserver createSynchronisedCounter() {
             return new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
         }
 
-        static ThreadCounter createNonThreadSafeCounter() {
+        static ThreadObserver createNonThreadSafeCounter() {
             return new ThreadCounter(unguarded(), new LongCounter(), new LongCounter());
         }
 
-        static ThreadCounter createThreadSafeCounterWithoutMaintainingResetInvariant() {
+        static ThreadObserver createThreadSafeCounterWithoutMaintainingResetInvariant() {
             return new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
         }
     }

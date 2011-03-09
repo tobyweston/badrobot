@@ -17,7 +17,7 @@
 package bad.robot.pingpong.shared.memory.optimistic;
 
 import bad.robot.pingpong.Introduce;
-import bad.robot.pingpong.shared.memory.pessimistic.ThreadCounter;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.ConcurrentTestRunner;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
@@ -35,7 +35,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(ConcurrentTestRunner.class)
 public class ThreadCounterIntegrationTest {
 
-    private static final ThreadCounter counter = createThreadSafeCounterMaintainingInvariant();
+    private static final ThreadCounter counter = (ThreadCounter) createThreadSafeCounterMaintainingInvariant();
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
