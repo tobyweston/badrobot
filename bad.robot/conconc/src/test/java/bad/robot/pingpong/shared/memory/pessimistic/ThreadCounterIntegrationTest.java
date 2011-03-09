@@ -17,6 +17,7 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.Introduce;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.ConcurrentTestRunner;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;

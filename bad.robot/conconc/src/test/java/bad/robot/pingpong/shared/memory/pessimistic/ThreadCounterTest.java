@@ -17,6 +17,7 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.shared.memory.Counter;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;

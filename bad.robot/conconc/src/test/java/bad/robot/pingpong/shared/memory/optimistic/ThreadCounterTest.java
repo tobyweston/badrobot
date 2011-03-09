@@ -1,6 +1,6 @@
 package bad.robot.pingpong.shared.memory.optimistic;
 
-import bad.robot.pingpong.shared.memory.pessimistic.ThreadCounter;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 import org.junit.Test;
 
 import java.util.concurrent.TimeoutException;
@@ -11,7 +11,7 @@ import static org.junit.Assert.assertThat;
 
 public class ThreadCounterTest {
 
-    private final ThreadCounter counter = OptimisticThreadCounters.createNonThreadSafeCounter();
+    private final ThreadCounter counter = (ThreadCounter) OptimisticThreadCounters.createNonThreadSafeCounter();
 
     @Test
     public void shouldIncrementActiveCount() {

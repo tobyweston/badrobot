@@ -1,5 +1,6 @@
 package bad.robot.pingpong.shared.memory.pessimistic;
 
+import bad.robot.pingpong.shared.memory.ThreadCounter;
 import com.google.code.tempusfugit.concurrency.Callable;
 import org.jmock.Expectations;
 import org.jmock.Mockery;

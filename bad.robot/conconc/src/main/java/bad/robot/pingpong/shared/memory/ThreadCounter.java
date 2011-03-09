@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.shared.memory.Counter;
-import bad.robot.pingpong.shared.memory.ThreadObserver;
+import bad.robot.pingpong.shared.memory.pessimistic.Guard;
 import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
 import static bad.robot.pingpong.shared.memory.Decrement.decrement;
@@ -25,7 +24,7 @@ import static bad.robot.pingpong.shared.memory.Increment.increment;
 import static bad.robot.pingpong.shared.memory.Reset.resetOf;
 
 @ThreadSafe
-public class ThreadCounter implements ThreadObserver {
+public class ThreadCounter implements ThreadObserver, Observable {
 
     private final Counter activeThreads;
     private final Counter createdThreads;
@@ -52,14 +51,17 @@ public class ThreadCounter implements ThreadObserver {
         guard.execute(decrement(activeThreads));
     }
 
+    @Override
     public Long getActiveThreads() {
         return activeThreads.get();
     }
 
+    @Override
     public Long getCreatedThreads() {
         return createdThreads.get();
     }
 
+    @Override
     public void reset() {
         if (guard.guarding())
             guard.execute(resetOf(activeThreads, createdThreads));
