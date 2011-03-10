@@ -24,7 +24,7 @@ import static bad.robot.pingpong.shared.memory.Increment.increment;
 import static bad.robot.pingpong.shared.memory.Reset.resetOf;
 
 @ThreadSafe
-public class ThreadCounter implements ThreadObserver, Observable {
+public class ThreadCounter implements ThreadObserver, ThreadCounterMBean {
 
     private final Counter activeThreads;
     private final Counter createdThreads;

@@ -17,8 +17,11 @@
 package bad.robot.pingpong.shared.memory;
 
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ObservableThreadFactory implements ThreadFactory {
+
+    private final static AtomicInteger count = new AtomicInteger(0);
 
     private final ThreadObserver observer;
 
@@ -37,8 +40,28 @@ public class ObservableThreadFactory implements ThreadFactory {
                     observer.threadTerminated();
                 }
             }
-        });
+        }, this.getClass().getPackage().getName() + "Thread-" + count.incrementAndGet());
         observer.threadCreated();
         return thread;
     }
+
+//    public static class ObservableThread extends Thread {
+//
+//        public ObservableThread() {
+//            super();
+//            observer.threadNew();
+//        }
+//
+//        @Override
+//        public void run() {
+//            observer.threadRunnable();
+//            try {
+//                super.run();
+//            } finally {
+//                observer.threadTerminated();
+//            }
+//        }
+//
+//
+//    }
 }
