@@ -17,7 +17,7 @@
 package bad.robot.pingpong.server;
 
 import bad.robot.pingpong.server.simple.SimpleServer;
-import bad.robot.pingpong.shared.memory.pessimistic.PessimisticExecutorServiceFactory;
+import bad.robot.pingpong.shared.memory.ObservableThreadFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -29,9 +29,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.Executors;
 
 import static bad.robot.pingpong.Matchers.hasContent;
 import static bad.robot.pingpong.Matchers.hasStatus;
+import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createLockBasedThreadSafeCounter;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
 import static bad.robot.pingpong.transport.ResponseCode.OK;
 import static org.junit.Assert.assertThat;
@@ -42,7 +44,7 @@ public class PingIntegrationTest {
 
     @Before
     public void start() throws IOException {
-        server = new SimpleServer(new PessimisticExecutorServiceFactory());
+        server = new SimpleServer(Executors.newFixedThreadPool(5, new ObservableThreadFactory(createLockBasedThreadSafeCounter())));
         server.start();
     }
 
