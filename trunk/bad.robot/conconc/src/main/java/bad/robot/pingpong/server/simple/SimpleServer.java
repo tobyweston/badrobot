@@ -17,9 +17,10 @@
 package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.UncheckedException;
+import bad.robot.pingpong.server.Jmx;
 import bad.robot.pingpong.server.Server;
-import bad.robot.pingpong.shared.memory.ExecutorServiceFactory;
-import bad.robot.pingpong.shared.memory.pessimistic.PessimisticExecutorServiceFactory;
+import bad.robot.pingpong.shared.memory.ObservableThreadFactory;
+import bad.robot.pingpong.shared.memory.ThreadObserver;
 import org.simpleframework.http.Address;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -34,15 +35,17 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
+import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createLockBasedThreadSafeCounter;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class SimpleServer implements Server {
 
     private final Connection connection;
     private final ExecutorService threads;
 
-    public SimpleServer(ExecutorServiceFactory factory) throws IOException {
-        threads = factory.create();
+    public SimpleServer(ExecutorService threads) throws IOException {
+        this.threads = threads;
         connection = new SocketConnection(new AsynchronousContainer(threads, new ResourceContainer(new ResourceEngine() {
             @Override
             public Resource resolve(Address target) {
@@ -63,7 +66,9 @@ public class SimpleServer implements Server {
     }
 
     public static void main(String... args) throws IOException {
-        new SimpleServer(new PessimisticExecutorServiceFactory()).start();
+        ThreadObserver threadCounter = createLockBasedThreadSafeCounter();
+        Jmx.register(threadCounter);
+        new SimpleServer(newFixedThreadPool(20, new ObservableThreadFactory(threadCounter))).start();
     }
 
     private static class NotFoundResource implements Resource {

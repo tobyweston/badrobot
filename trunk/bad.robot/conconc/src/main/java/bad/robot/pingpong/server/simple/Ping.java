@@ -16,6 +16,7 @@
 
 package bad.robot.pingpong.server.simple;
 
+import bad.robot.pingpong.Introduce;
 import bad.robot.pingpong.UncheckedException;
 import bad.robot.pingpong.server.StandardPing;
 import com.google.code.tempusfugit.temporal.StopWatch;
@@ -26,8 +27,10 @@ import org.simpleframework.http.core.Container;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import static bad.robot.pingpong.UpTo.upTo;
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
 import static bad.robot.pingpong.transport.ResponseCode.OK;
+import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.RealClock.now;
 
 class Ping implements Container {
@@ -40,6 +43,7 @@ class Ping implements Container {
             standardResponseHeaders().setOn(response, OK);
             body = response.getPrintStream();
             body.print(new StandardPing().ping());
+            Introduce.jitter(upTo(millis(500)));
             System.out.printf("Processed on %s, after %s%n", Thread.currentThread().getName(), watch.markAndGetTotalElapsedTime());
         }
         catch (IOException e) {
