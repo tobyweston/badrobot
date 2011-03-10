@@ -26,7 +26,7 @@ public class PessimisticExecutorServiceFactory implements ExecutorServiceFactory
             return new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
         }
 
-        static ThreadObserver createSynchronisedCounter() {
+        static ThreadObserver createSynchronisedThreadSafeCounter() {
             return new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
         }
 

@@ -22,12 +22,6 @@ public abstract class AbstractThreadCounterIntegrationTest {
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
 
-    @AfterClass
-    public static void verifyCounter() {
-        assertThat(counter.getActiveThreads(), is(4000L));
-        assertThat(counter.getCreatedThreads(), is(5000L));
-    }
-
     @Test
     @Repeating
     @Concurrent(count = 50)
@@ -50,5 +44,11 @@ public abstract class AbstractThreadCounterIntegrationTest {
     public void notifyThreadCreated() {
         counter.threadCreated();
         Introduce.jitter();
+    }
+
+    @AfterClass
+    public static void verifyCounter() {
+        assertThat(counter.getActiveThreads(), is(4000L));
+        assertThat(counter.getCreatedThreads(), is(5000L));
     }
 }
