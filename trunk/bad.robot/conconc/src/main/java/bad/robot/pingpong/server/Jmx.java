@@ -9,21 +9,21 @@ import java.lang.management.ManagementFactory;
 
 public class Jmx {
 
-    public static void register(Object object) {
+    public static void register(Object object, String name) {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = createObjectName();
+        ObjectName objectName = createObjectName(name);
         try {
-            if (server.isRegistered(name))
-                server.unregisterMBean(name);
-            server.registerMBean(object, name);
+            if (server.isRegistered(objectName))
+                server.unregisterMBean(objectName);
+            server.registerMBean(object, objectName);
         } catch (Exception e) {
             throw new UncheckedException(e);
         }
     }
 
-    private static ObjectName createObjectName() {
+    private static ObjectName createObjectName(String name) {
         try {
-            return new ObjectName("bad.robot:type=ThreadCounter");
+            return new ObjectName("bad.robot:type=" + name);
         } catch (MalformedObjectNameException e) {
             throw new UncheckedException(e);
         }
