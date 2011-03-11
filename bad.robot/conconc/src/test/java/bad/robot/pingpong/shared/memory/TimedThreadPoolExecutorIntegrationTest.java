@@ -21,9 +21,8 @@ public class TimedThreadPoolExecutorIntegrationTest {
         setThreadingPolicy(new Synchroniser());
     }};
 
-    private final RequestObserver timer = context.mock(RequestObserver.class);
-    private final RequestObserver.Request request = context.mock(RequestObserver.Request.class);
-    private final ThreadPoolExecutor threads = new TimedThreadPoolExecutor(1, new ThreadFactory() {
+    private final ThreadPoolObserver observer = context.mock(ThreadPoolObserver.class);
+    private final ThreadPoolExecutor threads = new ObservableThreadPoolExecutor(1, new ThreadFactory() {
         @Override
         public Thread newThread(Runnable runnable) {
             Thread thread = new Thread(runnable);
@@ -38,13 +37,13 @@ public class TimedThreadPoolExecutorIntegrationTest {
             });
             return thread;
         }
-    }, timer);
+    }, observer);
 
     @Test
     public void submitWillNotifyObserver() throws TimeoutException, ExecutionException, InterruptedException {
         context.checking(new Expectations() {{
-            oneOf(timer).started(); will(returnValue(request));
-            oneOf(request).finished(); 
+            oneOf(observer).beforeExecute(with(any(Thread.class)), with(any(Runnable.class)));
+            oneOf(observer).afterExecute(with(any(Runnable.class)), with(any(Throwable.class)));
         }});
         Future<?> future = threads.submit(doNothing());
         future.get(500, MILLISECONDS);
@@ -53,8 +52,8 @@ public class TimedThreadPoolExecutorIntegrationTest {
     @Test (expected = Exception.class)
     public void taskThrowsException() throws TimeoutException, ExecutionException, InterruptedException {
         context.checking(new Expectations() {{
-            oneOf(timer).started(); will(returnValue(request));
-            oneOf(request).finished();
+            oneOf(observer).beforeExecute(with(any(Thread.class)), with(any(Runnable.class)));
+            oneOf(observer).afterExecute(with(any(Runnable.class)), with(any(Throwable.class)));
         }});
         Future<?> future = threads.submit(throwsException());
         future.get(500, MILLISECONDS);
@@ -62,6 +61,9 @@ public class TimedThreadPoolExecutorIntegrationTest {
 
     @After
     public void shutdownThreadPool() throws Throwable {
+        context.checking(new Expectations(){{
+            oneOf(observer).terminated();
+        }});
         shutdown(threads).waitingForCompletion(millis(500));
     }
 
