@@ -45,23 +45,4 @@ public class ObservableThreadFactory implements ThreadFactory {
         return thread;
     }
 
-//    public static class ObservableThread extends Thread {
-//
-//        public ObservableThread() {
-//            super();
-//            observer.threadNew();
-//        }
-//
-//        @Override
-//        public void run() {
-//            observer.threadRunnable();
-//            try {
-//                super.run();
-//            } finally {
-//                observer.threadTerminated();
-//            }
-//        }
-//
-//
-//    }
 }

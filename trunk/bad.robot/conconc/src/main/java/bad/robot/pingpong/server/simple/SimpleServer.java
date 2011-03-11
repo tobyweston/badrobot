@@ -17,10 +17,7 @@
 package bad.robot.pingpong.server.simple;
 
 import bad.robot.pingpong.UncheckedException;
-import bad.robot.pingpong.server.Jmx;
 import bad.robot.pingpong.server.Server;
-import bad.robot.pingpong.shared.memory.ObservableThreadFactory;
-import bad.robot.pingpong.shared.memory.ThreadObserver;
 import org.simpleframework.http.Address;
 import org.simpleframework.http.Request;
 import org.simpleframework.http.Response;
@@ -35,8 +32,6 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
-import static bad.robot.pingpong.shared.memory.Executors.newFixedThreadPool;
-import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createLockBasedThreadSafeCounter;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
 
 public class SimpleServer implements Server {
@@ -66,11 +61,7 @@ public class SimpleServer implements Server {
     }
 
     public static void main(String... args) throws IOException {
-        ThreadObserver threadCounter = createLockBasedThreadSafeCounter();
-        Jmx.register(threadCounter, "ThreadCounter");
-        ExecutorService threadPool = newFixedThreadPool(20, new ObservableThreadFactory(threadCounter));
-        Jmx.register(threadPool, "ThreadPool");
-        new SimpleServer(threadPool).start();
+        new SimpleServerBuilder().build().start();
     }
 
     private static class NotFoundResource implements Resource {
