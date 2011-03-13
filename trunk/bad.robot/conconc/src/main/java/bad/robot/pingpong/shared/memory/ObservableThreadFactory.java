@@ -40,7 +40,7 @@ public class ObservableThreadFactory implements ThreadFactory {
                     observer.threadTerminated();
                 }
             }
-        }, this.getClass().getPackage().getName() + "Thread-" + count.incrementAndGet());
+        }, this.getClass().getPackage().getName() + " Thread-" + count.incrementAndGet());
         observer.threadCreated();
         return thread;
     }

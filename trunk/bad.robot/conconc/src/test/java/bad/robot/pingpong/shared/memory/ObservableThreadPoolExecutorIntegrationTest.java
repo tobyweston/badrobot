@@ -1,9 +1,24 @@
+/*
+ * Copyright (c) 2009-2011, bad robot (london) ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package bad.robot.pingpong.shared.memory;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
-import org.jmock.lib.concurrent.Synchroniser;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,11 +30,9 @@ import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @RunWith(JMock.class)
-public class TimedThreadPoolExecutorIntegrationTest {
+public class ObservableThreadPoolExecutorIntegrationTest {
 
-    private final Mockery context = new Mockery() {{
-        setThreadingPolicy(new Synchroniser());
-    }};
+    private final Mockery context = new Mockery();
 
     private final ThreadPoolObserver observer = context.mock(ThreadPoolObserver.class);
     private final ThreadPoolExecutor threads = new ObservableThreadPoolExecutor(1, new ThreadFactory() {
@@ -74,6 +87,7 @@ public class TimedThreadPoolExecutorIntegrationTest {
             }
         };
     }
+
     private static Callable throwsException() {
         return new Callable<Void>() {
             @Override
