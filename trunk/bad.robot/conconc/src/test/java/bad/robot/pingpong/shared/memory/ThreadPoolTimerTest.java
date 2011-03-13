@@ -16,12 +16,16 @@
 
 package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.StopWatch;
-import com.google.code.tempusfugit.temporal.Duration;
+import bad.robot.pingpong.shared.memory.pessimistic.AtomicLongCounter;
+import bad.robot.pingpong.shared.memory.pessimistic.MillisecondCounter;
 import org.junit.Test;
+
+import java.util.concurrent.CountDownLatch;
 
 import static bad.robot.pingpong.shared.memory.ThreadPoolTimerMeanExecutionTimeMatcher.hasMeanElapsedTimeOf;
 import static com.google.code.tempusfugit.temporal.Duration.millis;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class ThreadPoolTimerTest {
@@ -29,7 +33,7 @@ public class ThreadPoolTimerTest {
     private static final Throwable NO_EXCEPTION = null;
 
     private final StopWatchStub stopWatch = new StopWatchStub();
-    private final ThreadPoolTimer timer = new ThreadPoolTimer(stopWatch);
+    private final ThreadPoolTimer timer = new ThreadPoolTimer(stopWatch, new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
 
     @Test
     public void shouldGetMeanExecutionTime() {
@@ -53,35 +57,37 @@ public class ThreadPoolTimerTest {
         assertThat(timer, hasMeanElapsedTimeOf(millis(650)));
     }
 
-    private class StopWatchStub implements StopWatch {
-
-        private Duration elapsedTime = millis(0);
-
-        @Override
-        public void start() {
-        }
-
-        @Override
-        public void stop() {
-        }
-
-        @Override
-        public Duration elapsedTime() {
-            return elapsedTime;
-        }
-
-        public void setElapsedTime(Duration elapsedTime) {
-            this.elapsedTime = elapsedTime;
-        }
+    @Test
+    public void shouldMaintainMeanForDifferentThreads() throws InterruptedException {
+        callTimerInAnotherThread();
+        assertThat(timer, hasMeanElapsedTimeOf(millis(0)));
+        stopWatch.setElapsedTime(millis(500));
+        callTimerInAnotherThread();
+        assertThat(timer, hasMeanElapsedTimeOf(millis(250)));
+        stopWatch.setElapsedTime(millis(1500));
+        callTimerInAnotherThread();
+        assertThat(timer, hasMeanElapsedTimeOf(millis(666)));
     }
 
+    private void callTimerInAnotherThread() throws InterruptedException {
+        final CountDownLatch complete = new CountDownLatch(1);
+        new Thread() {
+            @Override
+            public void run() {
+                timer.beforeExecute(this, newRunnable());
+                timer.afterExecute(newRunnable(), NO_EXCEPTION);
+                complete.countDown();
+            }
+        }.start();
+        assertThat(complete.await(500, MILLISECONDS), is(true));
+    }
 
     private static Thread newThread() {
         return new Thread();
     }
 
     private static Runnable newRunnable() {
-        return new Runnable(){
+        return new Runnable() {
             @Override
             public void run() {
             }

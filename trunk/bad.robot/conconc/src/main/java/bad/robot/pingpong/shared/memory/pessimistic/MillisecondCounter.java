@@ -16,12 +16,27 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
-import bad.robot.pingpong.shared.memory.RealClock;
-import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
+import bad.robot.pingpong.shared.memory.AccumulatingCounter;
+import com.google.code.tempusfugit.temporal.Duration;
 
-public class PessimisticThreadPoolTimers {
+import java.util.concurrent.atomic.AtomicLong;
 
-    public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
-        return new ThreadPoolTimer(new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
+public class MillisecondCounter implements AccumulatingCounter<Duration> {
+
+    private final AtomicLong count = new AtomicLong();
+
+    @Override
+    public void add(Duration duration) {
+        count.addAndGet(duration.inMillis());
+    }
+
+    @Override
+    public Long get() {
+        return count.get();
+    }
+
+    @Override
+    public void reset() {
+        count.set(0L);
     }
 }
