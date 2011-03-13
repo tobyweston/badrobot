@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.shared.memory.RealClock;
-import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
+@Shared
+public interface AccumulatingCounter<T> {
 
-public class PessimisticThreadPoolTimers {
+    void add(T addition);
 
-    public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
-        return new ThreadPoolTimer(new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
-    }
+    void reset();
+
+    Long get();
 }

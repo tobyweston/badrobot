@@ -1,38 +1,38 @@
 package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
-
-import java.util.concurrent.atomic.AtomicLong;
+import com.google.code.tempusfugit.temporal.Duration;
 
 public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean {
 
     private final StopWatch timer;
-    private final AtomicLong tasks;
-    private final AtomicLong totalTime;
-    private final AtomicLong terminated;
+    private final Counter tasks;
+    private final Counter terminated;
+    private final AccumulatingCounter<Duration> totalTime;
 
-    public ThreadPoolTimer(StopWatch timer) {
+    public ThreadPoolTimer(StopWatch timer, Counter tasks, Counter terminated, AccumulatingCounter<Duration> totalTime) {
         this.timer = timer;
-        tasks = new AtomicLong(0);
-        totalTime = new AtomicLong(0);
-        terminated = new AtomicLong(0);
+        this.tasks = tasks;
+        this.terminated = terminated;
+        this.totalTime = totalTime;
     }
 
     @Override
     public void beforeExecute(Thread thread, Runnable task) {
+        assert(Thread.currentThread().equals(thread));
         timer.start();
-        tasks.incrementAndGet();
+        tasks.increment();
     }
 
     @Override
     public void afterExecute(Runnable task, Throwable throwable) {
         timer.stop();
-        totalTime.addAndGet(timer.elapsedTime().inMillis());
+        totalTime.add(timer.elapsedTime());
     }
 
     @Override
     public void terminated() {
-        terminated.incrementAndGet();
+        terminated.increment();
 
     }
 
@@ -58,8 +58,9 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
 
     @Override
     public void reset() {
-        totalTime.set(0L);
-        tasks.set(0L);
+        totalTime.reset();
+        tasks.reset();
+        terminated.reset();
     }
 
 }

@@ -14,14 +14,31 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.shared.memory.RealClock;
-import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
+import bad.robot.pingpong.StopWatch;
+import com.google.code.tempusfugit.temporal.Duration;
 
-public class PessimisticThreadPoolTimers {
+import static com.google.code.tempusfugit.temporal.Duration.millis;
 
-    public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
-        return new ThreadPoolTimer(new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
+public class StopWatchStub implements StopWatch {
+
+    private Duration elapsedTime = millis(0);
+
+    @Override
+    public void start() {
+    }
+
+    @Override
+    public void stop() {
+    }
+
+    @Override
+    public Duration elapsedTime() {
+        return elapsedTime;
+    }
+
+    public void setElapsedTime(Duration elapsedTime) {
+        this.elapsedTime = elapsedTime;
     }
 }
