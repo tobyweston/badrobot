@@ -33,7 +33,7 @@ class AsynchronousContainer implements Container {
     }
 
     public void handle(final Request request, final Response response) {
-        System.out.printf("Handler thread %s%n", Thread.currentThread().getName());
+        System.out.printf("Request Handler thread %s%n", Thread.currentThread().getName());
         scheduler.execute(new Runnable() {
             public void run() {
                 delegate.handle(request, response);

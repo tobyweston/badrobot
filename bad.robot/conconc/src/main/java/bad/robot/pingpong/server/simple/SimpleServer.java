@@ -33,6 +33,9 @@ import java.util.concurrent.ExecutorService;
 
 import static bad.robot.pingpong.server.simple.StandardResponseHeader.standardResponseHeaders;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
+import static com.google.code.tempusfugit.concurrency.ExecutorServiceShutdown.shutdown;
+import static com.google.code.tempusfugit.temporal.Duration.millis;
+import static com.google.code.tempusfugit.temporal.Timeout.timeout;
 
 public class SimpleServer implements Server {
 
@@ -57,7 +60,11 @@ public class SimpleServer implements Server {
 
     public void stop() throws IOException {
         connection.close();
-        threads.shutdown();
+        try {
+            shutdown(threads).waitingForShutdown(timeout(millis(500)));
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     public static void main(String... args) throws IOException {
