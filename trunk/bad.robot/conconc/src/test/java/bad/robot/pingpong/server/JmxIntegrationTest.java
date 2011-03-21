@@ -6,15 +6,15 @@ import org.junit.Test;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 
-import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createLockBasedThreadSafeCounter;
+import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createThreadSafeCounterMaintainingInvariant;
 import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadPoolTimers.createThreadSafeThreadPoolTimer;
 
 public class JmxIntegrationTest {
 
     @Test
     public void canRegisterThreadObserver() throws InstanceNotFoundException, MBeanRegistrationException {
-        Jmx.register(createLockBasedThreadSafeCounter(), "1");
-        Jmx.unregister(createLockBasedThreadSafeCounter(), "1");
+        Jmx.register(createThreadSafeCounterMaintainingInvariant(), "1");
+        Jmx.unregister(createThreadSafeCounterMaintainingInvariant(), "1");
     }
 
     @Test
@@ -25,8 +25,8 @@ public class JmxIntegrationTest {
 
     @Test
     public void canRegisterTheSameComponentTwice() {
-        Jmx.register(createLockBasedThreadSafeCounter(), "1");
-        Jmx.register(createLockBasedThreadSafeCounter(), "1");
+        Jmx.register(createThreadSafeCounterMaintainingInvariant(), "1");
+        Jmx.register(createThreadSafeCounterMaintainingInvariant(), "1");
     }
 
     @After

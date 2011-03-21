@@ -29,12 +29,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.Executors;
 
 import static bad.robot.pingpong.Matchers.hasContent;
 import static bad.robot.pingpong.Matchers.hasStatus;
-import static bad.robot.pingpong.shared.memory.Executors.newFixedThreadPool;
-import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createLockBasedThreadSafeCounter;
-import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadPoolTimers.createThreadSafeThreadPoolTimer;
+import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createThreadSafeCounterMaintainingInvariant;
 import static bad.robot.pingpong.transport.ResponseCode.NOT_FOUND;
 import static bad.robot.pingpong.transport.ResponseCode.OK;
 import static org.junit.Assert.assertThat;
@@ -45,7 +44,7 @@ public class PingIntegrationTest {
 
     @Before
     public void start() throws IOException {
-        server = new SimpleServer(newFixedThreadPool(5, new ObservableThreadFactory(createLockBasedThreadSafeCounter()), createThreadSafeThreadPoolTimer()));
+        server = new SimpleServer(Executors.newFixedThreadPool(5, new ObservableThreadFactory(createThreadSafeCounterMaintainingInvariant())));
         server.start();
     }
 

@@ -852,7 +852,9 @@ public class ThreadCounter implements ThreadObserver {
             a concurrent context. For example,
         </p>
 <source>
-new ThreadCounter(new LockingGuard(new ReentrantLock()), new LongCounter(), new LongCounter());
+public static ThreadObserver createLockBasedThreadSafeCounter() {
+    return new ThreadCounter(new LockingGuard(new ReentrantLock()), new LongCounter(), new LongCounter());
+}
 </source>
         <p>
             creates a thread safe thread counter using the reentrant lock to ensure the invariant around reset is maintained.
@@ -860,14 +862,18 @@ new ThreadCounter(new LockingGuard(new ReentrantLock()), new LongCounter(), new 
             <code>volatile</code> keyword in <code>LongCounter</code>.
         </p>
 <source>
-new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
+public static ThreadObserver createThreadSafeCounterWithoutMaintainingResetInvariant() {
+    return new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
+}
 </source>
         <p>
             The above statement creates a thread counter which is thread safe (by virtue of the <code>AtomicLongCounter</code>s)
             but doesn't maintain the invariant. The unguarded <code>Guard</code> doesn't include any synchronisation.
         </p>
 <source>
-new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
+public static ThreadObserver createSynchronisedThreadSafeCounter() {
+    return new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
+}
 </source>
         <p>
             The above statement is roughly equivalent, it creates a thread safe thread counter but uses a Java monitor
@@ -875,7 +881,9 @@ new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
             <code>synchronised</code> method is the static creation method for <code>SynchronisingGuard</code> class.
         </p>
 <source>
-new ThreadCounter(unguarded(), new LongCounter(), new LongCounter());
+public static ThreadObserver createNonThreadSafeCounter() {
+    return new ThreadCounter(unguarded(), new LongCounter(), new LongCounter());
+}
 </source>
         <p>
            The above statement creates a non-thread safe version.
@@ -937,8 +945,175 @@ public class ThreadCounterTest {
 </source>
 
         <subsection name="Optimistic / Software Transaction Memory">
-        </subsection>
+            <p>
+                Software Transaction Memory is an optimistic alternative to lock based control to shared memory. It
+                provides atomicity and isolation schematics similar to database transactions. Consistency is maintained
+                by the developer just as in the pessimistic world but by providing the building blocks, consistency is
+                supported (if not guaranteed). Durability however, can not be supported as ultimately, any successful
+                transaction's results are stored in volatile memory the JVM can not ensure they are preserved.
+            </p>
+            <p>
+                In principle, a Software Transactional Memory (STM) version of the <code>ThreadCounter</code> should
+                isolate access to the shared memory (the <code>Counters</code> in our case) such that the integrity of
+                that access is maintained even from a concurrent context. The existing concurrent tests should all pass.
+            </p>
+            <p>
+                Using an STM based implementation of the <code>ThreadCounter</code>'s <code>Guard</code>, we can slot
+                straight into the unit of work that the guard defines. In this way, the gaurd is no longer protecting
+                or synchronising access but instead defining actions that will form an atomic unit of work.
+            </p>
+            <p>
+                For example, the snippet below shows how the <code>guard</code> co-ordinates access to decrement the
+                counter.
+            </p>
+<source>
+public void threadTerminated() {
+    guard.execute(<i>decrement</i>(activeThreads));
+}
+</source>
+            <p>
+                When an STM implementation of the <code>guard</code> is used, we can define our unit of work. For example,
+            </p>
+<source>
+public class StmGuard implements Guard {
+    public &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E {
+        return <i>runAtomically</i>(callable);
+    }
+} </source>
+            <p>
+                Where the <code>runAtomically</code> method delegates to the underlying STM library. In this case, we're using
+                the <a href="http://multiverse.codehaus.org/">Multiverse STM library</a> as the underlying library and
+                <a href="http://doc.akka.io/stm-java">Akka</a> STM to provide some neater abstractions.
+            </p>
+<source>
+    public class RunAtomically&lt;R, E extends Exception&gt; extends Atomic&lt;R&gt; {
 
+        private final Callable&lt;R, E&gt; callable;
+
+        public static &lt;R, E extends Exception&gt; R runAtomically(Callable&lt;R, E&gt; callable) {
+            return new RunAtomically&lt;R, E&gt;(callable).execute();
+        }
+
+        public RunAtomically(Callable&lt;R, E&gt; callable) {
+            this.callable = callable;
+        }
+
+        @Override
+        public R atomically() {
+            try {
+                return callable.call();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }    
+</source>
+            <p>
+                A call to the is basically equivalent to the following (minus the exception handling).
+            </p>
+<source>
+new Atomic&lt;R&gt;() {
+    return callable.call();
+}.execute();
+</source>
+        </subsection>
+            <p>
+                So the above defines the unit of work but any shared memory to be included in the transaction has to be
+                defined as a <i>transactional reference</i>. This is done by defining them as a <code>Ref</code> instance.
+                For example, to make use of the new <code>StmGuard</code> we would have to combine them with a
+                <code>Counter</code> as a <i>transactional reference.</i>
+            </p>
+<source>
+@Not(ThreadSafe.class)
+public class TransactionalReferenceCounter implements Counter {
+
+    private final Ref&lt;Long&gt; count = new Ref&lt;Long&gt;(0L);
+
+    @Override
+    public void increment() {
+        count.set(count.get() + 1L);
+    }
+
+    @Override
+    public void decrement() {
+        count.set(count.get() - 1);
+    }
+
+    @Override
+    public Long get() {
+        return count.get();
+    }
+
+    @Override
+    public void reset() {
+        count.set(0L);
+    }
+}
+</source>
+            <p>
+                As you'll notice, this class in itself isn't thread safe, nor is the <code>StmGuard</code>. However,
+                when they're combined with the <code>ThreadCounter</code> they'll pass all our previously defined tests
+                (including the concurrent ones). Therefore, the class construction below represents a thread safe
+                <code>ThreadCounter</code> that will also maintain the invariant.
+            </p>
+<source>
+static ThreadObserver createThreadSafeCounterMaintainingInvariant() {
+    return new ThreadCounter(new StmGuard(), new TransactionalReferenceCounter(), new TransactionalReferenceCounter());
+} </source>
+            <p>
+                If we consider an implementation similar to the pessimistic 
+                <code>createThreadSafeCounterWithoutMaintainingResetInvariant</code> we can bypass the guard and implement
+                atomicity around the individual mutators as below. 
+            </p>
+<source>
+@ThreadSafe
+public class StmAtomicLongCounter implements Counter {
+
+    private final Ref&lt;Long&gt; count = new Ref&lt;Long&gt;(0L);
+
+    @Override
+    public void increment() {
+        new Atomic&lt;Long&gt;() {
+            @Override
+            public Long atomically() {
+                return count.set(count.get() + 1L);
+            }
+        }.execute();
+    }
+
+    @Override
+    public void decrement() {
+        new Atomic&lt;Long&gt;() {
+            @Override
+            public Long atomically() {
+                return count.set(count.get() - 1L);
+            }
+        }.execute();
+    }
+
+    @Override
+    public Long get() {
+        return count.get();
+    }
+
+    @Override
+    public void reset() {
+        new Atomic&lt;Long&gt;() {
+            @Override
+            public Long atomically() {
+                return count.set(0L);
+            }
+        }.execute();
+    }
+}</source>
+        <p>
+            Which in context of the <code>ThreadCounter</code> class would be used as follows.
+        </p>
+<source>
+static ThreadObserver createThreadSafeCounterWithoutMaintainingResetInvariant() {
+    return new ThreadCounter(unguarded(), new StmAtomicLongCounter(), new StmAtomicLongCounter());
+}
+</source>
         </section>
 
     </body>

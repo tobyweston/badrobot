@@ -9,7 +9,7 @@ import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
 import java.io.IOException;
 
 import static bad.robot.pingpong.shared.memory.Executors.newFixedThreadPool;
-import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createLockBasedThreadSafeCounter;
+import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createThreadSafeCounterMaintainingInvariant;
 import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadPoolTimers.createThreadSafeThreadPoolTimer;
 
 public class SimpleServerBuilder {
@@ -17,7 +17,7 @@ public class SimpleServerBuilder {
     private static final int REQUEST_PROCESSING_THREADS = 20;
 
     public SimpleServer build() throws IOException {
-        ThreadObserver threadCounter = createLockBasedThreadSafeCounter();
+        ThreadObserver threadCounter = createThreadSafeCounterMaintainingInvariant();
         ThreadPoolTimer timer = createThreadSafeThreadPoolTimer();
         registerWithJmx(threadCounter, timer);
         return new SimpleServer(newFixedThreadPool(REQUEST_PROCESSING_THREADS, new ObservableThreadFactory(threadCounter), timer));
