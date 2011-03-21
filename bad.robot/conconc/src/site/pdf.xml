@@ -26,6 +26,7 @@
         <item name="Shared Memory" ref="shared.html"/>
         <item name="Problem Definition" ref="problem.html"/>
         <item name="Alternative Solutions" ref="solution.html"/>
+        <item name="ThreadCounter" ref="thread_counter.html"/>
         <item name="Conclusions" ref="conclusions.html"/>
     </toc>
 

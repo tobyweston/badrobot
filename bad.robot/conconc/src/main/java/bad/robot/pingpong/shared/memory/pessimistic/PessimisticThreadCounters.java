@@ -11,7 +11,7 @@ import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 
 public class PessimisticThreadCounters {
 
-    public static ThreadObserver createLockBasedThreadSafeCounter() {
+    public static ThreadObserver createThreadSafeCounterMaintainingInvariant() {
         return new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
     }
 
