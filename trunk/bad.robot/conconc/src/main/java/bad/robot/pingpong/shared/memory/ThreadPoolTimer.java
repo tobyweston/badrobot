@@ -33,7 +33,6 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
     @Override
     public void terminated() {
         terminated.increment();
-
     }
 
     @Override
