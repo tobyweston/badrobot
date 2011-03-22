@@ -30,15 +30,55 @@
         <section name="Shared Memory Model">
 
             <p>
-                This section describes the shared memory model.
+                Sharing common memory allows us to build software that works on common data structures, it allows us
+                to utilise modern architectures to solve common problems without having to copy common data between
+                processes.
             </p>
+            <subsection name="The Java Memory Model">
+                <p>
+                    The part of the Java Specification concerned with JVM implementations of shared memory is refereed
+                    to as the Java Memory Model. It basically describes how any JVM implementation should behave under
+                    certain conditions. Interestingly for us, it's particularly concerned with describing behaviour under
+                    multi-threaded conditions.
+                </p>
+                <p>
+                    In modern systems, the order in which instructions are actually executed in the same order that they are
+                    arranged at source. The compiler, processors and memory subsystems may reorder execution for best
+                    performance. In fact, on multi-core platforms, the processors will likely have their own local cache
+                    which may or may not be in-sync with main memory. Without some synchronising mechanism, when the data in
+                    main memory is shared, there is no guarantee that each processor will see an up-to-date value. This turns
+                    out to be a good example of why we need the Java Memory Model. This part of the specification defines
+                    such synchronisation mechanisms and behaviour. For example, it defines that the <code>volatile</code>
+                    keyword should indicate to the JVM that some shared state is not eligible for caching in
+                    processor-local caches and so ensure inter-thread visibility.
+                </p>
+                <p>
+                    Another important part of the Java Memory Model defines <i>as-if-serial </i> semantics. Here, the JVM is
+                    required to produce the same results as if serial execution were observed, regardless of the actual
+                    optimisations and re-ordering performed, at least within a single thread. The <i>as-if-serial</i>
+                    semantics however, don't prevent this guaranteed accuracy between threads and so the Java Memory Model
+                    has to prescribe alternative guarantees. These guarantees allow us to reason about concurrent program
+                    execution and underpin Java's concurrency control mechanisms. It's what enforces consistent behaviour
+                    across threads when entering or leaving a <code>synchronized</code> block for example.
+                </p>
+                <p>
+                    It's interesting to note that like any specification, vendors are free to ignore the Java Memory
+                    Model. There are certainly JVM implementations that may not respect the volatile keyword for example.
+                </p>
+            </subsection>
 
             <subsection name="Pessimistic Concurrency Control">
 
             </subsection>
             
             <subsection name="Optimistic Concurrency Control">
-
+                <p>
+                    Software Transaction Memory is an optimistic alternative to lock based control to shared memory. It
+                    provides atomicity and isolation schematics similar to database transactions. Consistency is maintained
+                    by the developer just as in the pessimistic world but by providing the building blocks, consistency is
+                    supported (if not guaranteed). Durability however, can not be supported as ultimately, any successful
+                    transaction's results are stored in volatile memory the JVM can not ensure they are preserved.
+                </p>
             </subsection>
 
             <subsection name="Alternatives">

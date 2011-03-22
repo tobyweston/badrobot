@@ -946,13 +946,6 @@ public class ThreadCounterTest {
 
         <subsection name="Optimistic / Software Transaction Memory">
             <p>
-                Software Transaction Memory is an optimistic alternative to lock based control to shared memory. It
-                provides atomicity and isolation schematics similar to database transactions. Consistency is maintained
-                by the developer just as in the pessimistic world but by providing the building blocks, consistency is
-                supported (if not guaranteed). Durability however, can not be supported as ultimately, any successful
-                transaction's results are stored in volatile memory the JVM can not ensure they are preserved.
-            </p>
-            <p>
                 In principle, a Software Transactional Memory (STM) version of the <code>ThreadCounter</code> should
                 isolate access to the shared memory (the <code>Counters</code> in our case) such that the integrity of
                 that access is maintained even from a concurrent context. The existing concurrent tests should all pass.
