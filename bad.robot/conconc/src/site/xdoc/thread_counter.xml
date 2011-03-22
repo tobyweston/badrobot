@@ -53,6 +53,7 @@ public interface ThreadObserver {
     void threadTerminated();
 }
 </source>
+            <p align="center"><b><i>Fig 5.1. The basic observer interface</i></b></p>
             <p>
                 Java's <code>ThreadFactory</code> is a natural place to make observations about thread activity. All that
                 would be required is for the application to be wired up to use the following thread factory and we can
@@ -84,6 +85,7 @@ public class ObservableThreadFactory implements ThreadFactory {
     }
 }
 </source>
+          <p align="center"><b><i>Fig 5.2. Example use of the observer in a ThreadFactory</i></b></p>
             <p>
                 Note that the class is easily tested using mock objects.
             </p>
@@ -138,6 +140,7 @@ public class ThreadCounter implements ThreadObserver {
     }
 }
 </source>
+            <p align="center"><b><i>Fig 5.3. Naive implementation of ThreadCounter</i></b></p>
             </subsection>
             <p>
                 The basic test below shows the implementation to be correct (at least in a non-concurrent context).
@@ -198,6 +201,7 @@ public class ThreadCounterTest {
     }
 }
 </source>
+        <p align="center"><b><i>Fig 5.4. Basic single-thread behavioural unit test</i></b></p>
         <h4>Testing Thread Safety</h4>
         <p>
             The next test shows that it isn't correct from a concurrent context. Here, the
@@ -254,6 +258,7 @@ public class ThreadCounterIntegrationTest {
     }
 }
 </source>
+        <p align="center"><b><i>Fig 5.5. Multi-threaded test highlighting concurrency problems</i></b></p>
         <p>
             The call to <code>Introduce.jitter()</code> introduces a pseudo-random delay of up to five milliseconds.
             This is designed to try and avoid deterministic behaviour and exaggerate the affect of the tests.
@@ -321,6 +326,7 @@ public class ThreadCounter implements ThreadObserver {
     }
 }
 </source>
+         <p align="center"><b><i>Fig 5.6. Thread safe version of the ThreadCounter</i></b></p>
          <p>
              At this point, the class is thread safe but the invariant around the <code>reset</code> method is still
              not maintained (or tested). A simple fix might be to use the <code>synchronized</code> keyword on <i>all</i>
@@ -413,6 +419,7 @@ public class ThreadCounter implements ThreadObserver {
     }
 }
 </source>
+            <p align="center"><b><i>Fig 5.7. More elaborate version ensuring consistency during reset</i></b></p>
             <p>
                 This revision attempts to maintain the invariant using Java <code>Lock</code>s and at the same encapsulate
                 the use of the locks in a separate class (<code>ExecuteUsingLock</code>) to ensure consistent behaviour. The
@@ -442,6 +449,7 @@ public class ExecuteUsingLock&lt;T, E extends Exception&gt; {
     }
 }
 </source>
+        <p align="center"><b><i>Fig 5.8. Execute Callables ensuring lock and unlock semantics</i></b></p>
         <p>
             By using the same lock to guard all the write methods, we're effectively implementing a class equivilant to
             one that synchronises on all the write methods. It becomes more serial than previous revisions (ie, you
@@ -507,6 +515,7 @@ public class ThreadCounter implements ThreadObserver {
     }
 }
 </source>
+<p align="center"><b><i>Fig 5.9. Tidied version of the ThreadCounter</i></b></p>
 <source>
 public class Increment implements Callable&lt;Void, RuntimeException&gt; {
 
@@ -527,6 +536,7 @@ public class Increment implements Callable&lt;Void, RuntimeException&gt; {
     }
 }
 </source>
+<p align="center"><b><i>Fig 5.10. Pushing the incrementing Callable into its own class</i></b></p>
 <source>
 public class AcquireLock {
 
@@ -540,6 +550,7 @@ public class AcquireLock {
     }
 }
 </source>
+<p align="center"><b><i>Fig 5.11. Pushing tryLock semantics in its own class</i></b></p>
 <source>
 public class Reset implements Callable&lt;Void, RuntimeException&gt; {
 
@@ -561,7 +572,7 @@ public class Reset implements Callable&lt;Void, RuntimeException&gt; {
     }
 }    
 </source>
-
+        <p align="center"><b><i>Fig 5.12. Pushing the reset Callable into its own class</i></b></p>
         <h4>Building out the <code>Guard</code> Interface</h4>
         <p>
             There are some limitations with the current implementation, notably the inability to test the invariant. We
@@ -577,6 +588,7 @@ public interface Guard {
     Boolean guarding();
 }
 </source>
+        <p align="center"><b><i>Fig 5.13. The Guard class</i></b></p>
         <p>
             The basic lock based implementation of which is shown below
         </p>
@@ -605,6 +617,7 @@ public class LockingGuard implements Guard {
     }
 }    
 </source>
+        <p align="center"><b><i>Fig 5.14. The Lock based guard</i></b></p>
         <p>
             This opens several opportunities for the improving the current implementation, specifically around testing
             individual components in isolation and finally creating a test to ensure the invariant in maintained. The first

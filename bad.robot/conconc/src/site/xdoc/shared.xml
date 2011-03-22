@@ -88,12 +88,6 @@
                     required to collaborate with other core's memory, it must communicate with them as an external
                     resource.
                 </p>
-                <p>
-                    There is also the idea of distributed yet shared memory.
-                </p>
-                <p>
-                    Are Actors an example?
-                </p>
             </subsection>
         </section>
 

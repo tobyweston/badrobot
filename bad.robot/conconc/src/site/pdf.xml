@@ -25,18 +25,19 @@
         <item name="Introduction" ref="introduction.html"/>
         <item name="Shared Memory" ref="shared.html"/>
         <item name="Problem Definition" ref="problem.html"/>
-        <item name="Alternative Solutions" ref="solution.html"/>
-        <item name="ThreadCounter" ref="thread_counter.html"/>
+        <item name="Solutions" ref="solution.html">
+            <item name="ThreadCounter" ref="thread_counter.html"/>
+        </item>
         <item name="Conclusions" ref="conclusions.html"/>
     </toc>
 
     <cover>
         <coverTitle>Optimistic and Pessimistic Concurrency Control with Shared Memory Models</coverTitle>
         <coverType>An analysis of modern concurrency control mechanisms</coverType>
-        <coverSubTitle>v. ${project.version}</coverSubTitle>
+        <coverSubTitle>v.${project.version}</coverSubTitle>
         <projectName>${project.name}</projectName>
         <companyName>Toby Weston</companyName>
-        <coverdate>October 2010</coverdate>
+        <coverdate>April 2011</coverdate>
         <author>Toby Weston</author>
     </cover>
 </document>
