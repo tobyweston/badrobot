@@ -32,9 +32,14 @@ import static java.lang.Thread.currentThread;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+/**
+ * Introducing jitter will uniformly distribute from between 0 and 5 milliseconds of delay in each loop of each thread.
+ * So, the assertion against variable data (ie the mean execution time) relies on this. For example, if uniformly
+ * distributed, the average jitter should be 2.5 milliseconds so 2.5 * 5000 / 5000 = 2.5, rounded should be 2.
+ */
 public class ThreadPoolTimerIntegrationTest {
 
-    private static ThreadPoolTimer timer = new ThreadPoolTimer(new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
+    private static final ThreadPoolTimer timer = new ThreadPoolTimer(new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
     private static final Throwable NO_EXCEPTION = null;
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
@@ -55,6 +60,7 @@ public class ThreadPoolTimerIntegrationTest {
         assertThat(timer.getNumberOfExecutions(), is(5000L));
         assertThat(timer.getMeanExecutionTime(), is(2L));
         assertThat(timer.getTerminated(), is(0L));
+        System.out.println(timer.getTotalTime() + " / " + timer.getNumberOfExecutions() + " = " + timer.getMeanExecutionTime());
     }
 
     private static Runnable newRunnable() {
