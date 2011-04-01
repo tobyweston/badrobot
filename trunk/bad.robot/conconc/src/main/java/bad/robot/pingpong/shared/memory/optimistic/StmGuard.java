@@ -5,6 +5,10 @@ import com.google.code.tempusfugit.concurrency.Callable;
 
 import static bad.robot.pingpong.shared.memory.optimistic.RunAtomically.runAtomically;
 
+/**
+ * any references accessed within the "atomic" block need to be of type {@link akka.stm.Ref} to be subject to atomicity
+ * constraints. Otherwise, this class acts as a simple delegate and wont enforce any atomicity.
+ */
 public class StmGuard implements Guard {
 
     @Override

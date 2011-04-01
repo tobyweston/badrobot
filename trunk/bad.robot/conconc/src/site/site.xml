@@ -41,6 +41,7 @@
             <item name="Example Problem" href="problem.html"/>
             <item name="Solutions" href="solution.html" collapse="true">
                 <item name="Instrumenting Thread Usage" href="thread_counter.html" />
+                <item name="Instrumenting Thread Pool Timer" href="thread_pool_timer.html" />
             </item>
             <item name="Conclusions" href="conclusions.html"/>
         </menu>

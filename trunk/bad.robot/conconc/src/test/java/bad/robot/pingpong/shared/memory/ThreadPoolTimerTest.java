@@ -17,10 +17,12 @@
 package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.shared.memory.pessimistic.AtomicLongCounter;
-import bad.robot.pingpong.shared.memory.pessimistic.MillisecondCounter;
+import bad.robot.pingpong.shared.memory.pessimistic.AtomicMillisecondCounter;
+import bad.robot.pingpong.shared.memory.pessimistic.LockingGuard;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static bad.robot.pingpong.shared.memory.ThreadPoolTimerMeanExecutionTimeMatcher.hasMeanElapsedTimeOf;
 import static com.google.code.tempusfugit.temporal.Duration.millis;
@@ -33,7 +35,7 @@ public class ThreadPoolTimerTest {
     private static final Throwable NO_EXCEPTION = null;
 
     private final StopWatchStub stopWatch = new StopWatchStub();
-    private final ThreadPoolTimer timer = new ThreadPoolTimer(stopWatch, new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
+    private final ThreadPoolTimer timer = new ThreadPoolTimer(new LockingGuard(new ReentrantLock()), stopWatch, new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
 
     @Test
     public void shouldGetMeanExecutionTime() {

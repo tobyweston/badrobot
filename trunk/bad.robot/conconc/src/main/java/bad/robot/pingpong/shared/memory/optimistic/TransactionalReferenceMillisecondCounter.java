@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.optimistic;
 
+import akka.stm.Ref;
 import bad.robot.pingpong.shared.memory.AccumulatingCounter;
 import com.google.code.tempusfugit.temporal.Duration;
 
-import java.util.concurrent.atomic.AtomicLong;
+public class TransactionalReferenceMillisecondCounter implements AccumulatingCounter<Duration> {
 
-public class MillisecondCounter implements AccumulatingCounter<Duration> {
-
-    private final AtomicLong count = new AtomicLong();
+    private final Ref<Long> count = new Ref<Long>(0L);
 
     @Override
-    public void add(Duration duration) {
-        count.addAndGet(duration.inMillis());
+    public void add(final Duration duration) {
+        count.set(count.get() + duration.inMillis());
     }
 
     @Override
