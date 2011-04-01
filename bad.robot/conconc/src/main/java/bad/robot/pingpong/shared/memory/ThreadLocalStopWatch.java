@@ -1,4 +1,4 @@
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
 import com.google.code.tempusfugit.temporal.Clock;
@@ -18,8 +18,8 @@ public class ThreadLocalStopWatch implements StopWatch {
     public ThreadLocalStopWatch(Clock clock) {
         this.clock = clock;
         Date now = this.clock.create();
-        started = new LongThreadLocal(now.getTime());
-        stopped = new LongThreadLocal(now.getTime());
+        started = new ThreadLocalLong(now.getTime());
+        stopped = new ThreadLocalLong(now.getTime());
     }
 
     @Override
@@ -37,10 +37,10 @@ public class ThreadLocalStopWatch implements StopWatch {
         return millis(stopped.get() - started.get());
     }
 
-    private static class LongThreadLocal extends ThreadLocal<Long> {
+    private static class ThreadLocalLong extends ThreadLocal<Long> {
         private final long initialValue;
 
-        public LongThreadLocal(long initialValue) {
+        public ThreadLocalLong(long initialValue) {
             this.initialValue = initialValue;
         }
 

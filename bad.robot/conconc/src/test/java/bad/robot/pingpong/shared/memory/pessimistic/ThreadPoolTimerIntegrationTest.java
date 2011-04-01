@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory;
+package bad.robot.pingpong.shared.memory.pessimistic;
 
 import bad.robot.pingpong.Introduce;
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicLongCounter;
-import bad.robot.pingpong.shared.memory.pessimistic.MillisecondCounter;
-import bad.robot.pingpong.shared.memory.pessimistic.ThreadLocalStopWatch;
+import bad.robot.pingpong.shared.memory.ThreadLocalMovableClock;
+import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
+import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
@@ -28,18 +28,17 @@ import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
+import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-/**
- * Introducing jitter will uniformly distribute from between 0 and 5 milliseconds of delay in each loop of each thread.
- * So, the assertion against variable data (ie the mean execution time) relies on this. For example, if uniformly
- * distributed, the average jitter should be 2.5 milliseconds so 2.5 * 5000 / 5000 = 2.5, rounded should be 2.
- */
 public class ThreadPoolTimerIntegrationTest {
 
-    private static final ThreadPoolTimer timer = new ThreadPoolTimer(new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new MillisecondCounter());
+    private static final ThreadLocalMovableClock clock = new ThreadLocalMovableClock();
+    // can't simulate the race condition here... see thread_pool_x.xml
+    private static final ThreadPoolTimer timer = new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(clock), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
     private static final Throwable NO_EXCEPTION = null;
 
     @Rule public ConcurrentRule concurrent = new ConcurrentRule();
@@ -51,16 +50,16 @@ public class ThreadPoolTimerIntegrationTest {
     public void executeTask() {
         Runnable task = newRunnable();
         timer.beforeExecute(currentThread(), task);
-        Introduce.jitter();
+        clock.incrementBy(millis(400));
         timer.afterExecute(task, NO_EXCEPTION);
+        Introduce.jitter();
     }
 
     @AfterClass
     public static void verifyCounters() {
         assertThat(timer.getNumberOfExecutions(), is(5000L));
-        assertThat(timer.getMeanExecutionTime(), is(2L));
+        assertThat(timer.getMeanExecutionTime(), is(400L));
         assertThat(timer.getTerminated(), is(0L));
-        System.out.println(timer.getTotalTime() + " / " + timer.getNumberOfExecutions() + " = " + timer.getMeanExecutionTime());
     }
 
     private static Runnable newRunnable() {

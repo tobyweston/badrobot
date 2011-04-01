@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.optimistic;
 
 import bad.robot.pingpong.shared.memory.RealClock;
 import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
 import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
 
-import java.util.concurrent.locks.ReentrantLock;
+import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 
-public class PessimisticThreadPoolTimers {
+public class OptimisticThreadPoolTimers {
+
+    // {@link ThreadLocalStopWatch) doesn't have an STM equivalent
 
     public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
-        return new ThreadPoolTimer(new LockingGuard(new ReentrantLock()), new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
+        return new ThreadPoolTimer(new StmGuard(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new TransactionalReferenceMillisecondCounter());
+    }
+
+    public static ThreadPoolTimer createUNKNOWNThreadSafeThreadPoolTimer() {
+        return new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter());
     }
 }

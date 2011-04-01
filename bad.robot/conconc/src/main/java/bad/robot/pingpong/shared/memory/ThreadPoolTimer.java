@@ -1,20 +1,26 @@
 package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
+import bad.robot.pingpong.shared.memory.pessimistic.Guard;
 import com.google.code.tempusfugit.temporal.Duration;
+
+import static bad.robot.pingpong.shared.memory.Divide.Divisor.by;
+import static bad.robot.pingpong.shared.memory.Divide.divide;
 
 public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean {
 
+    private final Guard guard;
     private final StopWatch timer;
     private final Counter tasks;
     private final Counter terminated;
     private final AccumulatingCounter<Duration> totalTime;
 
-    public ThreadPoolTimer(StopWatch timer, Counter tasks, Counter terminated, AccumulatingCounter<Duration> totalTime) {
+    public ThreadPoolTimer(Guard guard, StopWatch timer, Counter tasks, Counter terminated, AccumulatingCounter<Duration> totalTime) {
         this.timer = timer;
         this.tasks = tasks;
         this.terminated = terminated;
         this.totalTime = totalTime;
+        this.guard = guard;
     }
 
     @Override
@@ -47,7 +53,7 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
 
     @Override
     public Long getMeanExecutionTime() {
-        return totalTime.get() / tasks.get();
+        return guard.execute(divide(totalTime, by(tasks)));
     }
 
     @Override
@@ -61,5 +67,4 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
         tasks.reset();
         terminated.reset();
     }
-
 }
