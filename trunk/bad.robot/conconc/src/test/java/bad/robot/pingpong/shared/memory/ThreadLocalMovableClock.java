@@ -1,6 +1,5 @@
 package bad.robot.pingpong.shared.memory;
 
-import com.google.code.tempusfugit.temporal.Clock;
 import com.google.code.tempusfugit.temporal.Duration;
 
 import java.util.Date;
@@ -15,7 +14,6 @@ public class ThreadLocalMovableClock implements Clock {
         now = new ThreadLocal<Date>() {
             @Override
             protected Date initialValue() {
-                System.out.println("initializer " + Thread.currentThread().getName());
                 count.getAndIncrement();
                 return new Date(0);
             }
@@ -23,7 +21,7 @@ public class ThreadLocalMovableClock implements Clock {
     }
 
     @Override
-    public Date create() {
+    public Date time() {
         Date date = now.get();
         return new Date(date.getTime());
     }
