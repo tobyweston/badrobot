@@ -38,8 +38,8 @@ public class StmThreadPoolTimerIntegrationTest {
     private static final StmThreadPoolTimer timer = new StmThreadPoolTimer(new ThreadLocalStopWatch(clock));
     private static final Throwable NO_EXCEPTION = null;
 
-    @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
+    @Rule public ConcurrentRule concurrent = new ConcurrentRule();
 
     @Concurrent (count = 50)
     @Repeating (repetition = 100)

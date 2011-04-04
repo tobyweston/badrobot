@@ -9,4 +9,5 @@ public interface StopWatch {
     void stop();
 
     Duration elapsedTime();
+
 }

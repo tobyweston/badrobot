@@ -30,9 +30,10 @@ public class ThreadLocalStopWatchIntegrationTest {
     @Concurrent(count = 10)
     @Repeating(repetition = 50)
     public void elapsedTimeWhenUsingThreadLocalMovableClock() throws InterruptedException {
+        timer.start();
         clock.incrementBy(millis(100));
         timer.stop();
-        totalTime.getAndSet(timer.elapsedTime().inMillis());
+        totalTime.getAndAdd(timer.elapsedTime().inMillis());
         Introduce.jitter();
     }
 
