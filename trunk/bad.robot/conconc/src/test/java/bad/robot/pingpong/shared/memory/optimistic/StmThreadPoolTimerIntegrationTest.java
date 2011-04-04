@@ -55,7 +55,7 @@ public class StmThreadPoolTimerIntegrationTest {
     @AfterClass
     public static void verifyCounters() {
 //        System.out.println(String.format("(%s)", 100 * 50 * 500));
-//        System.out.println(String.format("%s / %s = %s", timer.getTotalTime(), timer.getNumberOfExecutions(), timer.getMeanExecutionTime()));
+        System.out.println(String.format("%s / %s = %s", timer.getTotalTime(), timer.getNumberOfExecutions(), timer.getMeanExecutionTime()));
         assertThat(timer.getNumberOfExecutions(), is(5000L));
         assertThat(timer.getMeanExecutionTime(), is(500L));
         assertThat(timer.getTerminated(), is(0L));

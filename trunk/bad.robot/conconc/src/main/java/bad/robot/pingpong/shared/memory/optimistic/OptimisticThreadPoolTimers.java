@@ -27,10 +27,25 @@ public class OptimisticThreadPoolTimers {
     // {@link ThreadLocalStopWatch) doesn't have an STM equivalent
 
     public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
+        return new ThreadPoolTimer(new StmGuard(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter());
+    }
+
+    /**
+     * This is thread unsafe because the {@link TransactionalReferenceMillisecondCounter} parameter is left unguarded in
+     * the call to {@link ThreadPoolTimer#afterExecute(Runnable, Throwable)}. Although it is a transactional reference
+     * and so protected in the {@link bad.robot.pingpong.shared.memory.ThreadPoolTimer#getMeanExecutionTime()} method,
+     * it is left unprotected in the previous call.
+     */
+    public static ThreadPoolTimer createThreadUnsafeThreadPoolTimer() {
         return new ThreadPoolTimer(new StmGuard(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new TransactionalReferenceMillisecondCounter());
     }
 
-    public static ThreadPoolTimer createUNKNOWNThreadSafeThreadPoolTimer() {
+    /**
+     * This should be unsafe because without the guard, the race condition on {@link bad.robot.pingpong.shared.memory.ThreadPoolTimer#getMeanExecutionTime()}
+     * isn't protected. However, this is difficult to test
+     */
+    public static ThreadPoolTimer createUnsafeGetMeanExecutionTimeThreadPoolTimer() {
         return new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter());
     }
+
 }

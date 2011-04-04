@@ -11,9 +11,10 @@ import bad.robot.pingpong.shared.memory.ThreadPoolTimerMBean;
 public class StmThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean {
 
     private final StopWatch timer;
-    private final Ref<Long> tasks = new Ref<Long>(0L);
+    private final StmAtomicLongCounter tasks = new StmAtomicLongCounter();
     private final Ref<Long> terminated = new Ref<Long>(0L);
-    private final Ref<Long> totalTime = new Ref<Long>(0L);
+    private final TransactionalReferenceMillisecondCounter totalTime = new TransactionalReferenceMillisecondCounter();
+//    private final StmMillisecondCounter totalTime = new StmMillisecondCounter();
 
     public StmThreadPoolTimer(StopWatch timer) {
         this.timer = timer;
@@ -21,28 +22,21 @@ public class StmThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMB
 
     @Override
     public void beforeExecute(Thread thread, Runnable task) {
-        assert(Thread.currentThread().equals(thread));
+        assert (Thread.currentThread().equals(thread));
         timer.start();
-        new Atomic<Void>() {
-            @Override
-            public Void atomically() {
-                tasks.set(tasks.get() + 1L);
-                return null;
-            }
-        }.execute();
+        tasks.increment();
     }
 
     @Override
     public void afterExecute(Runnable task, Throwable throwable) {
         timer.stop();
-        final long elapsed = timer.elapsedTime().inMillis();
-        new Atomic<Void>() {
-            @Override
-            public Void atomically() {
-                totalTime.set(totalTime.get() + elapsed);
-                return null;
-            }
-        }.execute();
+//        new StmGuard().execute(new Callable<Void, RuntimeException>() {
+//            @Override
+//            public Void call() throws RuntimeException {
+                totalTime.add(timer.elapsedTime());
+//                return null;
+//            }
+//        });
     }
 
     @Override
