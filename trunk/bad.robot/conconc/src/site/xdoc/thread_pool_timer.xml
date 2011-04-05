@@ -34,8 +34,8 @@
             <subsection name="Testing using Time">
                 <p>
                     Testing something that involves time can be tricky as we don't want to introduce non-determinism by
-                    using real time. We generally have to try and control time using collaborators just as the <code>Clock</code>.
-                    For example, a <code>StopWatch</code> class night maintain an internal time stamp which it can use
+                    using real time. We generally have to try and control time using collaborators such as the <code>Clock</code>.
+                    For example, a <code>StopWatch</code> class night maintain an internal time which it can use
                     to compare with the current time to work out elapsed time. A straight forward implementation might
                     look like the following (taken from <a href="http://tempus-fugit.googlecode.com/svn/site/documentation/time.html#Controlling_Time_with_a_Date_Factory">tempus-fugit</a>).
                 </p>
@@ -136,6 +136,9 @@ public final class MovableClock implements Clock {
         now.setTime(now.getTime() + time.inMillis());
     }
 } </source>
+                <p>
+                    With the following test
+                </p>
 <source>
 @Test
 public void elapsedTimeFromBetterStopWatch() {
@@ -161,11 +164,50 @@ public Long getMeanExecutionTime() {
 }
 </source>
                 <p>
+                    The sequence of events is shown below when access to the two variables is uncoordinated.     
+                </p>
+                <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.1.png"/>
+<!--<source>-->
+<!--Thread A -> totalTime : set value to 1000-->
+<!--Thread A -> tasks : set value to 10-->
+<!--Main Thread -> totalTime : get value-->
+<!--totalTime &ndash;&gt; Main Thread : 1000-->
+<!--Main Thread -> tasks : get value-->
+<!--tasks &ndash;&gt; Main Thread : 10-->
+<!--Main Thread -> Main Thread : totalTime / tasks-->
+<!--</source>-->
+                <p>
+                    Uncoordinated access works fine when <code>Thread A</code> is the only one writing to the variables,
+                    the result will be <code>1000 / 10 = 100</code>. However, with the introduction of another thread
+                    and different interleaving, the result can be skewed. For example,
+                </p>
+                <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.2.png"/>
+<!--<source>-->
+<!--Thread A -> totalTime : set value to 1000-->
+<!--Thread A -> tasks : set value to 10-->
+<!--Main Thread -> totalTime : get value-->
+<!--totalTime &ndash;&gt; Main Thread : 1000-->
+<!--Thread B -> totalTime : set value to 4050-->
+<!--Thread B -> tasks : set value to 35-->
+<!--Main Thread -> tasks : get value-->
+<!--tasks &ndash;&gt; Main Thread : 35-->
+<!--Main Thread->Main Thread : totalTime / tasks-->
+<!--</source>-->
+                <p>
+                    With this interleaving, the <code>totalTime</code> is updated to <code>4050</code> but <i>after</i>
+                    the main thread has read the value for <code>totalTime</code> and <i>before</i> the related
+                    operation to set the task count to <code>35</code> could be completed. This update hasn't been able
+                    to complete before part of another operation has begun and so the consistency of the later will be
+                    compromised. The values the main thread will use can be seen by the dotted return value above;
+                    <code>1000 / 35 = 28.6</code>, it should either be <code>1000 / 10</code> or <code>4050 / 35</code>
+                    but not part of each as in the example above.
+                </p>
+                <p>
                     Testing for consistency of the mean execution time (<code>getMeanExecutionTime</code>) was tricky.
                     Initially, the basic approach for the pessimistic version of the <code>ThreadPoolTimer</code> was to
                     use real time and introduce uniform distribution of time between the threads. We can force an execution
                     time of between zero and five milliseconds and rely on the uniformity of the pseudo-random number
-                    generator to make assertions.
+                    generator to make assertions. Any inconsistencies in the updates should cause the assertions to fail.
                 </p>
 <source>
 public class ThreadPoolTimerIntegrationTest {
@@ -194,9 +236,9 @@ public class ThreadPoolTimerIntegrationTest {
 }
 </source>
                 <p>
-                    Here, the test using the same approach to spawning multiple threads as the <code>ThreadCounter</code>.
+                    Here, the test is using the same approach to spawning multiple threads as the <code>ThreadCounterIntegrationTest</code>.
                     Using real time here though, we're attempting to introduce a delay of 2.5 milliseconds (on average)
-                    between <code>timer.beforeExecute(...)</code> and <code>time.afterExecute(...)</code>. The assertions
+                    between <code>timer.beforeExecute</code> and <code>timer.afterExecute</code>. The assertions
                     ensure that the number of executions is correct (as we know the expected count ahead of time) and
                     make a best guess on the mean execution time. Mostly, this will pass but it still represents an
                     intermittently failing test.
@@ -204,8 +246,9 @@ public class ThreadPoolTimerIntegrationTest {
                 <p>
                     In the optimistic version, it seemed that the actual time to execute outweighed the artificial delay
                     and so skewed the assumption. We were no longer able to rely on the forced delay as the actual
-                    execution took proportionally significant time. This was a good reminder why using real time can
-                    be problematic and forced a rethink.
+                    execution took proportionally significant time. Anecdotally, this is likely to be caused by contention
+                    and retries in the STM but we'll revisit that later. The affect was a good reminder why using real time
+                    can be problematic and forced a rethink.
                 </p>
                 <p>
                     Somehow, we want to control time but with more complex semantics that the simple <code>StopWatch</code>
@@ -226,15 +269,15 @@ public class ThreadPoolTimerIntegrationTest {
                     ourselves if we can control the stop watch used to time the execution from within the test. Usually,
                     we can just use something like the <code>MovableClock</code> class to do this, effectively mocking
                     the stop watch within the test. However, the <code>ThreadPoolTimer</code> is required to
-                    use multiple stop watches, one per thread it's responsible for timing.
+                    use multiple stop watches, one for each thread it's responsible for timing.
                 </p>
                 <p>
                     For example, when the timer starts the stop watch, it must do so for the current thread. The
                     class requires that the current thread be passed into the <code>beforeExecute</code> method in order
                     to ensure this. When another timer is started by calling the same method (lets say, at the same time,
                     but from a different thread), the class should start a new stop watch tied to the current thread.
-                    This was largely influenced by the semantics of the <code>java.util.concurrent.ThreadPoolExecutor</code>
-                    which provides before and after extension points.
+                    This requirement is largely influenced by the semantics of the <code>java.util.concurrent.ThreadPoolExecutor</code>
+                    which provides the before and after extension points that we'll be using.
                 </p>
                 <p>
                     A basic implementation would be to associate a thread with a map, start a stop watch and associate
