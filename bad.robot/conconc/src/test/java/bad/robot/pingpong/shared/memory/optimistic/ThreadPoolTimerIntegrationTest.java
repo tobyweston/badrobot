@@ -28,6 +28,7 @@ import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static java.lang.Thread.currentThread;
 import static org.hamcrest.core.Is.is;
@@ -36,8 +37,7 @@ import static org.junit.Assert.assertThat;
 public class ThreadPoolTimerIntegrationTest {
 
     private static final ThreadLocalMovableClock clock = new ThreadLocalMovableClock();
-    private static final ThreadLocalStopWatch watch = new ThreadLocalStopWatch(clock);
-    private static final ThreadPoolTimer timer = new ThreadPoolTimer(new StmGuard(), watch, new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter());
+    private static final ThreadPoolTimer timer = new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(clock), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter());
     private static final Throwable NO_EXCEPTION = null;
 
     @Rule public RepeatingRule repeating = new RepeatingRule();
@@ -56,8 +56,6 @@ public class ThreadPoolTimerIntegrationTest {
 
     @AfterClass
     public static void verifyCounters() {
-        System.out.println(String.format("(%s)", 100 * 50 * 500));
-        System.out.println(String.format("%s / %s = %s", timer.getTotalTime(), timer.getNumberOfExecutions(), timer.getMeanExecutionTime()));
         assertThat(timer.getNumberOfExecutions(), is(5000L));
         assertThat(timer.getMeanExecutionTime(), is(500L));
         assertThat(timer.getTerminated(), is(0L));

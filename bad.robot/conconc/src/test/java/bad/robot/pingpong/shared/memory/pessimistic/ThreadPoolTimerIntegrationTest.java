@@ -41,8 +41,8 @@ public class ThreadPoolTimerIntegrationTest {
     private static final ThreadPoolTimer timer = new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(clock), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
     private static final Throwable NO_EXCEPTION = null;
 
-    @Rule public ConcurrentRule concurrent = new ConcurrentRule();
     @Rule public RepeatingRule repeating = new RepeatingRule();
+    @Rule public ConcurrentRule concurrent = new ConcurrentRule();
 
     @Concurrent (count = 50)
     @Repeating (repetition = 100)
