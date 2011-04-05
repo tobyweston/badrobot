@@ -37,7 +37,6 @@ import static org.junit.Assert.assertThat;
 public class ThreadPoolTimerIntegrationTest {
 
     private static final ThreadLocalMovableClock clock = new ThreadLocalMovableClock();
-    // can't simulate the race condition here... see thread_pool_x.xml
     private static final ThreadPoolTimer timer = new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(clock), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
     private static final Throwable NO_EXCEPTION = null;
 

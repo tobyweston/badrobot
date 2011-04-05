@@ -22,9 +22,15 @@ import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
+
 public class PessimisticThreadPoolTimers {
 
     public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
         return new ThreadPoolTimer(new LockingGuard(new ReentrantLock()), new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
+    }
+
+    public static ThreadPoolTimer createThreadSafeThreadPoolTimerWithoutEnforcingRaceConditionConsistency() {
+        return new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
     }
 }

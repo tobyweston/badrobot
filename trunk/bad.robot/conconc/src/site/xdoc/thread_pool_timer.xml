@@ -375,11 +375,8 @@ public class ThreadPoolTimerIntegrationTest {
                 To specifically test for the race condition, we should be able to compose the object such that the
                 consistency of field updates is maintained but the consistency of the <i>use of those fields</i> in
                 unprotected. We can achieve this by using thread safe versions of the <code>Counter</code> collaborators
-                but unsafe <code>Guard</code> implementation as it's the guard that protects against the race condition.
-            </p>
-            <p>
-                Does putting the assertion against the mean in the <code>AfterClass</code> block mean it won't simulate
-                unlike timing? yes.
+                but unsafe <code>Guard</code> implementation as it's the guard that protects against the race condition
+                but we'll have to make the call to <code>getMeanExecutionTime</code> repeatedly during the test.
             </p>
 
             <subsection name="What to Guard">
