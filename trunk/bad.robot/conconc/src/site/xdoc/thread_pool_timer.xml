@@ -15,7 +15,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
+<!--
+Fool Maven's validator:
+(see http://jira.codehaus.org/browse/MSITE-440)
+<document blah="true">
+</document>
+-->
 <document xmlns="http://maven.apache.org/XDOC/2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
@@ -166,7 +171,9 @@ public Long getMeanExecutionTime() {
                 <p>
                     The sequence of events is shown below when access to the two variables is uncoordinated.     
                 </p>
-                <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.1.png"/>
+                <div class="figure">
+                    <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.1.png"/>
+                </div>
 <!--<source>-->
 <!--Thread A -> totalTime : set value to 1000-->
 <!--Thread A -> tasks : set value to 10-->
@@ -181,8 +188,10 @@ public Long getMeanExecutionTime() {
                     the result will be <code>1000 / 10 = 100</code>. However, with the introduction of another thread
                     and different interleaving, the result can be skewed. For example,
                 </p>
-                <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.2.png"/>
-<!--<source>-->
+                <div class="figure">
+                    <img src="images/thread_pool_timer/fig-1.2.png" title="uncoordinated access to variables" alt="uncoordinated access to variables"/>
+                </div>
+                <!--<source>-->
 <!--Thread A -> totalTime : set value to 1000-->
 <!--Thread A -> tasks : set value to 10-->
 <!--Main Thread -> totalTime : get value-->
@@ -253,7 +262,7 @@ public class ThreadPoolTimerIntegrationTest {
                 <p>
                     Somehow, we want to control time but with more complex semantics that the simple <code>StopWatch</code>
                     example above. In the case of the <code>ThreadPoolTimer</code> it effectively has to maintain multiple
-                    stop watches, so we'd need to control multiple instances of time!
+                    stopwatches, so we'd need to control multiple instances of time!
                 </p>
             </subsection>
 
@@ -266,21 +275,21 @@ public class ThreadPoolTimerIntegrationTest {
                 </p>
                 <p>
                     In testing for the race condition when calculating mean execution time, we make life easier for
-                    ourselves if we can control the stop watch used to time the execution from within the test. Usually,
+                    ourselves if we can control the stopwatch used to time the execution from within the test. Usually,
                     we can just use something like the <code>MovableClock</code> class to do this, effectively mocking
-                    the stop watch within the test. However, the <code>ThreadPoolTimer</code> is required to
-                    use multiple stop watches, one for each thread it's responsible for timing.
+                    the stopwatch within the test. However, the <code>ThreadPoolTimer</code> is required to
+                    use multiple stopwatches, one for each thread it's responsible for timing.
                 </p>
                 <p>
-                    For example, when the timer starts the stop watch, it must do so for the current thread. The
+                    For example, when the timer starts the stopwatch, it must do so for the current thread. The
                     class requires that the current thread be passed into the <code>beforeExecute</code> method in order
                     to ensure this. When another timer is started by calling the same method (lets say, at the same time,
-                    but from a different thread), the class should start a new stop watch tied to the current thread.
+                    but from a different thread), the class should start a new stopwatch tied to the current thread.
                     This requirement is largely influenced by the semantics of the <code>java.util.concurrent.ThreadPoolExecutor</code>
                     which provides the before and after extension points that we'll be using.
                 </p>
                 <p>
-                    A basic implementation would be to associate a thread with a map, start a stop watch and associate
+                    A basic implementation would be to associate a thread with a map, start a stopwatch and associate
                     it with that thread. Fortunately for us, that's exactly what <code>ThreadLocal</code> provides. So,
                     assuming the method is called with the correct parameters (see the <code>assert</code> below), we
                     can just use a <code>ThreadLocalStopWatch</code> for the <code>timer</code> instance below.
@@ -372,12 +381,51 @@ public class ThreadPoolTimerIntegrationTest {
 }
 </source>
             <p>
-                To specifically test for the race condition, we should be able to compose the object such that the
-                consistency of field updates is maintained but the consistency of the <i>use of those fields</i> in
-                unprotected. We can achieve this by using thread safe versions of the <code>Counter</code> collaborators
-                but unsafe <code>Guard</code> implementation as it's the guard that protects against the race condition
-                but we'll have to make the call to <code>getMeanExecutionTime</code> repeatedly during the test.
+                To specifically test for the race condition, we should be able check the consistency of the date during
+                multiple updates. A test similar to the above but with assertions immediately after the updates should 
+                do but the tricky part is moving time forward a different amount for each thread in order to be able to 
+                make meaningful assertions. The test below manually controls the number of threads and iterations per
+                thread and uses the thread count to create a multiplier for the delay in the stopwatch.
             </p>
+<source>
+public class ThreadPoolTimerRaceConditionIntegrationTest {
+
+    private static final int threadCount = 50;
+    private static final int repetitions = 100;
+
+    private static final ThreadLocalMovableClock clock = new ThreadLocalMovableClock();
+    private static final ThreadPoolTimer timer = new ThreadPoolTimer(new SynchronisingGuard(), new ThreadLocalStopWatch(clock), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
+    private static final Throwable NO_EXCEPTION = null;
+
+    @Test
+    public void executeTask() throws InterruptedException, ExecutionException {
+        List&lt;Future&lt;?&gt;&gt; futures = new ArrayList&lt;Future&lt;?&gt;&gt;();
+        ExecutorService pool = newFixedThreadPool(threadCount);
+        for (int i = 1; i &lt;= threadCount; i++)
+            futures.add(pool.submit(newTestThread(millis(threadCount * 10))));
+        for (Future&lt;?&gt; future : futures)
+            future.get();
+        shutdown(pool).waitingForCompletion(seconds(5));
+    }
+
+    private static Callable&lt;Void&gt; newTestThread(final Duration delay) {
+        return new Callable&lt;Void&gt;() {
+            @Override
+            public Void call() throws RuntimeException {
+                for (int count = 1; count &lt;= repetitions; count++) {
+                    Runnable task = newRunnable();
+                    timer.beforeExecute(currentThread(), task);
+                    clock.incrementBy(delay);
+                    timer.afterExecute(task, NO_EXCEPTION);
+                    assertThat(timer.getMeanExecutionTime(), is(delay.inMillis()));
+                    Introduce.jitter();
+                }
+                return null;
+            }
+        };
+    }
+}    
+</source>
 
             <subsection name="What to Guard">
                 <p>
@@ -447,7 +495,12 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
 }                    
 </source>
                 <p>
-
+                    This implementation fails the above race condition test (<code>ThreadPoolTimerRaceConditionIntegrationTest</code>).
+                    The use of the <code>guard</code> in the <code>getMeanExecutionTime</code> and variable write methods
+                    ensure that writes to individual variables are coordinated with the reads. Updates during the read
+                    are prevented but our test still fails. It turns out we've missed something fundamental here, the
+                    guard doesn't actually protect us from specific interleaving when the protected methods have themselves
+                    completed. The diagram in Fig.XXX above is still very much possible.
                 </p>
             </subsection>
 
