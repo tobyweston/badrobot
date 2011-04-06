@@ -20,8 +20,11 @@ import bad.robot.pingpong.Introduce;
 import bad.robot.pingpong.shared.memory.ThreadLocalMovableClock;
 import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
 import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
+import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
+import com.google.code.tempusfugit.concurrency.annotations.Intermittent;
 import com.google.code.tempusfugit.temporal.Duration;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +33,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 import static com.google.code.tempusfugit.concurrency.ExecutorServiceShutdown.shutdown;
 import static com.google.code.tempusfugit.temporal.Duration.millis;
 import static com.google.code.tempusfugit.temporal.Duration.seconds;
@@ -39,13 +41,15 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(IntermittentTestRunner.class)
+@Intermittent (repetition = 10)
 public class ThreadPoolTimerRaceConditionIntegrationTest {
 
     private static final int threadCount = 50;
     private static final int repetitions = 100;
 
     private static final ThreadLocalMovableClock clock = new ThreadLocalMovableClock();
-    private static final ThreadPoolTimer timer = new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(clock), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
+    private static final ThreadPoolTimer timer = new ThreadPoolTimer(new SynchronisingGuard(), new ThreadLocalStopWatch(clock), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
     private static final Throwable NO_EXCEPTION = null;
 
     @Test

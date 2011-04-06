@@ -20,8 +20,11 @@ import bad.robot.pingpong.StopWatch;
 import bad.robot.pingpong.shared.memory.pessimistic.Guard;
 import com.google.code.tempusfugit.temporal.Duration;
 
+import static bad.robot.pingpong.shared.memory.Accumulate.To.to;
+import static bad.robot.pingpong.shared.memory.Accumulate.add;
 import static bad.robot.pingpong.shared.memory.Divide.Divisor.by;
 import static bad.robot.pingpong.shared.memory.Divide.divide;
+import static bad.robot.pingpong.shared.memory.Increment.increment;
 
 public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean {
 
@@ -41,20 +44,20 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
 
     @Override
     public void beforeExecute(Thread thread, Runnable task) {
-        assert(Thread.currentThread().equals(thread));
+        assert (Thread.currentThread().equals(thread));
         timer.start();
-        tasks.increment();
+        guard.execute(increment(tasks));
     }
 
     @Override
     public void afterExecute(Runnable task, Throwable throwable) {
         timer.stop();
-        totalTime.add(timer.elapsedTime());
+        guard.execute(add(timer.elapsedTime(), to(totalTime)));
     }
 
     @Override
     public void terminated() {
-        terminated.increment();
+        guard.execute(increment(terminated));
     }
 
     @Override

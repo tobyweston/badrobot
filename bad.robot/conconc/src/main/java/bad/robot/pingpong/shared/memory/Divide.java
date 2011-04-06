@@ -39,7 +39,7 @@ public class Divide implements Callable<Long, RuntimeException> {
     }
 
     public static class Divisor {
-        private static Counter value;
+        private Counter value;
 
         public static Divisor by(Counter counter) {
             return new Divisor(counter);

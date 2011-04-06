@@ -27,6 +27,7 @@
         <item name="Problem Definition" ref="problem.html"/>
         <item name="Solutions" ref="solution.html">
             <item name="ThreadCounter" ref="thread_counter.html"/>
+            <item name="ThreadPoolTimer" ref="thread_pool_timer.html"/>
         </item>
         <item name="Conclusions" ref="conclusions.html"/>
     </toc>
