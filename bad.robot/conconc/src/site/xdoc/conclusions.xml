@@ -35,7 +35,16 @@
 
             <subsection name="General Comments / Observations">
                 <p>
-
+                    In the pessimistic world, contended locks obviously block. The misconception that locking is expensive
+                    comes from this where in fact uncontended locks add only tens of nanoseconds (biased locking at around
+                    2-4 clock cycles and fast user-model locks otherwise). This is all highly optimised by the JVM as
+                    synchronisation has been so common in development. Things like lock elision, escape analysis, adaptive
+                    locking and lock coarsening all aim to correct the oversights of the developer. These optimisations
+                    and the support for the pessimistic model from the language have set its place and we won't be seeing
+                    it go away for some time yet.
+                </p>
+                <p>
+                    From <a href="http://www.azulsystems.com/blog/wp-content/uploads/2011/03/2011_WhatDoesJVMDo.pdf">some guy</a>
                 </p>
             </subsection>
         </section>
