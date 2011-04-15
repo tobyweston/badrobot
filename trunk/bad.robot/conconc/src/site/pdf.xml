@@ -30,11 +30,15 @@
             <item name="ThreadPoolTimer" ref="thread_pool_timer.html"/>
         </item>
         <item name="Conclusions" ref="conclusions.html"/>
+        <item name="References" ref="references.html"/>
+        <item name="Appendices" ref="index.html">
+            <item name="Appendix A" ref="appendix_A.html"/>
+        </item>
     </toc>
 
     <cover>
         <coverTitle>Optimistic and Pessimistic Concurrency Control with Shared Memory Models</coverTitle>
-        <coverType>An analysis of modern concurrency control mechanisms</coverType>
+        <coverType>An look at modern concurrency control mechanisms in Java</coverType>
         <coverSubTitle>v.${project.version}</coverSubTitle>
         <projectName>${project.name}</projectName>
         <companyName>Toby Weston</companyName>
