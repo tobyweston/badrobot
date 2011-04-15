@@ -73,9 +73,9 @@ Fool Maven's validator:
                     </li>
                     <li>
                         <p>
-                            Present alternative implementations of a common concurrency problem; a typical pessimistic,
-                            lock based synchronisation solution and a optimistic, software transactional memory based
-                            solution.
+                            Present alternative implementations of a common concurrency problems; typical pessimistic,
+                            lock based synchronisation solutions, modern (non-blocking) optimistic based solutions
+                            and optimistic, software transactional memory based solution.
                         </p>
                     </li>
                     <li>

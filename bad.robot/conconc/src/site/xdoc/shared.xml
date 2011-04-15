@@ -109,7 +109,7 @@ Fool Maven's validator:
                 </p>
             </subsection>
 
-            <subsection name="Non-Blocking Algorithms; The Gray Area">
+            <subsection name="Non-Blocking Algorithms; The Grey Area">
                 <p>
                     As mentioned, locking usually implies blocking behaviour which can have a knock-on affect to
                     performance and overall progress. However, non-blocking algorithms are available as an alternative
@@ -141,12 +141,12 @@ Fool Maven's validator:
                 </p>
             </subsection>
 
-            <subsection name="Alternatives">
+            <subsection name="Alternative Access Mechanisms">
                 <p>
                     Distributed Memory is the idea that in multi-core processors (or in single-core multiple processor
                     systems), each core/processor has local memory and works on it with exclusivity. If a task is
                     required to collaborate with other core's memory, it must communicate with them as an external
-                    resource.
+                    resource. The actor model or distributed message passing are examples.
                 </p>
             </subsection>
         </section>

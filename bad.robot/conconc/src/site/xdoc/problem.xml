@@ -14,6 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <!--
 Fool Maven's validator:
 (see http://jira.codehaus.org/browse/MSITE-440)
@@ -49,13 +50,10 @@ Fool Maven's validator:
                     performance monitoring our client-server application.
                 </p>
                 <p>
-                    Specifically then, the problem is
-                </p>
-                <blockquote>
-                    "Given a new web-application, we would like to record request statistics against specific services
+                    Specifically then, the problem is given a new web-application, we would like to record request statistics against specific services
                     so that we can understand typical response times and set achievable service level agreements with
-                    customers."
-                </blockquote>
+                    customers.
+                </p>
             </subsection>
 
             <subsection name="The Ping Server">
