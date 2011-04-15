@@ -45,7 +45,7 @@
             </item>
             <item name="Conclusions" href="conclusions.html"/>
             <item name="References" href="references.html"/>
-            <item name="Appendices" href="index.html" collapse="true">
+            <item name="Appendices" href="appendices.html" collapse="true">
                 <item name="Appendix A" href="appendix_A.html"/>
             </item>
         </menu>

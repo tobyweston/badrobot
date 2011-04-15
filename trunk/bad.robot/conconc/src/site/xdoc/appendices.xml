@@ -27,16 +27,13 @@ Fool Maven's validator:
           xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 
     <properties>
-        <title>Introduction</title>
+        <title>Appendices</title>
         <author>Toby Weston</author>
     </properties>
 
     <body>
 
-        <section name="Introduction">
-
-            <p>Hello</p>
-
+        <section name="Appendices">
         </section>
 
     </body>

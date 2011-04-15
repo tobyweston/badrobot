@@ -31,14 +31,14 @@
         </item>
         <item name="Conclusions" ref="conclusions.html"/>
         <item name="References" ref="references.html"/>
-        <item name="Appendices" ref="index.html">
+        <item name="Appendices" ref="appendices.html">
             <item name="Appendix A" ref="appendix_A.html"/>
         </item>
     </toc>
 
     <cover>
         <coverTitle>Optimistic and Pessimistic Concurrency Control with Shared Memory Models</coverTitle>
-        <coverType>An look at modern concurrency control mechanisms in Java</coverType>
+        <coverType>A look at modern concurrency control mechanisms in Java</coverType>
         <coverSubTitle>v.${project.version}</coverSubTitle>
         <projectName>${project.name}</projectName>
         <companyName>Toby Weston</companyName>
