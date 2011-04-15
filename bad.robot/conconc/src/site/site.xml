@@ -44,6 +44,10 @@
                 <item name="Instrumenting Thread Pool Timer" href="thread_pool_timer.html" />
             </item>
             <item name="Conclusions" href="conclusions.html"/>
+            <item name="References" href="references.html"/>
+            <item name="Appendices" href="index.html" collapse="true">
+                <item name="Appendix A" href="appendix_A.html"/>
+            </item>
         </menu>
         <menu ref="reports"/>
 

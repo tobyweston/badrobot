@@ -34,6 +34,13 @@
                 <configuration>
                     <validate>false</validate>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-docbook-simple</artifactId>
+                        <version>1.1.4</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -51,6 +58,13 @@
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-module-docbook-simple</artifactId>
+                        <version>1.1.4</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

@@ -1,0 +1,1 @@
+java -jar doxia-converter-1.1-jar-with-dependencies.jar -in src/site/xdoc/$1.xml -from xdoc -out target/docbook -to docbook

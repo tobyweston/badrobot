@@ -15,6 +15,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+
 <!--
 Fool Maven's validator:
 (see http://jira.codehaus.org/browse/MSITE-440)
@@ -37,25 +38,25 @@ Fool Maven's validator:
             <p>
                 Sharing common memory allows us to build software that works on common data structures, it allows us
                 to utilise modern architectures to solve common problems without having to copy common data between
-                processes.
+                processes (Christopher and Thiruvathukal 2001, p.3).
             </p>
             <subsection name="The Java Memory Model">
                 <p>
-                    The part of the Java Specification concerned with JVM implementations of shared memory is refereed
-                    to as the Java Memory Model. It basically describes how any JVM implementation should behave under
-                    certain conditions. Interestingly for us, it's particularly concerned with describing behaviour under
-                    multi-threaded conditions.
+                    The part of the Java Specification (Gosling, et al. 2005) concerned with JVM implementations of
+                    shared memory is refereed to as the Java Memory Model. It basically describes how any JVM
+                    implementation should behave under certain conditions. Interestingly for us, it's particularly
+                    concerned with describing behaviour under multi-threaded conditions.
                 </p>
                 <p>
-                    In modern systems, the order in which instructions are actually executed in the same order that they are
-                    arranged at source. The compiler, processors and memory subsystems may reorder execution for best
-                    performance. In fact, on multi-core platforms, the processors will likely have their own local cache
-                    which may or may not be in-sync with main memory. Without some synchronising mechanism, when the data in
-                    main memory is shared, there is no guarantee that each processor will see an up-to-date value. This turns
-                    out to be a good example of why we need the Java Memory Model. This part of the specification defines
-                    such synchronisation mechanisms and behaviour. For example, it defines that the <code>volatile</code>
-                    keyword should indicate to the JVM that some shared state is not eligible for caching in
-                    processor-local caches and so ensure inter-thread visibility.
+                    In modern systems, the order in which instructions are actually executed isn't necessarily the same
+                    order that they are arranged at source. The compiler, processors and memory subsystems may reorder
+                    execution for best performance. In fact, on multi-core platforms, the processors will likely have
+                    their own local cache which may or may not be in-sync with main memory. Without some synchronising
+                    mechanism, when the data in main memory is shared, there is no guarantee that each processor will
+                    see an up-to-date value. This turns out to be a good example of why we need the Java Memory Model.
+                    This part of the specification defines the behaviour of such synchronisation mechanisms and behaviour.
+                    For example, it defines that the <code>volatile</code> keyword should indicate to the JVM that some
+                    shared state is not eligible for caching in processor-local caches and so ensure inter-thread visibility.
                 </p>
                 <p>
                     Another important part of the Java Memory Model defines <i>as-if-serial </i> semantics. Here, the JVM is
@@ -73,16 +74,70 @@ Fool Maven's validator:
             </subsection>
 
             <subsection name="Pessimistic Concurrency Control">
-
+                <p>
+                    Being pessimistic about how to control access to shared memory means assuming the worse. It assumes
+                    that access to shared memory will be contended and so above all else, access must be serialised in
+                    some way so that only one access is allowed at any given time. Java provides plenty of mechanisms to
+                    achieve this such as the <code>synchronized</code> keyword, locks and other high level mechanisms such
+                    as barriers and semaphores. They usually rely on co-operation within the code to work correctly. For
+                    example, all potential accessors must <i>agree</i> to participate in the specific control mechanism used.
+                    Failing to spot the need to participate in a given control mechanism is often the cause of correctness
+                    problems in concurrent systems.
+                </p>
+                <p>
+                    For the purposes of this discussion, we can summarise pessimistic control as lock based. Locking
+                    usually implies blocking behaviour when waiting for a lock to become free.
+                </p>
             </subsection>
             
-            <subsection name="Optimistic Concurrency Control">
+            <subsection name="Optimistic Concurrency Control" id="optimistic_concurrency_control">
+                <p>
+                    An optimistic approach to concurrency control on the other hand takes a more liberal view on things.
+                    How likely is it that shared memory will actually be contented really? What if we don't assume the
+                    worse but instead assume that conflicts are relatively rare? In this case we can essentially leave
+                    shared memory unguarded but provide mechanisms to spot collisions and provide failure and
+                    recovery semantics. Database systems have provided these mechanisms for some time
+                    (Kung and Robinson, 1981) with most popular ORM mapping tools including Hibernate offering
+                    implementations.
+                </p>
                 <p>
                     Software Transaction Memory is an optimistic alternative to lock based control to shared memory. It
                     provides atomicity and isolation schematics similar to database transactions. Consistency is maintained
                     by the developer just as in the pessimistic world but by providing the building blocks, consistency is
                     supported (if not guaranteed). Durability however, can not be supported as ultimately, any successful
                     transaction's results are stored in volatile memory the JVM can not ensure they are preserved.
+                </p>
+            </subsection>
+
+            <subsection name="Non-Blocking Algorithms; The Gray Area">
+                <p>
+                    As mentioned, locking usually implies blocking behaviour which can have a knock-on affect to
+                    performance and overall progress. However, non-blocking algorithms are available as an alternative
+                    to strict (mutually exclusive) locking when accessing shared memory. Non-blocking algorithms
+                    guarantee either per-thread progress (wait-free) or system wide progress (lock-free)
+                    (Goetz et al, 2006, p. 329; Non-blocking algorithm, Anon., 2011) and are often cited as offering
+                    better scalability than lock based equivalents (Goetz 2006, pp. 326-329, 336).
+                </p>
+                <p>
+                    Usually, non-blocking algorithms require low level support for atomic read-modify-writes (such as
+                    <i>compare-and-swap</i> or <i>load-link/store-conditional</i>). The performance of equivalent
+                    implementations not using these primitives has traditionally been poor. More recently however,
+                    Software Transactional Memory offers a similar yet higher level abstraction when building non-blocking
+                    code whilst anecdotally offering good performance. Non-blocking constructs are usually used to build
+                    performant data structures (queues, stacks, hash tables etc) as found in the <code>java.util.concurrent</code>
+                    package.
+                </p>
+                <p>
+                    As Goetz (2006, p. 321) points out, <i>compare-and-swap</i> is an optimistic technique so for the
+                    purpose of this discussion, where do the Java classes using <i>compare-and-swap</i> fit in? In terms of
+                    classifying as either pessimistic or optimistic, traditional control structures providing serial access
+                    (such as <code>synchronized</code> and <code>wait</code>/<code>notify</code>) are certainly pessimitic.
+                    Emerging techniques such as Software Transactional Memory are clearly optimistic which just leaves
+                    the newer (post 1.5) constructs available in the <code>java.util.concurrent</code> package. Those
+                    that use <i>compare-and-swap</i> (for example, <code>AtomicLong</code>) or similar have to be classified
+                    as optimistic whereas the implementations of common concurrent blocking abstractions such as the semaphore
+                    are pessimistic. Some classes such as <code>Lock</code> implementations can even be seen as both (see
+                    <a href="appendix_A.html">Appendix A</a> for details).
                 </p>
             </subsection>
 

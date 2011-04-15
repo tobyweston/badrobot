@@ -1,0 +1,85 @@
+<!--
+  ~ Copyright (c) 2009-2011, bad robot (london) ltd
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+    <properties>
+        <title>References</title>
+        <author>Toby Weston</author>
+    </properties>
+
+    <body>
+
+        <section name="References">
+            <ol>
+                <li>
+                    <p>
+                        Christopher, T. W. and Thiruvathukal, G. K., 2001. <i>High Performance Java Platform Computing</i>. Sun Microsystems/Prentice Hall.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Kung, H. T. and John T. Robinson. June 1981. <i>On optimistic methods for concurrency control</i>. ACM Transactions on Database Systems, Vol. 6, No. 2.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Anon. 2011. Concurrency Control. <i>Wikipedia</i>, [online] Available at: <a href="http://en.wikipedia.org/wiki/Concurrency_control">http://en.wikipedia.org/wiki/Concurrency_control</a>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Anon. 2011. Non-blocking algorithm. <i>Wikipedia</i>, [online] Available at: <a href="http://en.wikipedia.org/wiki/Non-blocking_synchronization">http://en.wikipedia.org/wiki/Non-blocking_synchronization</a>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Moore, G. 1965. <i>Cramming More Components Onto Integrated Circuits.</i> Electronics Magazine.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Moore, G. 1975. <i>Progress in Digital Integrated Electronics.</i> IEEE, IEDM Tech Digest., pp. 11-13
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Amdahl, G.M. 1967, <i>Validity of the Single-Processor Approach to Achieving Large-Scale Computing Capabilities.</i>
+                        Proc. Am. Federation of Information Processing Societies Conf., AFIPS Press., pp. 483-485.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Gustafson, J. L. 1988. <i>Reevaluating Amdahl’s Law.</i> Comm. ACM., pp. 532-533.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Gosling, J. Joy, B. Steele, G. and Bracha, G. 2005. <i>Java Langauge Specification</i> 3rd Edition. Addison Wesley.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Goetz, B. Peierls, T. Bloch, J. Bowbeer, J. Holmes, D. and Lea, D. 2006. <i>Java Concurrency in Practice</i>. 1st Edition. Addison Wesley
+                    </p>
+                </li>
+            </ol>
+        </section>
+
+    </body>
+</document>

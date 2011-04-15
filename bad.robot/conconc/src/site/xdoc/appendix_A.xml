@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2009-2011, bad robot (london) ltd
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+Fool Maven's validator:
+(see http://jira.codehaus.org/browse/MSITE-440)
+<document blah="true">
+</document>
+-->
+<document xmlns="http://maven.apache.org/XDOC/2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+
+    <properties>
+        <title>Appendix A</title>
+        <author>Toby Weston</author>
+    </properties>
+
+    <body>
+
+        <section name="Classification of Java Concurrency Control Mechanisms">
+            <p>
+                For the purposes of this discussion, I've classified various options as either optimistic or
+                pessimistic.
+            </p>
+            <table>
+                <caption>Pessimistic</caption>
+                <tr>
+                    <td>Class or keyword</td>
+                    <td>Notes</td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>synchronized</code>
+                    </td>
+                    <td>Exclusive lock is inherently pessimistic.</td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>ReentrantLock</code>
+                    </td>
+                    <td>Exclusive locks but with additional functionality meaning they can offer non-blocking semantics (see below).</td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>ThreadLocal</code>
+                    </td>
+                    <td>Although avoiding contention, when using <code>ThreadLocal</code>, it can be argued that we're
+                        expecting the potential for contention and electing to side-step conflicts. As such, it offers
+                        no explicit collision detection or recovery as described in the
+                        <a href="shared.html#optimistic_concurrency_control">Optimistic Concurrency Control</a> section.
+                    </td>
+                </tr>
+            </table>
+
+            <table>
+                <caption>Optimistic</caption>
+                <tr>
+                    <td>Technique or keyword</td>
+                    <td>Notes</td>
+                </tr>
+                <tr>
+                    <td>
+                        Software Transactional Memory
+                    </td>
+                    <td>Usually STM offers automatic retry semantics.</td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>volatile</code>
+                    </td>
+                    <td>Atomic read and write (Gosling, et al. 2005. Section. 17.7). A write to a volatile field <i>happens-before</i> every subsequent read
+                        of that field (Gosling, et al. 2005. Section. 17.4.5).
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>AtomicInteger</code>
+                        and others
+                    </td>
+                    <td>Based on CAS, lock-free algorithm although on some platforms may involve some form of internal
+                        locking.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>ReentrantLock</code>
+                    </td>
+                    <td>Non-blocking when used to attempt to acquire a lock (using <code>tryLock</code>) with a conditional or allowing
+                    the lock to be interrupted (using <code>lockInterruptibly</code>) or with a timeout (using <code>tryLock(long, TimeUnit)</code>).</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+
+        </section>
+
+    </body>
+
+</document>
