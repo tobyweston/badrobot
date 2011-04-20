@@ -16,6 +16,7 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
+import bad.robot.pingpong.shared.memory.LongCounter;
 import bad.robot.pingpong.shared.memory.RealClock;
 import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
 import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
@@ -28,6 +29,11 @@ public class PessimisticThreadPoolTimers {
 
     public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
         return new ThreadPoolTimer(new LockingGuard(new ReentrantLock()), new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
+    }
+
+    // is this thread safe?
+    public static ThreadPoolTimer createThreadSafeThreadPoolTimerMonitoringContention() {
+        return new ThreadPoolTimer(new ContentionMonitoringGuard(), new ThreadLocalStopWatch(new RealClock()), new LongCounter(), new LongCounter(), new AtomicMillisecondCounter());
     }
 
     public static ThreadPoolTimer createThreadSafeThreadPoolTimerWithoutEnforcingRaceConditionConsistency() {

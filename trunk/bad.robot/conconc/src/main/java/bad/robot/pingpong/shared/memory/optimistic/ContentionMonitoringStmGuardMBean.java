@@ -14,30 +14,10 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong;
+package bad.robot.pingpong.shared.memory.optimistic;
 
-import com.google.code.tempusfugit.temporal.Duration;
+public interface ContentionMonitoringStmGuardMBean {
 
-import java.util.Random;
+    Double getContentionRatio();
 
-public class UpTo {
-
-    private final Duration duration;
-    private final Random random = new Random();
-
-    private UpTo(Duration duration) {
-        this.duration = duration;
-    }
-
-    public static Duration millis(int duration) {
-        return new UpTo(Duration.millis(duration)).duration();
-    }
-
-    public static UpTo upTo(Duration duration) {
-        return new UpTo(duration);
-    }
-
-    public Duration duration() {
-        return Duration.millis(random.nextInt((int) duration.inMillis()));
-    }
 }

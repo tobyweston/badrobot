@@ -19,6 +19,9 @@ package bad.robot.pingpong.shared.memory.optimistic;
 import akka.stm.Atomic;
 import com.google.code.tempusfugit.concurrency.Callable;
 
+import static org.multiverse.api.StmUtils.scheduleCompensatingTask;
+import static org.multiverse.api.StmUtils.scheduleDeferredTask;
+
 /**
  * The {@link #atomically} methods delegates to the {@link Callable} passed in. It catches {@link Exception} and re-throws
  * as a {@link RuntimeException} to allow the STM implementation to attempt a retry. Serious (non-recoverable/STM implementation
@@ -32,21 +35,40 @@ import com.google.code.tempusfugit.concurrency.Callable;
 public class RunAtomically<R, E extends Exception> extends Atomic<R> {
 
     private final Callable<R, E> callable;
+    private final DeferredTask onCommit;
+    private final CompensatingTask onAbort;
 
     public static <R, E extends Exception> R runAtomically(Callable<R, E> callable) {
-        return new RunAtomically<R, E>(callable).execute();
+        return new RunAtomically<R, E>(callable, new DoNothingDeferredTask(), new DoNothingCompensatingTask()).execute();
     }
 
-    public RunAtomically(Callable<R, E> callable) {
+    public static <R, E extends Exception> R runAtomically(Callable<R, E> callable, DeferredTask onCommit) {
+        return new RunAtomically<R, E>(callable, onCommit, new DoNothingCompensatingTask()).execute();
+    }
+
+    public static <R, E extends Exception> R runAtomically(Callable<R, E> callable, CompensatingTask onAbort) {
+        return new RunAtomically<R, E>(callable, new DoNothingDeferredTask(), onAbort).execute();
+    }
+
+    public static <R, E extends Exception> R runAtomically(Callable<R, E> callable, DeferredTask onCommit, CompensatingTask onAbort) {
+        return new RunAtomically<R, E>(callable, onCommit, onAbort).execute();
+    }
+
+    RunAtomically(Callable<R, E> callable, DeferredTask onCommit, CompensatingTask onAbort) {
         this.callable = callable;
+        this.onCommit = onCommit;
+        this.onAbort = onAbort;
     }
 
     @Override
     public R atomically() {
         try {
+            scheduleDeferredTask(onCommit);
+            scheduleCompensatingTask(onAbort);
             return callable.call();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
+
 }
