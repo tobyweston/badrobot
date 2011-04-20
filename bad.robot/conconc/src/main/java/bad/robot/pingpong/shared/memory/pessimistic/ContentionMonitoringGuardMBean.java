@@ -14,30 +14,12 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong;
+package bad.robot.pingpong.shared.memory.pessimistic;
 
-import com.google.code.tempusfugit.temporal.Duration;
+import bad.robot.pingpong.shared.memory.ThroughputMBean;
 
-import java.util.Random;
+public interface ContentionMonitoringGuardMBean extends ThroughputMBean {
 
-public class UpTo {
+    Double getContentionRatio();
 
-    private final Duration duration;
-    private final Random random = new Random();
-
-    private UpTo(Duration duration) {
-        this.duration = duration;
-    }
-
-    public static Duration millis(int duration) {
-        return new UpTo(Duration.millis(duration)).duration();
-    }
-
-    public static UpTo upTo(Duration duration) {
-        return new UpTo(duration);
-    }
-
-    public Duration duration() {
-        return Duration.millis(random.nextInt((int) duration.inMillis()));
-    }
 }
