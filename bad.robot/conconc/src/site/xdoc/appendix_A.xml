@@ -38,6 +38,7 @@ Fool Maven's validator:
                 For the purposes of this discussion, I've classified various options as either optimistic or
                 pessimistic.
             </p>
+            <subsection name="Pessimistic">
             <table>
                 <caption>Pessimistic</caption>
                 <tr>
@@ -48,26 +49,43 @@ Fool Maven's validator:
                     <td>
                         <code>synchronized</code>
                     </td>
-                    <td>Exclusive lock is inherently pessimistic.</td>
+                    <td>
+                        <p>
+                            Exclusive lock is inherently pessimistic. Client threads unable to acquire a object's monitor
+                            will enter the BLOCKED state.
+                        </p>
+                    </td>
                 </tr>
                 <tr>
                     <td>
                         <code>ReentrantLock</code>
                     </td>
-                    <td>Exclusive locks but with additional functionality meaning they can offer non-blocking semantics (see below).</td>
+                    <td>
+                        <p>
+                            Exclusive locks but with additional functionality meaning they can offer non-blocking
+                            semantics (see below). When a client thread in unable to acquire a lock, it will enter the
+                            WAITING or TIMED_WAITING state rather than BLOCKED.
+                        </p>
+                    </td>
                 </tr>
                 <tr>
                     <td>
                         <code>ThreadLocal</code>
                     </td>
-                    <td>Although avoiding contention, when using <code>ThreadLocal</code>, it can be argued that we're
-                        expecting the potential for contention and electing to side-step conflicts. As such, it offers
-                        no explicit collision detection or recovery as described in the
-                        <a href="shared.html#optimistic_concurrency_control">Optimistic Concurrency Control</a> section.
+                    <td>
+                        <p>
+                            Although avoiding contention, when using<code>ThreadLocal</code>, it can be argued that we're
+                            expecting the potential for contention and electing to side-step conflicts. As such, it
+                            offers no explicit collision detection or recovery as described in the
+                            <a href="shared.html#optimistic_concurrency_control">Optimistic Concurrency Control</a>
+                            section.
+                        </p>
                     </td>
                 </tr>
             </table>
+            </subsection>
 
+            <subsection name="Optimistic">
             <table>
                 <caption>Optimistic</caption>
                 <tr>
@@ -78,14 +96,21 @@ Fool Maven's validator:
                     <td>
                         Software Transactional Memory
                     </td>
-                    <td>Usually STM offers automatic retry semantics.</td>
+                    <td>
+                        <p>
+                            Often STM offers automatic retry semantics.
+                        </p>
+                    </td>
                 </tr>
                 <tr>
                     <td>
                         <code>volatile</code>
                     </td>
-                    <td>Atomic read and write (Gosling, et al. 2005. Section. 17.7). A write to a volatile field <i>happens-before</i> every subsequent read
-                        of that field (Gosling, et al. 2005. Section. 17.4.5).
+                    <td>
+                        <p>
+                            Atomic read and write (Gosling, et al. 2005. Section. 17.7). A write to a volatile field
+                            <i>happens-before</i> every subsequent read of that field (Gosling, et al. 2005. Section. 17.4.5).
+                        </p>
                     </td>
                 </tr>
                 <tr>
@@ -93,23 +118,81 @@ Fool Maven's validator:
                         <code>AtomicInteger</code>
                         and others
                     </td>
-                    <td>Based on CAS, lock-free algorithm although on some platforms may involve some form of internal
-                        locking.
+                    <td>
+                        <p>
+                            Based on CAS, lock-free algorithm although on some platforms may involve some form of
+                            internal locking.
+                        </p>
                     </td>
                 </tr>
                 <tr>
                     <td>
                         <code>ReentrantLock</code>
                     </td>
-                    <td>Non-blocking when used to attempt to acquire a lock (using <code>tryLock</code>) with a conditional or allowing
-                    the lock to be interrupted (using <code>lockInterruptibly</code>) or with a timeout (using <code>tryLock(long, TimeUnit)</code>).</td>
+                    <td>
+                        <p>
+                            Non-blocking when used to attempt to acquire a lock (using <code>tryLock</code>) preceded with
+                            a conditional or allowing the lock to be interrupted (using <code>lockInterruptibly</code>) or
+                            with a timeout (using <code>tryLock(long, TimeUnit)</code>). In this mode, <code>Lock</code>s
+                            will not block in so much as client threads will not enter the BLOCKED state if unable to
+                            acquire the lock but instead will go into WAITING or TIMED_WAITING states. This is the
+                            difference between waiting to acquire a lock due to <code>synchronized</code> or <code>wait</code>
+                            as apposed to something that ends up calling a <code>park</code> method. See footnote for more
+                            details.
+                        </p>
+                        <p>
+                            <code>ReentrantLock</code> (and <code>ReentrantReadWriteLock</code>) is a type of
+                            <i>ownable syncrhoniser</i> implying that they will not force client threads to be BLOCKED but
+                            will force waiting instead. This can have all the same detrimental affects as blocking in
+                            terms of liveliness and performance. See <code>ThreadMXBean</code>.
+                        </p>
+                    </td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                 </tr>
             </table>
-
+            </subsection>
+            
+            <subsection name="When Threads can be Blocked Waiting">
+                <p>
+                    With reference to non-blocking algorithms, a blocked thread is one that to some degree can not progress
+                    when waiting for some other thread to release a mutex that it would like to acquire. Java's documentation
+                    is reasonable consistent with this definition but it doesn't imply that a thread that is "blocked"
+                    is actually in the state BLOCKED. Java itself describes situations where a thread can be <i>blocked waiting</i>,
+                    meaning the following (taken from the
+                    <a href="http://download.oracle.com/javase/6/docs/api/java/lang/management/ThreadInfo.html#getLockInfo()">
+                        JavaDoc
+                    </a>
+                    ).
+                </p>
+                <p>
+                    A thread can be blocked waiting for one of the following:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            an object monitor to be acquired for entering or reentering a synchronization block/method.
+                            The thread is in the BLOCKED state waiting to enter the synchronized statement or method.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            an object monitor to be notified by another thread.
+                            The thread is in the WAITING or TIMED_WAITING state due to a call to the <code>Object.wait</code> method.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            a synchronization object responsible for the thread parking.
+                            The thread is in the WAITING or TIMED_WAITING state due to a call to the <code>LockSupport.park</code>
+                            method. The synchronization object is the object returned from <code>LockSupport.getBlocker</code>
+                            method. Typically it is an <i>ownable synchronizer</i> or a<code>Condition</code>.
+                        </p>
+                    </li>
+                </ul>
+            </subsection>
         </section>
 
     </body>

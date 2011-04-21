@@ -43,19 +43,23 @@ Fool Maven's validator:
                     (<i>Concurrency Control</i>, Anon., 2011). Languages such as Java have typically offered pessimistic
                     approaches such as guarded memory. Guarded memory requires a lot of effort from the developer to
                     get right, is difficult to prove correct and is often difficult to implement whilst maintaining
-                    good object oriented practices. Optimistic mechanisms promise to simplify the development process
-                    but as a relatively new approach have had little mainstream adoption.
+                    good object oriented practices. Optimistic mechanisms, specifically Software Transactional Memory,
+                    purport to simplify the development process but as a relatively new approach has had little
+                    mainstream adoption.
                 </p>
                 <p>
                     As the acceleration of processor power predicted by Moore's Law reaches its peak, the utilisation of
                     multi-core processors predicted by Amdahl's Law becomes more and more important (Moore, 1975; Amdahl
-                    1967). With the current trend
-                    towards functional / object oriented hybrid languages and their impact on concurrent programming, it
-                    seems obvious that concurrency is set to be an even bigger part of modern software development.
-                    Concurrent programming has always been difficult, mostly because of the traditional shared memory
-                    model. This paper aims to explore the problem, describing characteristics of concurrency control in
-                    shared memory systems, comparing optimistic and pessimistic approaches using a real world example
-                    and attempting to comment of the current state and appropriateness of technology choices.
+                    1967). With the current trend towards functional / object oriented hybrid languages and their impact
+                    on concurrent programming, it seems obvious that concurrency is set to be an even bigger part of
+                    modern software development.
+                </p>
+                <p>
+                    Concurrent programming has always been difficult, mostly because of the shared memory model and
+                    traditional approaches guarding it. This paper aims to explore the problems, describing
+                    characteristics of concurrency control in shared memory systems, comparing optimistic and
+                    pessimistic approaches using a real world example and attempting to comment of the current state and
+                    appropriateness of technology choices.
                 </p>
                 <p>
                     Distributed models avoid contention as they don't actually share memory, each process works on its
