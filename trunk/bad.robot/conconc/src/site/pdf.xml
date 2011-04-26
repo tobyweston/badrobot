@@ -39,7 +39,7 @@
     <cover>
         <coverTitle>Optimistic and Pessimistic Concurrency Control with Shared Memory Models</coverTitle>
         <coverType>A look at modern concurrency control mechanisms in Java</coverType>
-        <coverSubTitle>v.${project.version}</coverSubTitle>
+        <coverSubTitle>DRAFT</coverSubTitle>
         <projectName>${project.name}</projectName>
         <companyName>Toby Weston</companyName>
         <coverdate>April 2011</coverdate>
