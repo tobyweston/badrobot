@@ -58,7 +58,7 @@ Fool Maven's validator:
                     Concurrent programming has always been difficult, mostly because of the shared memory model and
                     traditional approaches guarding it. This paper aims to explore the problems, describing
                     characteristics of concurrency control in shared memory systems, comparing optimistic and
-                    pessimistic approaches using a real world example and attempting to comment of the current state and
+                    pessimistic approaches using a real world example and comment on the current state and
                     appropriateness of technology choices.
                 </p>
                 <p>

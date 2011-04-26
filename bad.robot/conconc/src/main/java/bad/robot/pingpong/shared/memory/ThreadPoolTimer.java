@@ -37,7 +37,7 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
     public ThreadPoolTimer(Guard guard, StopWatch timer, Counter tasks, Counter terminated, AccumulatingCounter<Duration> totalTime) {
         this.timer = timer;
         this.tasks = tasks;
-        this.terminated = terminated;
+        this.terminated = terminated;   
         this.totalTime = totalTime;
         this.guard = guard;
     }
