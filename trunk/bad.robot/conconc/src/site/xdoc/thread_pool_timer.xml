@@ -563,7 +563,6 @@ public Long getMeanExecutionTime() {
             <div class="figure">
                 <img alt="coordinated access to variables" src="images/thread_pool_timer/fig-1.3.png"/>˜
             </div>
-
 <!--opt guarded-->
    <!--Thread A -> totalTime : set value to 1000-->
    <!--Thread A -> tasks : set value to 10-->
@@ -579,6 +578,21 @@ public Long getMeanExecutionTime() {
    <!--tasks &ndash;&gt; Main Thread : 35                -->
    <!--Main Thread->Main Thread : totalTime / tasks-->
 <!--end-->
+            <p>
+                We can further tidy up the code by using instances of <code>Callable</code> classes rather than the
+                anonymous version like this.
+            </p>
+            <source>
+public void afterExecute(Runnable task, Throwable throwable) {
+    timer.stop();
+    guard.execute(
+        <i>allOf</i>(
+            <i>increment</i>(tasks),
+            <i>add</i>(timer.elapsedTime(), to(totalTime))
+        )
+    );
+}
+            </source>
 
             <subsection name="Summary">
                 <p>
@@ -599,12 +613,13 @@ public Long getMeanExecutionTime() {
                         <p>
                             Develop the a integration test running in a concurrent context
                             (<code>ThreadPoolTimerIntegrationTest</code>) to identify individual elements that require
-                            concurrency control
+                            concurrency control.
                         </p>
                     </li>
                     <li>
                         <p>
-                            Extend the class, make the test pass
+                            Extend the class, make the test pass. Our example forced the use of <code>Counter</code> variables which
+                            could be made thread safe.
                         </p>
                     </li>
                     <li>
@@ -614,7 +629,10 @@ public Long getMeanExecutionTime() {
                         </p>
                     </li>
                     <li>
-                        <p>Extend the class, make the test pass</p>
+                        <p>
+                            Extend the class, make the test pass. Our example forced guarding collaborating variables
+                            rather than making individual variables thread safe.
+                        </p>
                     </li>
                 </ol>
                 <p>

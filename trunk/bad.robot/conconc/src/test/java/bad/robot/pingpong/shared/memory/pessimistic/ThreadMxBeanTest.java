@@ -96,7 +96,7 @@ public class ThreadMxBeanTest {
         return new Condition() {
             @Override
             public boolean isSatisfied() {
-                final long waitedCount = jvm.getThreadInfo(thread.getId()).getWaitedCount();
+                long waitedCount = jvm.getThreadInfo(thread.getId()).getWaitedCount();
                 System.out.println(thread.getName() + " "+ waitedCount);
                 return matcher.matches(waitedCount);
             }
