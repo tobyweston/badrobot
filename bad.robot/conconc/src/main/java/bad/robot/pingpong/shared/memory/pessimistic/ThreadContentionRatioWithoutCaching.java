@@ -27,7 +27,7 @@ public class ThreadContentionRatioWithoutCaching {
         for (Long id : threads)
             blocked += getBlockCount(id);
         double ratio = blocked / (double) threads.size();
-        System.out.printf("%s / %s, %s %n", blocked, threads.size(), ratio);
+//        System.out.printf("%s / %s, %s %n", blocked, threads.size(), ratio);
         return ratio;
     }
 

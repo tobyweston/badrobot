@@ -18,9 +18,11 @@ package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
 import bad.robot.pingpong.shared.memory.pessimistic.Guard;
-import com.google.code.tempusfugit.concurrency.Callable;
 import com.google.code.tempusfugit.temporal.Duration;
 
+import static bad.robot.pingpong.shared.memory.Accumulate.To.to;
+import static bad.robot.pingpong.shared.memory.Accumulate.add;
+import static bad.robot.pingpong.shared.memory.AllOf.allOf;
 import static bad.robot.pingpong.shared.memory.Divide.Divisor.by;
 import static bad.robot.pingpong.shared.memory.Divide.divide;
 import static bad.robot.pingpong.shared.memory.Increment.increment;
@@ -50,14 +52,12 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
     @Override
     public void afterExecute(Runnable task, Throwable throwable) {
         timer.stop();
-        guard.execute(new Callable<Void, RuntimeException>() {
-            @Override
-            public Void call() throws RuntimeException {
-                tasks.increment();
-                totalTime.add(timer.elapsedTime());
-                return null;
-            }
-        });
+        guard.execute(
+            allOf(
+                increment(tasks),
+                add(timer.elapsedTime(), to(totalTime))
+            )
+        );
     }
 
     @Override
@@ -91,4 +91,5 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
         tasks.reset();
         terminated.reset();
     }
+
 }

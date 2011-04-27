@@ -44,7 +44,7 @@ public class RunAtomicallyTest {
         context.checking(new Expectations(){{
             one(callable).call();
         }});
-        new RunAtomically(callable, new DoNothingDeferredTask(), new DoNothingCompensatingTask()).atomically();
+        new RunAtomically(callable, new DoNothingDeferredTask(), new DoNothingCompensatingTask()).execute();
     }
 
     @Test(expected = RuntimeException.class)
