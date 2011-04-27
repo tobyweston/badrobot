@@ -464,8 +464,8 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
 
     @Override
     public void afterExecute(Runnable task, Throwable throwable) {
-        tasks.increment();
         timer.stop();
+        tasks.increment();
         totalTime.add(timer.elapsedTime());
     }
 
@@ -508,12 +508,124 @@ public class ThreadPoolTimer implements ThreadPoolObserver, ThreadPoolTimerMBean
                     ensure that writes to individual variables are coordinated with the reads. Updates during the read
                     are prevented but our test still fails. It turns out we've missed something fundamental here, the
                     guard doesn't actually protect us from specific interleaving when the protected methods have themselves
-                    completed. The interleaving showing diagram in Fig.XXX above is still very much possible.
+                    completed. The interleaving showing diagram in Fig.XXX above is still very much possible. We'd need
+                    to coordinate read and writes access of multiple variables in order to preserve consistent behaviour
+                    under concurrent usage.
+                </p>
+                <p>
+                    The offending methods from the the original implementation are shown below.
+                </p>
+                <source>
+public void afterExecute(Runnable task, Throwable throwable) {
+    timer.stop();
+    tasks.increment();
+    totalTime.add(timer.elapsedTime());
+}
+
+public Long getMeanExecutionTime() {
+    return guard.execute(divide(totalTime, by(tasks)));
+}
+                </source>
+                <p>
+                    This shows that although the three lines in the <code>afterExecute</code> method are individually 
+                    thread safe, they do not preserve any aromaticity with respect to each other. The task counter and 
+                    total time can be updated independently as in diagram Fig.XXX above. We can fix this by employing the 
+                    same gaurd the <code>getMeanExecutionTime</code> method uses as below.
                 </p>
             </subsection>
+            <source>
+public void beforeExecute(Thread thread, Runnable task) {
+    assert (Thread.currentThread().equals(thread));
+    timer.start();
+}
 
+public void afterExecute(Runnable task, Throwable throwable) {
+    timer.stop();
+    <b>guard.execute</b>(new Callable&lt;Void, RuntimeException&gt;() {
+        @Override
+        public Void call() throws RuntimeException {
+            tasks.increment();
+            totalTime.add(timer.elapsedTime());
+            return null;
+        }
+    });
+}
 
+public Long getMeanExecutionTime() {
+    return guard.execute(divide(totalTime, by(tasks)));
+}                
+            </source>
+            <p>
+                The implementation now passes our test. Access to individual variables is now coordinated using the
+                guard as shown in the gorilla UML below. The diagram is trying to indicate that the updates and the reads
+                (along with the calculation) are now all protected.
+            </p>
+            <div class="figure">
+                <img alt="coordinated access to variables" src="images/thread_pool_timer/fig-1.3.png"/>˜
+            </div>
 
+<!--opt guarded-->
+   <!--Thread A -> totalTime : set value to 1000-->
+   <!--Thread A -> tasks : set value to 10-->
+<!--end-->
+<!--opt guarded-->
+   <!--Thread B -> totalTime : set value to 4050-->
+   <!--Thread B -> tasks : set value to 35-->
+<!--end-->
+<!--opt guarded-->
+   <!--Main Thread -> totalTime : get value-->
+   <!--totalTime &ndash;&gt; Main Thread : 4050-->
+   <!--Main Thread -> tasks : get value-->
+   <!--tasks &ndash;&gt; Main Thread : 35                -->
+   <!--Main Thread->Main Thread : totalTime / tasks-->
+<!--end-->
+
+            <subsection name="Summary">
+                <p>
+                    The development steps for the <code>ThreadPoolTimer</code> followed the now familiar steps.
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Develop unit test to drive out the behaviour of the timer in a <b>non-concurrent usage</b> (<code>ThreadPoolTimerTest</code>)
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Develop the basic timer class to pass the test
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Develop the a integration test running in a concurrent context
+                            (<code>ThreadPoolTimerIntegrationTest</code>) to identify individual elements that require
+                            concurrency control
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Extend the class, make the test pass
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Identify any collaborating elements that require concurrency control, formulate as a test
+                            (<code>ThreadPoolTimerRaceConditionIntegrationTest</code>)
+                        </p>
+                    </li>
+                    <li>
+                        <p>Extend the class, make the test pass</p>
+                    </li>
+                </ol>
+                <p>
+                    Interestingly, to some degree steps 3. and 5. require some analysis from the developer <i>before</i>
+                    the test can be written. For step 1., the test can genuinely be written first to <i>drive</i> out
+                    behaviour but for the other testing steps, an understanding of the concurrency loop holes is required
+                    so that a test can be tailored to expose them. This is an uncomfortable situation for the TDD
+                    practitioner to be in but with concurrency tests, it often boils down to spotting the holes first
+                    then filling them rather than letting the tests expose the holes for you.
+                </p>
+            </subsection>
         </section>
 
     </body>
