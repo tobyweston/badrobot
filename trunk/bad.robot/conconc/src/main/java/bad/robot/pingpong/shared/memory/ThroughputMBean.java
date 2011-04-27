@@ -4,4 +4,5 @@ public interface ThroughputMBean {
 
     Double getRequestsPerSecond();
 
+    Long getTotalRequests();
 }

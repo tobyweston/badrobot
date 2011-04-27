@@ -28,6 +28,7 @@
         <item name="Solutions" ref="solution.html">
             <item name="ThreadCounter" ref="thread_counter.html"/>
             <item name="ThreadPoolTimer" ref="thread_pool_timer.html"/>
+            <item name="Contention Monitoring" ref="contention.html"/>
         </item>
         <item name="Conclusions" ref="conclusions.html"/>
         <item name="References" ref="references.html"/>

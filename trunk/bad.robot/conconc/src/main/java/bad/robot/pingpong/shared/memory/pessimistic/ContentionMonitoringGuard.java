@@ -55,4 +55,9 @@ public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGua
         return throughput.getRequestsPerSecond();
     }
 
+    @Override
+    public Long getTotalRequests() {
+        return throughput.getTotalRequests();
+    }
+
 }

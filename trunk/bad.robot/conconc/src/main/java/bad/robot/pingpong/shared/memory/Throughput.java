@@ -32,4 +32,9 @@ public class Throughput implements RequestObserver, ThroughputMBean {
     public Double getRequestsPerSecond() {
         return (double) count.get() / ((double) totalTime.get() / 1000);
     }
+
+    @Override
+    public Long getTotalRequests() {
+        return count.get();
+    }
 }
