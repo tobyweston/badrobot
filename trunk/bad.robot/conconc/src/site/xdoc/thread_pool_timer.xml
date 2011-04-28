@@ -26,13 +26,13 @@ Fool Maven's validator:
           xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 
     <properties>
-        <title>Thread Pool Timer</title>
+        <title>Instrumenting Thread Pool Timings</title>
         <author>Toby Weston</author>
     </properties>
 
     <body>
 
-        <section name="Instrumenting Thread Pool Timer">
+        <section name="Instrumenting Thread Pool Timings">
 
             <p></p>
 

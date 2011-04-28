@@ -138,6 +138,7 @@
         <xsl:attribute name="font-size">9.0pt</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="body.title" use-attribute-sets="base.heading.style">
+        <xsl:attribute name="wrap-option">no-wrap</xsl:attribute>
         <xsl:attribute name="font-size">16pt</xsl:attribute>
         <xsl:attribute name="font-weight">bold</xsl:attribute>
     </xsl:attribute-set>

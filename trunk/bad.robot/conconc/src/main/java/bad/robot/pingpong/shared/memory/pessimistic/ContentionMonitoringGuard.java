@@ -29,13 +29,13 @@ public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGua
 
     @Override
     public <R, E extends Exception> R execute(Callable<R, E> callable) throws E {
-        contention.sample();
         synchronized (this) {
             RequestObserver.Request request = throughput.started();
             try {
                 return callable.call();
             } finally {
                 request.finished();
+                contention.sample();
             }
         }
     }
