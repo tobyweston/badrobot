@@ -8,6 +8,14 @@
     <artifactId>conconc</artifactId>
     <name>Optimistic and Pessimistic Concurrency Control with Shared Memory Models</name>
     <version>1.0-SNAPSHOT</version>
+    <developers>
+        <developer>
+            <name>Toby Weston</name>
+            <organization>bad.robot london ltd</organization>
+            <id>toby</id>
+            <url>http://pequenoperro.blogspot.com/</url>
+        </developer>
+    </developers>
 
     <repositories>
         <repository>
