@@ -173,7 +173,7 @@ public Long getMeanExecutionTime() {
                     The sequence of events is shown below when access to the two variables is uncoordinated.     
                 </p>
                 <div class="figure">
-                    <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.1.png"/>˜
+                    <img alt="uncoordinated access to variables" src="images/thread_pool_timer/fig-1.1.png"/>
                 </div>
 <!--<source>-->
 <!--Thread A -> totalTime : set value to 1000-->
@@ -561,7 +561,7 @@ public Long getMeanExecutionTime() {
                 (along with the calculation) are now all protected.
             </p>
             <div class="figure">
-                <img alt="coordinated access to variables" src="images/thread_pool_timer/fig-1.3.png"/>˜
+                <img alt="coordinated access to variables" src="images/thread_pool_timer/fig-1.3.png"/>
             </div>
 <!--opt guarded-->
    <!--Thread A -> totalTime : set value to 1000-->
