@@ -46,8 +46,6 @@ public class ContentionMonitoringStmGuardIntegrationTest {
 
     @AfterClass
     public static void verify() {
-        Double contentionRatio = guard.getContentionRatio();
-        System.out.println("contentionRatio = " + contentionRatio);
-        assertThat(contentionRatio, is(allOf(lessThan(1.80), greaterThan(1.60))));
+        assertThat(guard.getContentionRatio(), is(allOf(lessThan(1.80), greaterThan(1.60))));
     }
 }
