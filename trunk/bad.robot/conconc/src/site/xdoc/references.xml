@@ -83,6 +83,17 @@ Fool Maven's validator:
                         Goetz, B. Peierls, T. Bloch, J. Bowbeer, J. Holmes, D. and Lea, D. 2006. <i>Java Concurrency in Practice</i>. 1st Edition. Addison Wesley
                     </p>
                 </li>
+                <li>
+                    <p>
+                        Dice, D. Shalev, O and shavit, N. 2006. <i>Transactional Locking II</i>. 20th International Symposium on Distributed Computing (DISC). pp. 194-208.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Lev, Y. Luchangco, V. Marathe, V. J. Moir, M. Nussbaum, D. and Olszewski, M. 2009. <i>Anatomy of a Scalable Software Transactional Memory</i>
+                        In the proceedings of TRANSACT`09: The 4th ACM SIGPLAN Workshop on Transactional Computing Raleigh.
+                    </p>
+                </li>
             </ol>
         </section>
 

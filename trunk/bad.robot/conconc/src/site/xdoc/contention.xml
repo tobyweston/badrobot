@@ -36,30 +36,30 @@ Fool Maven's validator:
         <section name="Contention Monitoring">
 
             <p>
-                In making comparisons between the implementations, before making conclusions, it may be useful to
+                When making comparisons between the implementations, it may be useful to
                 understand any contention between competing threads on resources. For us, we're interested in contention
-                when access to shared memory; when two or more threads simultaneously attempt to access some shared
+                when accessing shared memory; when two or more threads simultaneously attempt to access some shared
                 memory and a guard rejects access.
             </p>
             <p>
-                For the purposes of this discussion, we can define contention as follows.
+                For the purposes of this discussion then, we can define the term <i>contention</i> as follows.
             </p>
             <ol>
                 <li>
                     <p>
-                        <b>Pessimistic (<code>synchronized</code>) </b> - the number of requests blocked whilst attempting
+                        <b>Contention with Pessimistic (<code>synchronized</code>) Control </b> - the number of requests blocked whilst attempting
                         to acquire an object monitor.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Optimistic (<code>Lock</code>s) </b> - the number of requests made to wait whilst attempting
+                        <b>Contention with Optimistic (<code>Lock</code>s) Control </b> - the number of requests made to wait whilst attempting
                         to acquire a lock.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Optimistic (Software Transactional Memory) </b> - the number of aborted atomic updates (this
+                        <b>Contention with Optimistic (Software Transactional Memory) Control </b> - the number of aborted atomic updates (this
                         assumes an abort is the result of an attempt to access a transactional reference which has already
                         been accessed and not some other runtime exception).
 
@@ -79,7 +79,7 @@ Fool Maven's validator:
                 <p>
                     To begin with we're interested in recording contention caused by the waiting on monitor acquisition.
                     We can use the Java class <code>ThreadInfo</code> to get information about a particular thread
-                    including the block count (the number of times the thread has been in the <code>BLOCKED</code> state
+                    including the block count (the number of times the thread has been in the <code>BLOCKED</code> state)
                     and total elapsed time a thread has been blocked (again, the total time spent in the <code>BLOCKED</code>
                     state). The state transition to <code>BLOCKED</code> is only possible when a thread is waiting to
                     acquire (or re-acquire) an object's monitor.
@@ -130,10 +130,10 @@ public class ThreadContentionRatio {
                 </p>
                 <p>
                     As we are interested in monitoring contention around locks, we can conveniently use the
-                    <code>ThreadContentionRation</code> class from a custom <code>Guard</code> implementation.
+                    <code>ThreadContentionRation</code> class from within a custom <code>Guard</code> implementation.
                     The guard is our abstraction for protecting resources and we're interested in understanding contention
                     at this point. As we're also interested in the total number of requests, we can employ the
-                    <code>Throughput</code> class defined previously.
+                    <code>Throughput</code> class defined previously in the same place. For example,
                 </p>
                 <source>
 public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGuardMBean {
@@ -182,7 +182,8 @@ public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGua
                     no contention. If however, whilst that thread is executing the guarded section, another attempts to
                     do the same, it will block until the first has released the monitor. In this case, the second
                     thread will record a blocked attempt when executing the <code>contention.sample()</code> method. A
-                    thread dump showing the blocking behaviour is shown below.
+                    thread dump showing the kind of blocking behaviour that <code>ContentionMonitoringGuard</code> would
+                    capture as contention is shown below.
                 </p>
 <source>
 Thread Thread-0@9: (state = RUNNABLE)
@@ -199,15 +200,136 @@ Thread Thread-1@10: (state = BLOCKED)
 </source>
 
             <p>
-                <code>Thread-0</code> acquired the guard's monitoring and is executing (it's in the <code>RUNNABLE</code>
+                <code>Thread-0</code> acquired the guard's monitor and is executing (it's in the <code>RUNNABLE</code>
                 state) whilst <code>Thread-1</code> is <code>BLOCKED</code> at the <code>execute</code> call.
                 When <code>Thread-1</code> finally continues the <code>ContentionMonitoringGuard</code> would indicate a
                 contention ratio of 0.5. Half the requests were contended.
             </p>
             </subsection>
 
-            <subsection name="Contention in Software Transaction Memory">
+            <subsection name="Contention in Locks">
 
+            </subsection>
+
+            <subsection name="Contention in Software Transaction Memory">
+                <p>
+                    Using hooks into the Multiverse STM library, we can observe the number of aborts vs the number of 
+                    successful commits giving us the contention ratio. Multiverse allows us to add a <i>deferred task</i>
+                    to execute on successful commit and a <i>compensating task</i> on aborts. Implementing basic tasks 
+                    using our existing <code>Counter</code>s, we can wire up a basic contention monitoring <code>Guard</code>. 
+                    For example, we can re-use the <code>Increment</code> class shown below to increment <code>Counter</code>s
+                    <i>on abort</i> or <i>on commit</i> events.
+                </p>
+                <source>
+public class Increment&lt;T extends Counter&gt; implements Callable&lt;Void, RuntimeException&gt; {
+
+    private final Counter counter;
+
+    public static &lt;T extends Counter&gt; Increment&lt;T&gt; increment(T counter) {
+        return new Increment&lt;T&gt;(counter);
+    }
+
+    private Increment(T counter) {
+        this.counter = counter;
+    }
+
+    @Override
+    public Void call() throws RuntimeException {
+        counter.increment();
+        return null;
+    }
+}                    
+                </source>
+                <p>
+                    The increment functionality is a <code>Callable</code>, so if we adapt it to either a <code>CompensatingTask</code>
+                    or <code>DeferredTask</code>,
+                </p>
+                <source>
+public final class CallableAdaptors {
+
+    public static CompensatingTask onAbort(final Callable&lt;?, RuntimeException&gt; callable) {
+        return new CompensatingTask() {
+            @Override
+            public void run() {
+                callable.call();
+            }
+        };
+    }
+
+    public static DeferredTask onCommit(final Callable&lt;?, RuntimeException&gt; callable) {
+        return new DeferredTask() {
+            @Override
+            public void run() {
+                callable.call();
+            }
+        };
+    }
+}                    
+                </source>
+                <p>
+                    we can then schedule increment behaviour on the events using our "runner" (and the infrastructure
+                    supplied by Multiverse in the <code>STMUtils</code> class) below.
+                </p>
+                <source>
+public class RunAtomically&lt;R, E extends Exception&gt; extends Atomic&lt;R&gt; {
+
+    private final Callable&lt;R, E&gt; callable;
+    private final DeferredTask onCommit;
+    private final CompensatingTask onAbort;
+
+    public static &lt;R, E extends Exception&gt; R runAtomically(Callable&lt;R, E&gt; callable) {
+        return new RunAtomically&lt;R, E&gt;(callable, new DoNothingDeferredTask(), new DoNothingCompensatingTask()).execute();
+    }
+
+    public static &lt;R, E extends Exception&gt; R runAtomically(Callable&lt;R, E&gt; callable, DeferredTask onCommit, CompensatingTask onAbort) {
+        return new RunAtomically&lt;R, E&gt;(callable, onCommit, onAbort).execute();
+    }
+
+    RunAtomically(Callable&lt;R, E&gt; callable, DeferredTask onCommit, CompensatingTask onAbort) {
+        this.callable = callable;
+        this.onCommit = onCommit;
+        this.onAbort = onAbort;
+    }
+
+    @Override
+    public R atomically() {
+        try {
+            <b>StmUtils.scheduleDeferredTask(onCommit);</b>
+            <b>StmUtils.scheduleCompensatingTask(onAbort);</b>
+            return callable.call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+}                    
+                </source>
+                <p>
+                    Finally, the <code>Guard</code> can use the counters to work out contention when using the "runner"
+                    to <code>runAtomically</code>. For example,
+                </p>
+                <source>
+public class ContentionMonitoringStmGuard implements Guard, ContentionMonitoringStmGuardMBean {
+
+    private final Counter aborts = new AtomicLongCounter();
+    private final Counter commits = new AtomicLongCounter();
+
+    @Override
+    public &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E {
+        return <b>runAtomically(callable, onCommit(increment(commits)), onAbort(increment(aborts)));</b>
+    }
+
+    @Override
+    public Boolean guarding() {
+        return true;
+    }
+
+    @Override
+    public Double getContentionRatio() {
+        return (double) aborts.get() / (double) commits.get();
+    }
+}                    
+                </source>
+                
             </subsection>
 
         </section>
