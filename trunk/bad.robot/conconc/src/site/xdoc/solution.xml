@@ -45,21 +45,45 @@ Fool Maven's validator:
                     used some syntactic sugar available as part of Akka (akka-stm) but the core STM is Multiverse.
                 </p>
                 <p>
-                    Multiverse version 0.6 is based around the Multi Version Concurrency Control (MVCC) idea. This means
-                    ... something about a central clock/version ...
-                    Specifically, it uses a Transaction Locking II (TL2) algorithm in its central engine. The central
-                    engine of Multiverse is called AlphaSTM.
+                    Multiverse version 0.6 is based around the Multi Version Concurrency Control (MVCC) idea used by
+                    popular database implementations. As it's name suggests it revolves around the idea of keeping
+                    versions of data or <i>snapshots</i> and detecting if a conflict has occurred when working with a
+                    particular version. Multiverse implements this idea using a central <code>AtomicLong</code> to increment
+                    version numbers associated with shared memory writes (Veentjer, 2011, section 10.1) and it's underlying
+                    <code>compareAndSet</code> for conflict detection. This can be seen as an implementation of the
+                    Transaction Locking II (TL2) algorithm (Dice et al, 2006). The central engine of Multiverse is called AlphaSTM.
                 </p>
                 <p>
                     Multiverse version 0.7 shifted away from the central clock towards the idea of a conflict counter
-                    (comparable to the SkySTM) which offers less contention. The improved core engine pools more objects
-                    and is described by the author as faster than previous versions. The central engine is 0.7 is called
-                    BetaSTM (or is it GammaSTM?).
+                    (comparable to SkySTM by Lev et al) which offers less contention, greater scalability and may prove
+                    key in providing distributed transactional memory in the future. The improved core engine pools more
+                    objects and is described by the author as faster than previous versions. Lev (2009) notes that
+                    SkySTM offers more scalable STM than previous approaches such as TL2. The central engine is 0.7 has
+                    been referred to as both BetaSTM and GammaSTM by the author.
                 </p>
             </subsection>
 
         </section>
 
+        <section name="Source Code">
+            <p>
+                All source code is available from Subversion. To checkout and recreate this document, run the following
+                commands (*nix platforms).
+            </p>
+            <source>
+svn checkout http://badrobot.googlecode.com/svn/trunk/bad.robot/conconc badrobot-read-only
+mvn pdf:pdf
+open target/pdf/concurrency-control-1.0-SNAPSHOT.pdf
+            </source>
+            <p>
+                or the following on Windows platforms
+            </p>
+            <source>
+svn checkout http://badrobot.googlecode.com/svn/trunk/bad.robot/conconc badrobot-read-only
+mvn pdf:pdf
+start target\pdf\concurrency-control-1.0-SNAPSHOT.pdf
+            </source>
+        </section>
     </body>
 
 </document>
