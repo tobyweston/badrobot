@@ -34,12 +34,43 @@ Fool Maven's validator:
         <section name="Example Solutions">
 
             <p>
-                This section presents the solutions to the problem.
+                This section presents various solutions to recording statistics of our HTTP server. Essentially, I
+                went about implementing basic performance monitoring abstractions and embedding these into the server.
+                By implementing various versions of these components (optimistic and pessimistic), we're able to compare
+                their characteristics. As the embedded components are associated with the request-response cycle, we can
+                also expect them to see lots of concurrent access when the server is under heavy simulated load which is
+                just what we're interested in.
             </p>
-            <subsection name="Pessimistic / Lock Based Synchronisation">
-            </subsection>
+            <p>
+                This section includes a write up of thread safe components used to
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        capture thread usage, the number of created, active and terminated threads in the system.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        thread timings, number of threads executed, total time and average time to execute.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        throughput of any request showing total number and a mean requests per second.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Instrument contention of guarded segments as a ration of collisions against successful acquisition.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                discussing the testing strategies to each and how that influenced the implementations.
+            </p>
 
-            <subsection name="Optimistic / Software Transaction Memory">
+            <subsection name="The Software Transaction Memory Library Used">
                 <p>
                     The specific Software Transaction Memory library used for this discussion is the Multiverse STM. I
                     used some syntactic sugar available as part of Akka (akka-stm) but the core STM is Multiverse.
@@ -51,15 +82,18 @@ Fool Maven's validator:
                     particular version. Multiverse implements this idea using a central <code>AtomicLong</code> to increment
                     version numbers associated with shared memory writes (Veentjer, 2011, section 10.1) and it's underlying
                     <code>compareAndSet</code> for conflict detection. This can be seen as an implementation of the
-                    Transaction Locking II (TL2) algorithm (Dice et al, 2006). The central engine of Multiverse is called AlphaSTM.
+                    Transaction Locking II (TL2) algorithm (Dice et al, 2006). The central engine of Multiverse is called
+                    AlphaSTM.
                 </p>
                 <p>
                     Multiverse version 0.7 shifted away from the central clock towards the idea of a conflict counter
                     (comparable to SkySTM by Lev et al) which offers less contention, greater scalability and may prove
-                    key in providing distributed transactional memory in the future. The improved core engine pools more
-                    objects and is described by the author as faster than previous versions. Lev (2009) notes that
-                    SkySTM offers more scalable STM than previous approaches such as TL2. The central engine is 0.7 has
-                    been referred to as both BetaSTM and GammaSTM by the author.
+                    key in providing distributed transactional memory in the future. The implementation has various
+                    strategies which should offer improvements over vanilla SkySTM. The improved core engine pools more
+                    objects and is described by its author as faster than previous versions. Lev (2009) notes that
+                    SkySTM offers more scalable STM than previous approaches such as TL2. The central engine in 0.7 started
+                    live as BetaSTM but has since been deprecated and a newer version called GammaSTM introduced. At the
+                    time of writing, GammaSTM is the engine used in 0.7.
                 </p>
             </subsection>
 
