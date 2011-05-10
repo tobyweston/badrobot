@@ -4,6 +4,7 @@ import com.google.code.tempusfugit.temporal.Duration;
 import org.junit.Test;
 
 import static com.google.code.tempusfugit.temporal.Duration.millis;
+import static java.lang.Double.NaN;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -13,7 +14,14 @@ public class ThroughputTest {
     private final Throughput throughput = new Throughput(timer);
 
     @Test
-    public void calculateThroughput() throws Exception {
+    public void calculateThroughputWithNoRequests() {
+        throughput.started();
+        timer.setElapsedTime(millis(355));
+        assertThat(throughput.getRequestsPerSecond(), is(NaN));
+    }
+
+    @Test
+    public void calculateThroughput() {
         makeRequestLasting(millis(250));
         makeRequestLasting(millis(150));
         makeRequestLasting(millis(50));
