@@ -52,6 +52,28 @@ Fool Maven's validator:
                     From <a href="http://www.azulsystems.com/blog/wp-content/uploads/2011/03/2011_WhatDoesJVMDo.pdf">some guy</a>
                 </p>
             </subsection>
+
+            <subsection name="Pessimistic / Lock Based Synchronisation">
+                <p>
+                    As we noted in the <a href="shared.html">Shared Memory Model</a> section, pessimistic solutions
+                    revolve around using intrinsic locks, essentially using the <code>synchronized</code> keyword. In
+                    looking at solutions using this approach, it's important to be aware of some drawbacks associated
+                    with it, namely;
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                           Lock's can block indefinitely, causing non-recoverable liveliness problems such as deadlock.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                           Various up-front strategies must be employed to avoid situations above (for example, ensuring
+                           consistent lock acquisition ordering to avoid deadlock.
+                        </p>
+                    </li>
+                </ul>
+            </subsection>
         </section>
 
     </body>
