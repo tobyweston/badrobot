@@ -41,7 +41,7 @@ Fool Maven's validator:
             <subsection name="General Comments / Observations">
                 <p>
                     In the pessimistic world, contended locks obviously block. The misconception that locking is expensive
-                    comes from this where in fact uncontended locks add only tens of nanoseconds (biased locking at around
+                    comes from this but in fact, uncontended locks add only tens of nanoseconds (biased locking at around
                     2-4 clock cycles and fast user-model locks otherwise). This is all highly optimised by the JVM as
                     synchronisation has been so common in development. Things like lock elision, escape analysis, adaptive
                     locking and lock coarsening all aim to correct the oversights of the developer. These optimisations
@@ -50,6 +50,20 @@ Fool Maven's validator:
                 </p>
                 <p>
                     From <a href="http://www.azulsystems.com/blog/wp-content/uploads/2011/03/2011_WhatDoesJVMDo.pdf">some guy</a>
+                </p>
+            </subsection>
+
+            <subsection name="Fine Grained Concurrent Components">
+                <p>
+                    Stressing components like the instrumentation classes in a concurrent context demonstrates typical
+                    concurrency control of fine-grained shared memory. It does not, however, demonstrate
+                    coarse grained concurrency like the type you might expect when using <i>business components</i>.
+                    What I mean here is that when two or more <i>business processes</i> are run in parallel, the same
+                    kind of problems may appear as when we access fine-grained shared memory. The consistency of critical
+                    sections may still need to be preserved and race conditions between processes may still exist.
+                </p>
+                <p>
+                    This discussion hasn't focused on this at all.
                 </p>
             </subsection>
 
