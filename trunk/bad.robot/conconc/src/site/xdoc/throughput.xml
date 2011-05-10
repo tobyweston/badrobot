@@ -34,6 +34,122 @@ Fool Maven's validator:
     <body>
 
         <section name="Throughput">
+            <p>
+                A general purpose interface to expose throughput might look like the following.
+            </p>
+            <source>
+public interface ThroughputMBean {
+
+    Double getRequestsPerSecond();
+
+    Long getTotalRequests();
+}
+            </source>
+            <p>
+                Any implementation would require some form of timer to record elapsed time and the ability to record the
+                number of requests made. If we think about the thing that we want to observe as a <i>request</i>, we can
+                phrase an interface to record the start and finish points as the following.
+            </p>
+
+            <source>
+public interface RequestObserver {
+
+    Request started();
+
+    public interface Request {
+        Duration finished();
+    }
+}
+            </source>
+            <p>
+                With the intention of using an instance to instrument before / after points something like the following.
+            </p>
+            <source>
+public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    Request request = throughput.started();
+    try {
+        doSomeWork();
+    } finally {
+        request.finished();
+    }
+}
+            </source>
+            <p>
+                In this way, we're able to indicate to some component a request has started and provide a callback
+                object to indicate when its finished. No mention of a timer and lots of "tell, don't ask" which means 
+                the component is free to decide what to do with the information. A basic implementation might look like
+                this.
+            </p>
+            <source>
+public class Throughput implements RequestObserver, ThroughputMBean {
+
+    private final StopWatch timer;
+    private final Counter count = ...
+    private final AccumulatingCounter&lt;Duration&gt; totalTime = ...
+
+    public Throughput(StopWatch timer) {
+        this.timer = timer;
+    }
+
+    @Override
+    public Request started() {
+        timer.start();
+        return new Request() {
+            @Override
+            public Duration finished() {
+                count.increment();
+                timer.stop();
+                totalTime.add(timer.elapsedTime());
+                return timer.elapsedTime();
+            }
+        };
+    }
+                
+    @Override
+    public Double getRequestsPerSecond() {
+        return (double) count.get() / ((double) totalTime.get() / 1000);
+    }
+
+    @Override
+    public Long getTotalRequests() {
+        return count.get();
+    }
+}
+            </source>
+            <p>
+                A unit style test, ensuring just the behaviour and not thread safety, might look like the following.
+            </p>
+            <source>
+public class ThroughputTest {
+
+    private final StopWatchStub timer = new StopWatchStub();
+    private final Throughput throughput = new Throughput(timer);
+
+    @Test
+    public void calculateThroughputWithNoRequests() {
+        throughput.started();
+        timer.setElapsedTime(millis(355));
+        assertThat(throughput.getRequestsPerSecond(), is(<i>NaN</i>));
+    }
+
+    @Test
+    public void calculateThroughput() throws Exception {
+        makeRequestLasting(millis(250));
+        makeRequestLasting(millis(150));
+        makeRequestLasting(millis(50));
+        makeRequestLasting(millis(300));
+        assertThat(throughput.getRequestsPerSecond(), is(5.333333333333333));
+    }
+
+    private void makeRequestLasting(Duration duration) {
+        RequestObserver.Request request = throughput.started();
+        timer.setElapsedTime(duration);
+        request.finished();
+    }
+}
+            </source>
+
+
         </section>
 
     </body>

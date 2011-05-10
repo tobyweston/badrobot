@@ -6,8 +6,8 @@ import com.google.code.tempusfugit.temporal.Duration;
 
 public class Throughput implements RequestObserver, ThroughputMBean {
 
-    private final Counter count = new LongCounter();
     private final StopWatch timer;
+    private final Counter count = new LongCounter();
     private final AccumulatingCounter<Duration> totalTime = new AtomicMillisecondCounter();
 
     public Throughput(StopWatch timer) {
