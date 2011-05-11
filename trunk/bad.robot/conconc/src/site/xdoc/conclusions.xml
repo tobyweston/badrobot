@@ -88,8 +88,91 @@ Fool Maven's validator:
                     </li>
                 </ul>
             </subsection>
-        </section>
 
+
+            <subsection name="Making Classes Thread Safe">
+                <p>
+                    As we've seen from different styles of tests in the <a href="solutions.html">Solution</a> section,
+                    we can look at class level thread safety as having two dimensions. A class can be thread safe,
+                    in terms of
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            its composite variables. Variables which are available for read and write access from multiple
+                            threads need to be protected against lost updates (visibility) and write consistency. The
+                            <code>Counter</code> implementations when used in isolation are a good example here.
+                        </p>
+                        <p>
+                            We can protect these at the class level or at the client level. In our examples, it's
+                            interesting to note that we haven't needed to implement a <code>synchronized</code> version
+                            of a <code>Counter</code> instead favouring client <code>Guard</code> implementations to
+                            protect access. We have implemented optimistic versions (for example,
+                            <code>AtomicLongCounter</code> and <code>StmAtomicLongCounter</code>).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            the relationships between composite variables. Any shared variables from 1. above that
+                            collaborate with others should be considered in terms of atomicity. It's likely that any
+                            interaction should be executed under a <code>Guard</code>. In the same way as a <i>check then
+                            set</i> operation is subject to race conditions, any collaboration with shared variables is
+                            also open to modifications during the execution of that collaboration which may subvert the
+                            outcome.
+                        </p>
+                        <p>
+                            It may be worth considering <i>accuracy vs performance</i> here though as sometimes the
+                            consistency isn't always required. An example might be the <code>reset</code> method of
+                            <code>ThreadCounter</code> where we've chosen to reset the active and create threads
+                            together preventing modifications to either until the reset is complete but in
+                            <code>ThreadPoolTimer</code> we've chosen to reset variables independently and allow
+                            modifications.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    In building out the implementations, I naturally feel into a rhythm that fits into this way of
+                    looking at it. This is outlined below.
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            Develop a non-threaded behavioural unit test to help drive out the behaviour of your class.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Build the class to pass the test.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Develop a threaded integration style test to identify the composite variables of the class
+                            that represent shared state (point 1. above).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Implement basic protection for the composite variables.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Develop a threaded integration style test to highlight collaborating elements that require
+                            additional protection to ensure consistency of behaviour (maintaining invariants for example)
+                            and avoid race conditions.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Implement addition protection against the relationships of the elements, this is a good
+                            candidate for using a <code>Guard</code>.
+                        </p>
+                    </li>
+                </ol>
+            </subsection>
+
+        </section>
     </body>
 
 </document>

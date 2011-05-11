@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static bad.robot.pingpong.shared.memory.optimistic.OptimisticThroughput.createThreadUnsafeThroughput;
 import static com.google.code.tempusfugit.concurrency.ThreadUtils.sleep;
 import static java.lang.Integer.toHexString;
 import static org.hamcrest.Matchers.*;
@@ -31,7 +32,7 @@ import static org.junit.Assert.assertThat;
  */
 public class ContentionMonitoringGuardIntegrationTest {
 
-    private static final ContentionMonitoringGuard guard = new ContentionMonitoringGuard();
+    private static final ContentionMonitoringGuard guard = new ContentionMonitoringGuard(createThreadUnsafeThroughput());
 
     @BeforeClass
     public static void registerWithJmx() {
@@ -57,7 +58,9 @@ public class ContentionMonitoringGuardIntegrationTest {
 
     @AfterClass
     public static void verify() {
-        assertThat(guard.getContentionRatio(), is(allOf(lessThan(0.96), greaterThan(0.91))));
+        Double ratio = guard.getContentionRatio();
+        System.out.println(ratio);
+        assertThat(ratio, is(allOf(lessThan(0.96), greaterThan(0.91))));
     }
 
 }
