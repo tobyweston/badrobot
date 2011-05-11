@@ -16,16 +16,18 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
-import bad.robot.pingpong.shared.memory.RealClock;
 import bad.robot.pingpong.shared.memory.RequestObserver;
-import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
 import bad.robot.pingpong.shared.memory.Throughput;
 import com.google.code.tempusfugit.concurrency.Callable;
 
 public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGuardMBean {
 
     private final ThreadContentionRatio contention = new ThreadContentionRatio(new JmxThreadMxBean());
-    private final Throughput throughput = new Throughput(new ThreadLocalStopWatch(new RealClock()));
+    private final Throughput throughput;
+
+    public ContentionMonitoringGuard(Throughput throughput) {
+        this.throughput = throughput;
+    }
 
     @Override
     public <R, E extends Exception> R execute(Callable<R, E> callable) throws E {

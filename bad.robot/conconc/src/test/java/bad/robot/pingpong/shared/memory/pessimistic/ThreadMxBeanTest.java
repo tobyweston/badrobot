@@ -28,12 +28,10 @@ import static org.junit.Assert.assertThat;
  * Test shows that when using the {@link ThreadMXBean#getThreadInfo(long)}, you can't keep a reference to the
  * {@link java.lang.management.ThreadInfo}; you have to ask the question on demand. Change the {@link #blockCountFor(Thread, org.hamcrest.Matcher}
  * method below to use a cached reference instead of using it on demand and the test will fail (for the monitor usage).
- *
+ * <p/>
  * It also shows that the block count can not be used with {@link Lock}s (as locks use {@link java.util.concurrent.locks.LockSupport#park()}
  * and block count will only show synchronised (BLOCKED) and waiting (TIMED_WAITING, WAITING)). In this case, we should
  * use the wait count.
- *
- *
  *
  * @see {@link ContentionRecordingLongCounter}
  */
@@ -49,7 +47,7 @@ public class ThreadMxBeanTest {
     }
 
     @Test
-    @Intermittent (repetition = 30)
+    @Intermittent(repetition = 30)
     public void threadInfoShouldReflectMonitorBlockCount() throws TimeoutException, InterruptedException {
         Thread thread1 = waitForStartup(new AcquireMonitor(this));
         Thread thread2 = startAsThread(new AcquireMonitor(this));
@@ -60,7 +58,7 @@ public class ThreadMxBeanTest {
     }
 
     @Test
-    @Intermittent (repetition = 30)
+    @Intermittent(repetition = 30)
     public void threadInfoShouldReflectLockBlockCount() throws TimeoutException, InterruptedException {
         ReentrantLock lock = new ReentrantLock();
         Thread thread1 = waitForStartup(new AcquireLock(lock));
@@ -96,9 +94,7 @@ public class ThreadMxBeanTest {
         return new Condition() {
             @Override
             public boolean isSatisfied() {
-                long waitedCount = jvm.getThreadInfo(thread.getId()).getWaitedCount();
-                System.out.println(thread.getName() + " "+ waitedCount);
-                return matcher.matches(waitedCount);
+                return matcher.matches(jvm.getThreadInfo(thread.getId()).getWaitedCount());
             }
         };
     }

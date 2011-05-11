@@ -1,17 +1,18 @@
 package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicMillisecondCounter;
 import com.google.code.tempusfugit.temporal.Duration;
 
 public class Throughput implements RequestObserver, ThroughputMBean {
 
     private final StopWatch timer;
-    private final Counter count = new LongCounter();
-    private final AccumulatingCounter<Duration> totalTime = new AtomicMillisecondCounter();
+    private final Counter count;
+    private final AccumulatingCounter<Duration> totalTime;
 
-    public Throughput(StopWatch timer) {
+    public Throughput(StopWatch timer, Counter count, AccumulatingCounter<Duration> totalTime) {
         this.timer = timer;
+        this.count = count;
+        this.totalTime = totalTime;
     }
 
     @Override

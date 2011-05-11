@@ -23,6 +23,7 @@ import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import static bad.robot.pingpong.shared.memory.optimistic.OptimisticThroughput.createThreadSafeThroughput;
 import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
 
 public class PessimisticThreadPoolTimers {
@@ -33,7 +34,7 @@ public class PessimisticThreadPoolTimers {
 
     // is this thread safe?
     public static ThreadPoolTimer createThreadSafeThreadPoolTimerMonitoringContention() {
-        return new ThreadPoolTimer(new ContentionMonitoringGuard(), new ThreadLocalStopWatch(new RealClock()), new LongCounter(), new LongCounter(), new AtomicMillisecondCounter());
+        return new ThreadPoolTimer(new ContentionMonitoringGuard(createThreadSafeThroughput()), new ThreadLocalStopWatch(new RealClock()), new LongCounter(), new LongCounter(), new AtomicMillisecondCounter());
     }
 
     public static ThreadPoolTimer createThreadSafeThreadPoolTimerWithoutEnforcingRaceConditionConsistency() {

@@ -84,11 +84,13 @@ public void doGet(HttpServletRequest request, HttpServletResponse response) {
 public class Throughput implements RequestObserver, ThroughputMBean {
 
     private final StopWatch timer;
-    private final Counter count = ...
-    private final AccumulatingCounter&lt;Duration&gt; totalTime = ...
+    private final Counter count;
+    private final AccumulatingCounter&lt;Duration&gt; totalTime;
 
-    public Throughput(StopWatch timer) {
+    public Throughput(StopWatch timer, Counter count, AccumulatingCounter&lt;Duration&gt; totalTime) {
         this.timer = timer;
+        this.count = count;
+        this.totalTime = totalTime;
     }
 
     @Override
@@ -122,8 +124,8 @@ public class Throughput implements RequestObserver, ThroughputMBean {
             <source>
 public class ThroughputTest {
 
-    private final StopWatchStub timer = new StopWatchStub();
-    private final Throughput throughput = new Throughput(timer);
+    private final StopWatch timer = new StopWatchStub();
+    private final Throughput throughput = new Throughput(timer, new LongCounter(), new AtomicMillisecondCounter());
 
     @Test
     public void calculateThroughputWithNoRequests() {
@@ -149,6 +151,44 @@ public class ThroughputTest {
 }
             </source>
 
+            <p>
+                In terms of thread safety, the class depends on a <code>StopWatch</code> and two <code>Counter</code>s.
+                If these are themselves thread safe implementations, then the following test will pass. This highlights
+                that a class can be thread safe in two ways, the first is that its composite variables are thread safe
+                in isolation and the second is that the class itself is free from race conditions and is consistent with
+                any invariants and so on (see the <a href="conclusions.html">Conclusions</a> section). The following test
+                only tests that the variables are thread safe in isolation is so much as any race condition possible in
+                the <code>getRequestsPerSecond</code> isn't exercised.
+            </p>
+            <source>
+public class ThroughputIntegrationTest {
+
+    private static final ThreadLocalMovableClock clock = new ThreadLocalMovableClock();
+    private static final StopWatch timer = new ThreadLocalStopWatch(clock);
+    private static final Throughput throughput = new Throughput(timer, new AtomicLongCounter(), new AtomicMillisecondCounter());
+
+    @Rule public ConcurrentRule concurrent = new ConcurrentRule();
+    @Rule public RepeatingRule repeating = new RepeatingRule();
+
+    @Concurrent (count = 10)
+    @Repeating (repetition = 100)
+    @Test
+    public void recordThroughput() {
+        RequestObserver.Request request = throughput.started();
+        clock.incrementBy(millis(250));
+        request.finished();
+    }
+
+    @AfterClass
+    public static void verify() {
+        Long requests = throughput.getTotalRequests();
+        Double requestsPerSecond = throughput.getRequestsPerSecond();
+        System.out.printf("%s requests, %s rps%n", requests, requestsPerSecond);
+        assertThat(requests, is(1000L));
+        assertThat(requestsPerSecond, is(4D));
+    }
+}                
+            </source>
 
         </section>
 
