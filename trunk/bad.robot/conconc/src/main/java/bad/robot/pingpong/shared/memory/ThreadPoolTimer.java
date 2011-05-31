@@ -17,7 +17,6 @@
 package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
-import bad.robot.pingpong.shared.memory.pessimistic.Guard;
 import com.google.code.tempusfugit.temporal.Duration;
 
 import static bad.robot.pingpong.shared.memory.Accumulate.To.to;

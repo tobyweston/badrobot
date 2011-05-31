@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.pessimistic.synchronised;
 
-import com.google.code.tempusfugit.Factory;
-import com.google.code.tempusfugit.FactoryException;
+import bad.robot.pingpong.shared.memory.ThroughputMBean;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+public interface ContentionMonitoringGuardMBean extends ThroughputMBean {
 
-public class JmxThreadMxBean implements Factory<ThreadMXBean> {
-    @Override
-    public ThreadMXBean create() throws FactoryException {
-        return ManagementFactory.getThreadMXBean();
-    }
+    Double getContentionRatio();
+
 }
