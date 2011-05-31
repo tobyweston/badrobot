@@ -16,3 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+.source pre {
+  margin: 0px;
+  padding: 0px;
+}
+.source {
+  border: 1px solid #999;
+  overflow:auto
+}
