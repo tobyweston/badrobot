@@ -193,6 +193,52 @@ Fool Maven's validator:
                     </li>
                 </ul>
             </subsection>
+
+            <subsection name="How Threads become blocked">
+                <p>
+                    A summary of how threads can enter the various states is offered below.
+                </p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>As a result of calling</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td valign="top">
+                                <code>BLOCKED</code>
+                            </td>
+                            <td valign="top">
+                                <code>synchronized</code> (when monitor is already owned)<br/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <code>TIMED_WAITING</code>
+                            </td>
+                            <td valign="top">
+                                <code>Thread.sleep(duration)</code><br/>
+                                <code>Object.wait(timeout)</code><br/>
+                                <code>Thread.join(timeout)</code><br/>
+                                <code>LockSupport.parkNanos(timeout)</code><br/>
+                                <code>LockSupport.parkUntil(timeout)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">
+                                <code>WAITING</code>
+                            </td>
+                            <td>
+                                <code>Object.wait()</code><br/>
+                                <code>Thread.join()</code><br/>
+                                <code>LockSupport.park()</code><br/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </subsection>
         </section>
 
     </body>
