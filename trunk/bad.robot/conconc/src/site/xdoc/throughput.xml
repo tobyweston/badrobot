@@ -183,7 +183,6 @@ public class ThroughputIntegrationTest {
     public static void verify() {
         Long requests = throughput.getTotalRequests();
         Double requestsPerSecond = throughput.getRequestsPerSecond();
-        System.out.printf("%s requests, %s rps%n", requests, requestsPerSecond);
         assertThat(requests, is(1000L));
         assertThat(requestsPerSecond, is(4D));
     }
