@@ -123,9 +123,9 @@ Fool Maven's validator:
                     <i>compare-and-swap</i> or <i>load-link/store-conditional</i>). The performance of equivalent
                     implementations not using these primitives has traditionally been poor. More recently however,
                     Software Transactional Memory offers a similar yet higher level abstraction when building non-blocking
-                    code whilst anecdotally offering good performance. Non-blocking constructs are usually used to build
-                    performant data structures (queues, stacks, hash tables etc) as found in the <code>java.util.concurrent</code>
-                    package.
+                    code whilst anecdotally offering good performance. Low level non-blocking constructs are usually
+                    used to build performant data structures (queues, stacks, hash tables etc) as found in the
+                    <code>java.util.concurrent</code> package.
                 </p>
                 <p>
                     As Goetz (2006, p. 321) points out, <i>compare-and-swap</i> is an optimistic technique so for the
@@ -137,7 +137,9 @@ Fool Maven's validator:
                     that use <i>compare-and-swap</i> (for example, <code>AtomicLong</code>) or similar have to be classified
                     as optimistic whereas the implementations of common concurrent blocking abstractions such as the semaphore
                     are pessimistic. Some classes such as <code>Lock</code> implementations can even be seen as both (see
-                    <a href="appendix_A.html">Appendix A</a> for details).
+                    <a href="appendix_A.html">Appendix A</a> for details). However, constructs using <i>compare-and-swap</i>,
+                    although offering collision detection (<code>compareAndSet</code> returns a boolean indicating success),
+                    still require the developer to implement any recovery strategy.
                 </p>
             </subsection>
 

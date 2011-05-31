@@ -16,19 +16,23 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
-import bad.robot.pingpong.shared.memory.LongCounter;
 import bad.robot.pingpong.shared.memory.RealClock;
 import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
 import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
+import bad.robot.pingpong.shared.memory.optimistic.LongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicMillisecondCounter;
+import bad.robot.pingpong.shared.memory.optimistic.lock.LockingGuard;
+import bad.robot.pingpong.shared.memory.pessimistic.synchronised.ContentionMonitoringGuard;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import static bad.robot.pingpong.shared.memory.optimistic.OptimisticThroughput.createThreadSafeThroughput;
-import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
+import static bad.robot.pingpong.shared.memory.pessimistic.synchronised.SynchronisingGuard.synchronised;
 
 public class PessimisticThreadPoolTimers {
 
-    public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
+    public static ThreadPoolTimer createLockBasedThreadSafeThreadPoolTimer() {
         return new ThreadPoolTimer(new LockingGuard(new ReentrantLock()), new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
     }
 
@@ -37,7 +41,8 @@ public class PessimisticThreadPoolTimers {
         return new ThreadPoolTimer(new ContentionMonitoringGuard(createThreadSafeThroughput()), new ThreadLocalStopWatch(new RealClock()), new LongCounter(), new LongCounter(), new AtomicMillisecondCounter());
     }
 
-    public static ThreadPoolTimer createThreadSafeThreadPoolTimerWithoutEnforcingRaceConditionConsistency() {
-        return new ThreadPoolTimer(unguarded(), new ThreadLocalStopWatch(new RealClock()), new AtomicLongCounter(), new AtomicLongCounter(), new AtomicMillisecondCounter());
+    public static ThreadPoolTimer createThreadSafeThreadPoolTimer() {
+        return new ThreadPoolTimer(synchronised(), new ThreadLocalStopWatch(new RealClock()), new LongCounter(), new LongCounter(), new AtomicMillisecondCounter());
     }
+
 }

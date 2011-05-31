@@ -16,9 +16,9 @@
 
 package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicLongCounter;
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicMillisecondCounter;
-import bad.robot.pingpong.shared.memory.pessimistic.LockingGuard;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicMillisecondCounter;
+import bad.robot.pingpong.shared.memory.optimistic.lock.LockingGuard;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;

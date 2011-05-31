@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.optimistic.lock;
 
-import com.google.code.tempusfugit.Factory;
-import com.google.code.tempusfugit.FactoryException;
+import com.google.code.tempusfugit.concurrency.Interruptible;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+import java.util.concurrent.locks.Lock;
 
-public class JmxThreadMxBean implements Factory<ThreadMXBean> {
-    @Override
-    public ThreadMXBean create() throws FactoryException {
-        return ManagementFactory.getThreadMXBean();
+import static com.google.code.tempusfugit.concurrency.ThreadUtils.resetInterruptFlagWhen;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
+public class AcquireLock {
+
+    public static Boolean acquired(final Lock lock) {
+        return resetInterruptFlagWhen(new Interruptible<Boolean>() {
+            @Override
+            public Boolean call() throws InterruptedException {
+                return lock.tryLock(10, MILLISECONDS);
+            }
+        });
     }
 }

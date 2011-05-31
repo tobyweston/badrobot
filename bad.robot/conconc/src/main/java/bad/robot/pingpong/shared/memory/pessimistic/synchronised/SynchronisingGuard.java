@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.pessimistic.synchronised;
 
-import com.google.code.tempusfugit.Factory;
-import com.google.code.tempusfugit.FactoryException;
+import bad.robot.pingpong.shared.memory.Guard;
+import com.google.code.tempusfugit.concurrency.Callable;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+public class SynchronisingGuard implements Guard {
 
-public class JmxThreadMxBean implements Factory<ThreadMXBean> {
+    public static Guard synchronised() {
+        return new SynchronisingGuard();
+    }
+
     @Override
-    public ThreadMXBean create() throws FactoryException {
-        return ManagementFactory.getThreadMXBean();
+    public synchronized <R, E extends Exception> R execute(Callable<R, E> callable) throws E {
+        return callable.call();
+    }
+
+    @Override
+    public Boolean guarding() {
+        return true;
     }
 }

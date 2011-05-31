@@ -17,8 +17,8 @@
 package bad.robot.pingpong.shared.memory;
 
 import bad.robot.pingpong.StopWatch;
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicLongCounter;
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicMillisecondCounter;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicMillisecondCounter;
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;

@@ -18,20 +18,50 @@ package bad.robot.pingpong.shared.memory.optimistic;
 
 import bad.robot.pingpong.shared.memory.ThreadCounter;
 import bad.robot.pingpong.shared.memory.ThreadObserver;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.lock.LockAttemptingGuard;
+import bad.robot.pingpong.shared.memory.optimistic.lock.LockInterruptiblyGuard;
+import bad.robot.pingpong.shared.memory.optimistic.stm.StmAtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.stm.StmGuard;
+import bad.robot.pingpong.shared.memory.optimistic.stm.TransactionalReferenceCounter;
 
-import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static bad.robot.pingpong.shared.memory.Unguarded.unguarded;
 
 public class OptimisticThreadCounters {
 
-    static ThreadObserver createThreadSafeCounterMaintainingInvariant() {
-        return new ThreadCounter(new StmGuard(), new TransactionalReferenceCounter(), new TransactionalReferenceCounter());
+    public static class Conventional {
+
+        public static ThreadObserver createNonBlockingThreadSafeCounterMaintainingInvariant() {
+            return new ThreadCounter(new LockAttemptingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
+        }
+
+        public static ThreadObserver createPotentiallyNonBlockingThreadSafeCounterMaintainingInvariant() {
+            return new ThreadCounter(new LockInterruptiblyGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
+        }
+
+        public static ThreadObserver createNonThreadSafeCounter() {
+            return new ThreadCounter(unguarded(), new LongCounter(), new LongCounter());
+        }
+
+        public static ThreadObserver createThreadSafeCounterWithoutMaintainingResetInvariant() {
+            return new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
+        }
     }
 
-    static ThreadObserver createThreadSafeCounterWithoutMaintainingResetInvariant() {
-        return new ThreadCounter(unguarded(), new StmAtomicLongCounter(), new StmAtomicLongCounter());
-    }
+    public static class Stm {
 
-    static ThreadObserver createNonThreadSafeCounter() {
-        return new ThreadCounter(unguarded(), new TransactionalReferenceCounter(), new TransactionalReferenceCounter());
+        static ThreadObserver createThreadSafeCounterMaintainingInvariant() {
+            return new ThreadCounter(new StmGuard(), new TransactionalReferenceCounter(), new TransactionalReferenceCounter());
+        }
+
+        static ThreadObserver createThreadSafeStmCounterWithoutMaintainingResetInvariant() {
+            return new ThreadCounter(unguarded(), new StmAtomicLongCounter(), new StmAtomicLongCounter());
+        }
+
+        static ThreadObserver createNonThreadSafeStmCounter() {
+            return new ThreadCounter(unguarded(), new TransactionalReferenceCounter(), new TransactionalReferenceCounter());
+        }
     }
 }

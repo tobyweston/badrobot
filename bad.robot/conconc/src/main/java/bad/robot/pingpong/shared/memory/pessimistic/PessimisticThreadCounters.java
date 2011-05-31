@@ -16,17 +16,23 @@
 
 package bad.robot.pingpong.shared.memory.pessimistic;
 
-import bad.robot.pingpong.shared.memory.LongCounter;
 import bad.robot.pingpong.shared.memory.ThreadCounter;
 import bad.robot.pingpong.shared.memory.ThreadObserver;
+import bad.robot.pingpong.shared.memory.optimistic.LongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.lock.LockingGuard;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import static bad.robot.pingpong.shared.memory.pessimistic.SynchronisingGuard.synchronised;
-import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
+import static bad.robot.pingpong.shared.memory.pessimistic.synchronised.SynchronisingGuard.synchronised;
 
 public class PessimisticThreadCounters {
 
+    /**
+     * Because the {@link LockingGuard} is called without first checking the lock can be acquired (ie, it doesn't call
+     * <code>tryLock</code> before guarding), it has been classified pessimistic (even though, the counters themselves
+     * are optimistic).
+     */
     public static ThreadObserver createThreadSafeCounterMaintainingInvariant() {
         return new ThreadCounter(new LockingGuard(new ReentrantLock()), new AtomicLongCounter(), new AtomicLongCounter());
     }
@@ -35,11 +41,4 @@ public class PessimisticThreadCounters {
         return new ThreadCounter(synchronised(), new LongCounter(), new LongCounter());
     }
 
-    public static ThreadObserver createNonThreadSafeCounter() {
-        return new ThreadCounter(unguarded(), new LongCounter(), new LongCounter());
-    }
-
-    public static ThreadObserver createThreadSafeCounterWithoutMaintainingResetInvariant() {
-        return new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
-    }
 }

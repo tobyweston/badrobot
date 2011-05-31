@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static bad.robot.pingpong.shared.memory.pessimistic.Unguarded.unguarded;
+import static bad.robot.pingpong.shared.memory.Unguarded.unguarded;
 
 @RunWith(JMock.class)
 public class ThreadCounterTest {

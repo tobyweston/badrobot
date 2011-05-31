@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.optimistic.atomic;
 
-import com.google.code.tempusfugit.Factory;
-import com.google.code.tempusfugit.FactoryException;
+import bad.robot.pingpong.shared.memory.AbstractThreadCounterIntegrationTest;
+import bad.robot.pingpong.shared.memory.ThreadCounter;
+import org.junit.BeforeClass;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+import static bad.robot.pingpong.shared.memory.Unguarded.unguarded;
 
-public class JmxThreadMxBean implements Factory<ThreadMXBean> {
-    @Override
-    public ThreadMXBean create() throws FactoryException {
-        return ManagementFactory.getThreadMXBean();
+public class ThreadCounterIntegrationTest extends AbstractThreadCounterIntegrationTest {
+
+    @BeforeClass
+    public static void createThreadCounter() {
+        counter = new ThreadCounter(unguarded(), new AtomicLongCounter(), new AtomicLongCounter());
     }
+
 }

@@ -16,7 +16,6 @@
 
 package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.shared.memory.pessimistic.Guard;
 import com.google.code.tempusfugit.concurrency.annotations.ThreadSafe;
 
 import static bad.robot.pingpong.shared.memory.Decrement.decrement;

@@ -16,7 +16,8 @@
 
 package bad.robot.pingpong.shared.memory;
 
-import bad.robot.pingpong.shared.memory.pessimistic.AtomicMillisecondCounter;
+import bad.robot.pingpong.shared.memory.optimistic.LongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.LongMillisecondCounter;
 import com.google.code.tempusfugit.temporal.Duration;
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertThat;
 public class ThroughputTest {
 
     private final StopWatchStub timer = new StopWatchStub();
-    private final Throughput throughput = new Throughput(timer, new LongCounter(), new AtomicMillisecondCounter());
+    private final Throughput throughput = new Throughput(timer, new LongCounter(), new LongMillisecondCounter());
 
     @Test
     public void calculateThroughputWithNoRequests() {

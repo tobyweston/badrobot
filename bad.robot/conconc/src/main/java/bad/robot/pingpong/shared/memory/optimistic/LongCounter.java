@@ -14,17 +14,31 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.optimistic;
 
-import com.google.code.tempusfugit.Factory;
-import com.google.code.tempusfugit.FactoryException;
+import bad.robot.pingpong.shared.memory.Counter;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
+public class LongCounter implements Counter {
 
-public class JmxThreadMxBean implements Factory<ThreadMXBean> {
+    private volatile long count = 0;
+
     @Override
-    public ThreadMXBean create() throws FactoryException {
-        return ManagementFactory.getThreadMXBean();
+    public void increment() {
+        count++;
+    }
+
+    @Override
+    public void decrement() {
+        count--;
+    }
+
+    @Override
+    public Long get() {
+        return count;
+    }
+
+    @Override
+    public void reset() {
+        count = 0;
     }
 }

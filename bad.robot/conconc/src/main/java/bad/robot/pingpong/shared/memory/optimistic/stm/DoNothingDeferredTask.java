@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package bad.robot.pingpong.shared.memory.pessimistic;
+package bad.robot.pingpong.shared.memory.optimistic.stm;
 
-import com.google.code.tempusfugit.Factory;
-import com.google.code.tempusfugit.FactoryException;
-
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
-public class JmxThreadMxBean implements Factory<ThreadMXBean> {
+public class DoNothingDeferredTask implements DeferredTask {
     @Override
-    public ThreadMXBean create() throws FactoryException {
-        return ManagementFactory.getThreadMXBean();
+    public void run() {
     }
 }
