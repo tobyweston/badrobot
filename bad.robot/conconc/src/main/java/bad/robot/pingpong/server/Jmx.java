@@ -26,7 +26,7 @@ import java.lang.management.ManagementFactory;
 public class Jmx {
 
     public static void register(Object object, String name) {
-        unregister(object, name);
+        unregister(name);
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName = createObjectName(name);
         try {
@@ -36,7 +36,7 @@ public class Jmx {
         }
     }
 
-    public static void unregister(Object object, String name) {
+    public static void unregister(String name) {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName = createObjectName(name);
         try {

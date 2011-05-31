@@ -23,10 +23,7 @@ import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicLongCounter;
 import bad.robot.pingpong.shared.memory.optimistic.atomic.AtomicMillisecondCounter;
 import bad.robot.pingpong.shared.memory.optimistic.lock.LockAttemptingGuard;
 import bad.robot.pingpong.shared.memory.optimistic.lock.LockInterruptiblyGuard;
-import bad.robot.pingpong.shared.memory.optimistic.stm.StmAtomicLongCounter;
-import bad.robot.pingpong.shared.memory.optimistic.stm.StmGuard;
-import bad.robot.pingpong.shared.memory.optimistic.stm.StmMillisecondCounter;
-import bad.robot.pingpong.shared.memory.optimistic.stm.TransactionalReferenceMillisecondCounter;
+import bad.robot.pingpong.shared.memory.optimistic.stm.*;
 
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -65,6 +62,11 @@ public class OptimisticThreadPoolTimers {
         public static ThreadPoolTimer createThreadUnsafeThreadPoolTimer() {
             return new ThreadPoolTimer(new StmGuard(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new TransactionalReferenceMillisecondCounter());
         }
+
+        public static ThreadPoolTimer createThreadSafeThreadPoolTimerMonitoringContention() {
+            return new ThreadPoolTimer(new ContentionMonitoringStmGuard(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter());
+        }
+
 
         /**
          * This should be unsafe because without the guard, the race condition on {@link bad.robot.pingpong.shared.memory.ThreadPoolTimer#getMeanExecutionTime()}

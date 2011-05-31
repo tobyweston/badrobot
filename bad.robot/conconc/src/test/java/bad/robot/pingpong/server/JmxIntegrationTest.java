@@ -16,38 +16,69 @@
 
 package bad.robot.pingpong.server;
 
-import org.junit.After;
+import bad.robot.pingpong.shared.memory.RealClock;
+import bad.robot.pingpong.shared.memory.ThreadLocalStopWatch;
+import bad.robot.pingpong.shared.memory.ThreadPoolTimer;
+import bad.robot.pingpong.shared.memory.optimistic.OptimisticThroughput;
+import bad.robot.pingpong.shared.memory.optimistic.stm.ContentionMonitoringStmGuard;
+import bad.robot.pingpong.shared.memory.optimistic.stm.StmAtomicLongCounter;
+import bad.robot.pingpong.shared.memory.optimistic.stm.StmMillisecondCounter;
+import bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters;
+import bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadPoolTimers;
+import bad.robot.pingpong.shared.memory.pessimistic.synchronised.ContentionMonitoringGuard;
 import org.junit.Test;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 
+import static bad.robot.pingpong.shared.memory.optimistic.OptimisticThroughput.createThreadSafeThroughput;
 import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadCounters.createThreadSafeCounterMaintainingInvariant;
-import static bad.robot.pingpong.shared.memory.pessimistic.PessimisticThreadPoolTimers.createThreadSafeThreadPoolTimer;
 
 public class JmxIntegrationTest {
 
     @Test
     public void canRegisterThreadObserver() throws InstanceNotFoundException, MBeanRegistrationException {
-        Jmx.register(createThreadSafeCounterMaintainingInvariant(), "1");
-        Jmx.unregister(createThreadSafeCounterMaintainingInvariant(), "1");
+        Jmx.register(PessimisticThreadCounters.createThreadSafeCounterMaintainingInvariant(), "1");
+        Jmx.unregister("1");
     }
 
     @Test
     public void canRegisterThreadPoolObserver() {
-        Jmx.register(createThreadSafeThreadPoolTimer(), "2");
-        Jmx.unregister(createThreadSafeThreadPoolTimer(), "2");
+        Jmx.register(PessimisticThreadPoolTimers.createThreadSafeThreadPoolTimer(), "2");
+        Jmx.unregister("2");
+    }
+
+    @Test
+    public void canRegisterThroughput() {
+        Jmx.register(OptimisticThroughput.createThreadSafeThroughput(), "3");
+        Jmx.unregister("3");
+    }
+
+    @Test
+    public void canRegisterContentionMonitor() {
+        Jmx.register(new ContentionMonitoringGuard(createThreadSafeThroughput()), "4");
+        Jmx.unregister("4");
+    }
+
+    @Test
+    public void canRegisterStmContentionMonitor() {
+        Jmx.register(new ContentionMonitoringStmGuard(), "5");
+        Jmx.unregister("5");
+    }
+
+    @Test
+    public void exampleUsageOfRegisteringRelatedComponents() {
+        Jmx.register(new ContentionMonitoringStmGuard(), "Contention-ThreadPool-1");
+        Jmx.register(new ThreadPoolTimer(new ContentionMonitoringStmGuard(), new ThreadLocalStopWatch(new RealClock()), new StmAtomicLongCounter(), new StmAtomicLongCounter(), new StmMillisecondCounter()), "Throughput-ThreadPool-1");
+        Jmx.unregister("Contention-ThreadPool-1");
+        Jmx.unregister("Throughput-ThreadPool-1");
     }
 
     @Test
     public void canRegisterTheSameComponentTwice() {
         Jmx.register(createThreadSafeCounterMaintainingInvariant(), "1");
         Jmx.register(createThreadSafeCounterMaintainingInvariant(), "1");
-    }
-
-    @After
-    public void unregister() {
-
+        Jmx.unregister("1");
     }
 
 }
