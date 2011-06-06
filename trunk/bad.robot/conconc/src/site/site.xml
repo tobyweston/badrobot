@@ -39,7 +39,7 @@
                 <item name="Instrumenting Thread Usage" href="thread_counter.html" />
                 <item name="Instrumenting Thread Pool Timer" href="thread_pool_timer.html" />
                 <item name="Instrumenting Throughput" href="throughput.html"/>
-                <item name="Instrumenting Thread Contention" href="contention.html"/>
+                <item name="Instrumenting Blocking Ratio" href="contention.html"/>
             </item>
             <item name="Conclusions" href="conclusions.html"/>
             <item name="References" href="references.html"/>

@@ -29,7 +29,7 @@
             <item name="Instrumenting Thread Usage using ThreadCounter" ref="thread_counter.html"/>
             <item name="Instrumenting Thread Timings using ThreadPoolTimer" ref="thread_pool_timer.html"/>
             <item name="Instrumenting Throughput" ref="throughput.html"/>
-            <item name="Instrumenting Contention Monitoring" ref="contention.html"/>
+            <item name="Instrumenting Blocking Ratio" ref="contention.html"/>
         </item>
         <item name="Conclusions" ref="conclusions.html"/>
         <item name="References" ref="references.html"/>
@@ -44,7 +44,7 @@
         <coverSubTitle>DRAFT-${day}${month}${year}</coverSubTitle>
         <projectName>${project.name}</projectName>
         <companyName>Toby Weston</companyName>
-        <coverdate>May 2011</coverdate>
+        <coverdate>June 2011</coverdate>
         <author>Toby Weston</author>
     </cover>
 </document>

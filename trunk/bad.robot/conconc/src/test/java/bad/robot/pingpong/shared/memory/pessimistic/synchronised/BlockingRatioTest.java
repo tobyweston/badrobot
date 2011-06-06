@@ -31,7 +31,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JMock.class)
-public class ThreadContentionRatioTest {
+public class BlockingRatioTest {
 
     private final Mockery context = new Mockery() {{
         setImposteriser(ClassImposteriser.INSTANCE);
@@ -43,14 +43,14 @@ public class ThreadContentionRatioTest {
     @Test
     public void constructionSetsUpContentionMonitoring() throws Exception {
         expectingInitialisation();
-        ThreadContentionRatio ratio = new ThreadContentionRatio(factory);
+        BlockingRatio ratio = new BlockingRatio(factory);
         assertThat(ratio.get(), is(0.0));
     }
 
     @Test
     public void shouldCalculateOnHighContention() {
         expectingInitialisation();
-        ThreadContentionRatio ratio = new ThreadContentionRatio(factory);
+        BlockingRatio ratio = new BlockingRatio(factory);
         expectingContention(5, 5L);
         ratio.sample();
         ratio.sample();
@@ -63,7 +63,7 @@ public class ThreadContentionRatioTest {
     @Test
     public void shouldCalculateLowNoContention() {
         expectingInitialisation();
-        ThreadContentionRatio ratio = new ThreadContentionRatio(factory);
+        BlockingRatio ratio = new BlockingRatio(factory);
         expectingContention(5, 1L);
         ratio.sample();
         ratio.sample();
@@ -76,7 +76,7 @@ public class ThreadContentionRatioTest {
     @Test
     public void shouldCalculateOnNoContention() {
         expectingInitialisation();
-        ThreadContentionRatio ratio = new ThreadContentionRatio(factory);
+        BlockingRatio ratio = new BlockingRatio(factory);
         expectingContention(2, 0L);
         ratio.sample();
         ratio.sample();

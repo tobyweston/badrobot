@@ -49,7 +49,7 @@ import static org.junit.Assert.assertThat;
  * and block count will only show synchronised (BLOCKED) and waiting (TIMED_WAITING, WAITING)). In this case, we should
  * use the wait count.
  *
- * @see bad.robot.pingpong.shared.memory.pessimistic.synchronised.ThreadContentionRatio
+ * @see BlockingRatio
  */
 @RunWith(IntermittentTestRunner.class)
 public class ThreadMxBeanTest {

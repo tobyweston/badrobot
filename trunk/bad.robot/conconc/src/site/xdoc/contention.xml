@@ -27,57 +27,158 @@ Fool Maven's validator:
           xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
 
     <properties>
-        <title>Contention Monitoring</title>
+        <title>Contention Monitoring and Block/Wait Counts</title>
         <author>Toby Weston</author>
     </properties>
 
     <body>
 
-        <section name="Contention Monitoring">
+        <section name="Contention Monitoring and Block/Wait Counts">
 
             <p>
                 When making comparisons between the implementations, it may be useful to
                 understand any contention between competing threads on resources. For us, we're interested in contention
-                when accessing shared memory; when two or more threads simultaneously attempt to access some shared
-                memory and a guard rejects access.
+                when accessing shared memory. When shared memory is protected (or serialised) by a single guard, several
+                concurrent requests will <i>contend</i> for exclusive access to the guard. A <i>contention ratio</i> then,
+                may be useful in understanding the potential strain a protected resources could come under.
             </p>
             <p>
-                For the purposes of this discussion then, we can define the term <i>contention</i> as follows.
+                A simple contention ratio then can be seen as
             </p>
-            <ol>
-                <li>
-                    <p>
-                        <b>Contention with Pessimistic (<code>synchronized</code>) Control </b> - the number of requests blocked whilst attempting
-                        to acquire an object monitor.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Contention with Optimistic (<code>Lock</code>s) Control </b> - the number of requests made to wait whilst attempting
-                        to acquire a lock.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Contention with Optimistic (Software Transactional Memory) Control </b> - the number of aborted atomic updates (this
-                        assumes an abort is the result of an attempt to access a transactional reference which has already
-                        been accessed and not some other runtime exception).
+            <source>
 
+    number of concurrent calls to a shared memory resource : number of guards
+
+            </source>
+            <p>
+                For example, twenty concurrent calls to a single <code>synchronized</code> block would result in a ratio
+                of
+            </p>
+            <source>
+
+    20:1
+
+            </source>
+            <p>
+                in other words, the single lock could service only 5% of the time.
+            </p>
+            <p>
+                However, this is not an easy thing to predict or measure ahead of time. We're not going to be able to tell
+                how many calls to a shared resource are going to be made at precisely the same time. We can however,
+                measure the <i>affect</i> of some implied contention. For example, we can measure the number of failed
+                guarded calls and compare these to the number of success calls under different loads. The implication
+                here being that the throughput (the number of requests the system is going to be able to make) will be
+                affected by the contention ratio and by extension the effectiveness of the guard implementation. A guard
+                that processes multiple requests quickly will positively affect throughput compared to a guard that blocks
+                excessively, which will slow things down. At least, that's the theory.
+            </p>
+            <p>
+                However, because of the way in which our guards protect a shared resource, we can't just monitor
+                the number of failed guarded calls and use it as an indicator of contention. For example, a Software
+                Transaction Memory guard might retry dozens of time before failing, whereas a <code>Lock</code> based
+                solution may fail on the first attempt and never retry. Both were asked just once to attempt the call,
+                but the behaviour of the implementation dictates the number of retries. What number represents the
+                request count, the original request (one) of the number of retries (dozens)?
+            </p>
+            <p>
+                So, to paint a fuller picture, we need to understand our system in terms of contention (how likely is it
+                that a service is going to be heavily contended) as well as how quickly the service can process the
+                contention (both in terms of processing time and time spent co-ordinating access to shared memory) and
+                the observable outcome to the throughput of the service. In summary, if shared memory isn't contended
+                (under load), it's likely that co-ordinating efforts are having little affect on the throughput. We want
+                to be able to stretch the system to simulate contention in order to observe the affect our guards have
+                on throughput.
+            </p>
+            <p>
+                Lets paraphrase some of these assumptions to make things clearer
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        we want to <b>exaggerate contention in order to exaggerate the affect of a <code>Guard</code> </b>
+                        implementation (so that we can evaluate their use)
                     </p>
                 </li>
-            </ol>
-            <p>
-                It may also be useful to represent the contention as a ratio against the number of successful requests.
-                For example, the number of blocked requests divided by the total number of requests. Comparing contention
-                ratios should be done over the same number of requests to be fair.
-            </p>
-            <p>
-                See <a href="appendix_A.html">Appendix A</a> for some additional background.
-            </p>
+                <li>
+                    <p>
+                        we can <b>increase the contention by increasing the load</b> (number of concurrent
+                        requests) made to a service
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>we can measure a block/wait count</b> for our <code>Guard</code> implementations
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        if we <b>tweak the load so that block/wait counts are similar, a measure of throughput indicates
+                        effectiveness</b> of the <code>Guard</code> (as well as the intermediate code on the critical path)
+                    </p>
+                </li>
+            </ul>
 
-            <subsection name="Contention in Pessimistic Concurrency Control">
+            <subsection name="The Blocking Coefficient">
                 <p>
-                    To begin with we're interested in recording contention caused by the waiting on monitor acquisition.
+                    We introduced the idea of measuring blocked calls or waits above in order to better interpret
+                    various measures to evaluate our<code>Guard</code>s. We can formalise the idea into talking about
+                    a<i>blocking coefficient</i>. A coefficient is some multiplicative factor, a constant term affecting
+                    a calculation. In our case, the blocking coefficient is amount of time not spent servicing a task
+                    (blocking or waiting) expressed as a percentage (or fraction) of the total time.
+                </p>
+                <p>
+                    The blocking coefficient as a fraction is a number between 0 and 1 to indicate how much a particular
+                    task is blocking (or waiting). Zero indicates CPU intensive work (no blocking) and a number close to
+                    one represents a heavily blocked task. A fully blocked task would have 1 as a coefficient.
+                </p>
+                <p>
+                    For example, if a task is idling (waiting or blocked) 80% of the time and so actually processing 20%
+                    of the time, the blocking coefficient is 0.8 (80 / 100).
+                </p>
+                <p>
+                    In terms of our <code>Guard</code> implementations, we're able to monitor;
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            <b>Blocking with Pessimistic (<code>synchronized</code>) Control </b> - the number of requests
+                            (or time) blocked whilst attempting to acquire an object monitor.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Waiting with Optimistic (<code>Lock</code>s) Control </b> - the number of requests (or
+                            time) made to wait whilst attempting to acquire a lock.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Contention with Optimistic (Software Transactional Memory) Control </b> - the number of
+                            aborted atomic updates (this assumes an abort is the result of an attempt to access a
+                            transactional reference which has already been accessed and not some other runtime exception).
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    In all cases, we can use these values along with total request counts to give us our
+                    coefficient. For example, the waiting or blocked count divided by the sample count where the sample
+                    count is equal to the number of requests made. This gives the ratio of failed requests (due to blocked
+                    or waiting). For example, if 10 calls out of 100 failed, the ratio would be 0.1 (10 / 100).
+                </p>
+                <p>
+                    We can also use the waiting or blocked <i>time</i> divided by the CPU (service) time. This produces a similar indication as
+                    above but this time in terms of time. For example, if thread A was busy for 1000 milliseconds and
+                    waiting for 100 milliseconds, the result would be 0.1 milliseconds (100 microseconds).
+                </p>
+                <p>
+                    See <a href="appendix_A.html">Appendix A</a> for some additional background around why and how
+                    threads will enter blocked or waiting states.
+                </p>
+            </subsection>
+            
+            <subsection name="Blocking in Pessimistic Concurrency Control">
+                <p>
+                    To begin with we're interested in measuring the blocking coefficient caused by the waiting on monitor acquisition.
                     We can use the Java class <code>ThreadInfo</code> to get information about a particular thread
                     including the block count (the number of times the thread has been in the <code>BLOCKED</code> state)
                     and total elapsed time a thread has been blocked (again, the total time spent in the <code>BLOCKED</code>
@@ -90,14 +191,16 @@ Fool Maven's validator:
                     an approximation using the following code.
                 </p>
                 <source>
-public class ThreadContentionRatio {
+public class BlockingRatio {
 
     private final Counter count = new AtomicLongCounter();
     private final Map&lt;Long, Long&gt; blocked = new ConcurrentHashMap&lt;Long, Long&gt;();
     private final ThreadMXBean jvm;
 
-    public ThreadContentionRatio(Factory&lt;ThreadMXBean&gt; factory) {
+    public BlockingRatio(Factory&lt;ThreadMXBean&gt; factory) {
         jvm = factory.create();
+        if (jvm.isThreadContentionMonitoringSupported())
+            jvm.setThreadContentionMonitoringEnabled(true);
     }
 
     public void sample() {
@@ -115,11 +218,9 @@ public class ThreadContentionRatio {
     private long getBlockedCount(Thread thread) {
         return jvm.getThreadInfo(thread.getId()).getBlockedCount();
     }
-
-}
-                </source>
+}</source>
                 <p>
-                    Here, we assume that client will "sample" contention at appropriate times which is basically during
+                    Here, we assume that client will "sample" blocked calls at appropriate times which is basically during
                     load. We also brush over the fact that the instrumentation itself may influence the results. We use
                     an <code>AtomicLongCounter</code> and <code>ConcurrentHashMap</code> as they both offer optimistic
                     thread safety (with the implication being that they are fast). We also defer maintaining the
@@ -130,7 +231,7 @@ public class ThreadContentionRatio {
                 </p>
                 <p>
                     As we are interested in monitoring contention around locks, we can conveniently use the
-                    <code>ThreadContentionRation</code> class from within a custom <code>Guard</code> implementation.
+                    <code>BlockingRatio</code> class from within a custom <code>Guard</code> implementation.
                     The guard is our abstraction for protecting resources and we're interested in understanding contention
                     at this point. As we're also interested in the total number of requests, we can employ the
                     <code>Throughput</code> class defined previously in the same place. For example,
@@ -138,11 +239,16 @@ public class ThreadContentionRatio {
                 <source>
 public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGuardMBean {
 
-    private final ThreadContentionRatio contention = new ThreadContentionRatio(new JmxThreadMxBean());
+    private final BlockingRatio contention = new BlockingRatio(new JmxThreadMxBean());
+    private final Throughput throughput;
+
+    public ContentionMonitoringGuard(Throughput throughput) {
+        this.throughput = throughput;
+    }
 
     @Override
     public &lt;R, E extends Exception&gt; R execute(Callable&lt;R, E&gt; callable) throws E {
-        <b>synchronized</b> (this) {
+        synchronized (this) {
             RequestObserver.Request request = throughput.started();
             try {
                 return callable.call();
@@ -172,9 +278,11 @@ public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGua
     public Long getTotalRequests() {
         return throughput.getTotalRequests();
     }
-}
-                </source>
+}                </source>
 
+                <p>
+                    We include the throughput as well as blocking coefficient so that we can adjust the load later.
+                </p>
                 <p>
                     An instance of this guard will be used to protect some shared resource and as such will sample the
                     current thread's block count just before releasing it's monitor. A thread which manages to execute the
@@ -207,8 +315,8 @@ Thread Thread-1@10: (state = BLOCKED)
             </p>
             </subsection>
 
-            <subsection name="Contention in Locks">
-
+            <subsection name="Waiting in Locks">
+                <p>...</p>
             </subsection>
 
             <subsection name="Contention in Software Transaction Memory">
@@ -330,6 +438,78 @@ public class ContentionMonitoringStmGuard implements Guard, ContentionMonitoring
 }                    
                 </source>
                 
+            </subsection>
+
+            <subsection name="Choosing the Optimal Number of Threads">
+                <p>
+                    As we saw earlier, if we can keep the blocking coefficient in a similar range by adjusting the load,
+                    we can make stronger inferences against the resulting throughput. However, this isn't the whole
+                    story. We also want to try and tune the system so that it's able to utilise the system processors
+                    efficiently. It may therefore make sense to have a guide when deciding how many threads to use when
+                    testing.
+                </p>
+                <h4>CPU Bound Tasks</h4>
+                <p>
+                    For CPU bound tasks, Goetz (2002, 2006.) recommends
+                </p>
+                <source>threads = number of CPUs + 1</source>
+                <p>
+                    Which is intuitive as if a CPU is being kept busy, we can't do more work than the number of CPUs.
+                    Goetz purports that the additional CPU has been shown as an improvement over omitting it (2006. pp.XXX),
+                    presumably helping with thread context switching.
+                </p>
+                <h4>IO Bound Tasks</h4>
+                <p>
+                    Working out the optimal number for IO bound tasks is less obvious. During an IO bound task, a CPU
+                    will be left idle (waiting or blocking). This idle time can be better used in initiating another
+                    IO bound request.
+                </p>
+                <p>
+                    Subramaniam (2011, p.31) describes the optimal number of threads in terms of the following formula.
+                </p>
+                <source>threads = number of cores /  (1 – blocking coefficient)</source>
+                <p>
+                    <img alt="subramaniam" src="images/contention/subramaniam.gif"/>
+                </p>
+
+                <p>
+                    And Goetz (2002) describes the optimal number of threads in terms of the following.
+                </p>
+                <source>threads = number of cores * (1 + wait time / service time)</source>
+                <p>
+                    <img alt="goetz" src="images/contention/goetz.gif" />
+                </p>
+                <p>
+                    Where we can think of <code>wait time / service</code> time as a measure of how contended the task is.
+                </p>
+                <p>
+                    When we use equivalent terms in Subramaniam‘s expression we can begin to form the proposition that
+                    both formulas are equivalent. Starting with Goetz’s formula, we assert that w+s=1 and remove the
+                    service time (s) from Goetz’s formula giving the following
+                </p>
+                <p>
+                    <img alt="goetz" src="images/contention/goetz-2.gif"/>
+                </p>
+
+                <p>
+                    We can continue by multiplying both sides by 1-w reducing the right hand side to c before reversing
+                    the operation and revealing Subramaniam’s expression.
+                </p>
+                <p>
+                    <img alt="goetz" src="images/contention/goetz-3.gif" />
+                </p>
+                <p>
+                    <img alt="goetz" src="images/contention/goetz-4.gif" />
+                </p>
+                <p>
+                    <img alt="subramaniam" src="images/contention/subramaniam.gif"/>
+                </p>
+
+                <p>
+                    As we were able to show that Subramaniam and Goetz agree on the number of threads to use for IO
+                    bound tasks, we'll be confident in our choices of thread pool sizes when it comes to performance
+                    testing later.
+                </p>
             </subsection>
 
         </section>
