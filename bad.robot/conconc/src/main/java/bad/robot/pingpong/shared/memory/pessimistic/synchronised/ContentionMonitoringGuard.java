@@ -24,7 +24,7 @@ import com.google.code.tempusfugit.concurrency.Callable;
 
 public class ContentionMonitoringGuard implements Guard, ContentionMonitoringGuardMBean {
 
-    private final ThreadContentionRatio contention = new ThreadContentionRatio(new JmxThreadMxBean());
+    private final BlockingRatio contention = new BlockingRatio(new JmxThreadMxBean());
     private final Throughput throughput;
 
     public ContentionMonitoringGuard(Throughput throughput) {

@@ -80,6 +80,11 @@ Fool Maven's validator:
                 </li>
                 <li>
                     <p>
+                        Goetz, B. 2002. Java theory and practice: Thread pools and work queues. <i>IBM DeveloperWorks</i>, [online] Available at <a href="http://www.ibm.com/developerworks/java/library/j-jtp0730/index.html">http://www.ibm.com/developerworks/java/library/j-jtp0730/index.html</a>
+                    </p>
+                </li>
+                <li>
+                    <p>
                         Goetz, B. Peierls, T. Bloch, J. Bowbeer, J. Holmes, D. and Lea, D. 2006. <i>Java Concurrency in Practice</i>. 1st Edition. Addison Wesley
                     </p>
                 </li>

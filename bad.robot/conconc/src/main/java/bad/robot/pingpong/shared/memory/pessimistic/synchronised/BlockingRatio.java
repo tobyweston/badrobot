@@ -32,15 +32,16 @@ import static java.lang.Thread.currentThread;
  * by a call to <code>synchronized</code>) divided by the number of samples taken.
  *
  * It offers only an estimation of the contention ratio but in order to get an accurate ratio as possible,
- * clients should call the {@link #sample()} method consistently along with call that are synchronized.
+ * clients should call the {@link #sample()} method consistently along with call that are synchronized. For example,
+ * sampling after every call to a synchronized section.
  */
-public class ThreadContentionRatio {
+public class BlockingRatio {
 
     private final Counter count = new AtomicLongCounter();
     private final Map<Long, Long> blocked = new ConcurrentHashMap<Long, Long>();
     private final ThreadMXBean jvm;
 
-    public ThreadContentionRatio(Factory<ThreadMXBean> factory) {
+    public BlockingRatio(Factory<ThreadMXBean> factory) {
         jvm = factory.create();
         if (jvm.isThreadContentionMonitoringSupported())
             jvm.setThreadContentionMonitoringEnabled(true);
