@@ -19,7 +19,6 @@ package bad.robot.turtle.server;
 import bad.robot.http.HttpClient;
 import bad.robot.http.HttpResponse;
 import bad.robot.http.apache.ApacheHttpClient;
-import bad.robot.http.apache.ApacheHttpClientBuilder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +26,7 @@ import org.junit.Test;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static bad.robot.http.apache.ApacheHttpClientBuilder.anApacheClientWithLowTimeout;
 import static bad.robot.turtle.http.Matchers.hasBody;
 import static bad.robot.turtle.http.Matchers.hasStatus;
 import static org.junit.Assert.assertThat;
@@ -47,7 +47,7 @@ public class MapResourceTest {
 
     @Test
     public void invalidUuid() throws MalformedURLException {
-        HttpClient http = new ApacheHttpClient(new ApacheHttpClientBuilder());
+        HttpClient http = new ApacheHttpClient(anApacheClientWithLowTimeout());
         HttpResponse response = http.get(new URL("http://localhost:8080/map/cheese"));
         assertThat(response, hasStatus(400));
         assertThat(response, hasBody("Invalid UUID string: cheese"));
