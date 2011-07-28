@@ -17,6 +17,7 @@
 package bad.robot.http.apache;
 
 import bad.robot.http.HttpClient;
+import bad.robot.http.HttpClientBuilder;
 import bad.robot.http.HttpException;
 import bad.robot.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -32,7 +33,7 @@ public class ApacheHttpClient implements HttpClient {
 
     private final org.apache.http.client.HttpClient client;
 
-    public ApacheHttpClient(ApacheHttpClientBuilder builder) {
+    public ApacheHttpClient(HttpClientBuilder builder) {
         client = builder.build();
     }
 
@@ -46,7 +47,7 @@ public class ApacheHttpClient implements HttpClient {
         return new Callable<HttpResponse>() {
             @Override
             public HttpResponse call() throws Exception {
-                return client.execute(request, new HttpResponseHandler());
+                return client.execute(request, new HttpResponseHandler(new ToStringConsumer()));
             }
         };
     }
