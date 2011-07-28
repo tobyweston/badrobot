@@ -17,7 +17,6 @@
 package bad.robot.http.apache;
 
 import bad.robot.http.HttpClientBuilder;
-import bad.robot.turtle.Defect;
 import com.google.code.tempusfugit.temporal.Duration;
 import org.apache.http.HttpHost;
 import org.apache.http.client.params.HttpClientParams;
@@ -29,28 +28,26 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.HttpParams;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.net.ssl.SSLContext.getInstance;
+import static com.google.code.tempusfugit.temporal.Duration.minutes;
+import static com.google.code.tempusfugit.temporal.Duration.seconds;
 import static org.apache.http.client.params.ClientPNames.*;
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY;
-import static org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 import static org.apache.http.params.CoreConnectionPNames.CONNECTION_TIMEOUT;
 import static org.apache.http.params.CoreConnectionPNames.SO_TIMEOUT;
 import static org.apache.http.params.CoreProtocolPNames.USE_EXPECT_CONTINUE;
 
 public class ApacheHttpClientBuilder implements HttpClientBuilder {
 
-    private Duration timeout = Duration.seconds(30);
+    private Duration timeout = minutes(10);
     private List<ApacheHttpAuthenticationCredentials> credentials = new ArrayList<ApacheHttpAuthenticationCredentials>();
     private HttpHost proxy;
+
+    public static ApacheHttpClientBuilder anApacheClientWithLowTimeout() {
+        return new ApacheHttpClientBuilder().with(seconds(5));
+    }
 
     public ApacheHttpClientBuilder with(Duration timeout) {
         this.timeout = timeout;
@@ -78,22 +75,8 @@ public class ApacheHttpClientBuilder implements HttpClientBuilder {
     private SchemeRegistry createSchemeRegistry() {
         SchemeRegistry registry = new SchemeRegistry();
         registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        registry.register(new Scheme("https", createSslSocketFactory(), 443));
+        registry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
         return registry;
-    }
-
-    private SSLSocketFactory createSslSocketFactory() {
-        try {
-            SSLContext ctx = getInstance("TLS");
-            ctx.init(null, new TrustManager[]{new TolerantCertificateManager()}, null);
-            SSLSocketFactory sslSocketFactory = new SSLSocketFactory(ctx);
-            sslSocketFactory.setHostnameVerifier(ALLOW_ALL_HOSTNAME_VERIFIER);
-            return sslSocketFactory;
-        } catch (NoSuchAlgorithmException e) {
-            throw new Defect(e);
-        } catch (KeyManagementException e) {
-            throw new Defect(e);
-        }
     }
 
     private HttpParams createAndConfigureHttpParameters() {
@@ -123,16 +106,4 @@ public class ApacheHttpClientBuilder implements HttpClientBuilder {
             client.getCredentialsProvider().setCredentials(credentials.getScope(), credentials.getUser());
     }
 
-     private static class TolerantCertificateManager implements TrustManager {
-
-        public void checkClientTrusted(X509Certificate[] certificates, String string) throws CertificateException {
-        }
-
-        public void checkServerTrusted(X509Certificate[] certificates, String string) throws CertificateException {
-        }
-
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-    }
 }
