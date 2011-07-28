@@ -20,11 +20,16 @@ import bad.robot.http.DefaultHttpResponse;
 import bad.robot.http.HttpResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
-import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 
 class HttpResponseHandler implements ResponseHandler<HttpResponse> {
+
+    private final ContentConsumingStrategy consumer;
+
+    HttpResponseHandler(ContentConsumingStrategy consumer) {
+        this.consumer = consumer;
+    }
 
     @Override
     public HttpResponse handleResponse(org.apache.http.HttpResponse response) throws IOException {
@@ -39,20 +44,19 @@ class HttpResponseHandler implements ResponseHandler<HttpResponse> {
         return response.getStatusLine().getStatusCode();
     }
 
-    private static String getContentFrom(org.apache.http.HttpResponse response) throws IOException {
+    private String getContentFrom(org.apache.http.HttpResponse response) throws IOException {
         HttpEntity entity = response.getEntity();
         if (entity == null)
             return "";
         try {
-            return EntityUtils.toString(entity);
+            return consumer.toString(entity);
         } finally {
             cleanup(entity);
         }
     }
 
-    private static void cleanup(HttpEntity response) throws IOException {
-        if (response != null)
-            response.consumeContent();
+    private static void cleanup(HttpEntity entity) throws IOException {
+        entity.consumeContent();
     }
 
 }

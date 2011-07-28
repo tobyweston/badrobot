@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package bad.robot.turtle.matcher;
+package bad.robot.http.apache;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.util.EntityUtils;
 
-import org.hamcrest.TypeSafeMatcher;
+import java.io.IOException;
 
-import javax.ws.rs.core.Response;
+class ToStringConsumer implements ContentConsumingStrategy {
 
-public class Matchers {
-
-    public static TypeSafeMatcher<Response> hasStatus(Response.Status status) {
-        return new ResponseStatusCodeMatcher(status);
+    @Override
+    public String toString(HttpEntity entity) throws IOException {
+        return EntityUtils.toString(entity);
     }
-
-    public static TypeSafeMatcher<Response> responseBodyContains(String string) {
-        return new ResponseBodyMatcher(string);
-    }
-
-    public static TypeSafeMatcher<Response> hasHeader(String header, String expected) {
-        return new ResponseHeaderMatcher(header, expected);
-    }
-    
 }

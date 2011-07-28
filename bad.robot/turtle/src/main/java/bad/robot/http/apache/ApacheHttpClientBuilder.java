@@ -16,6 +16,7 @@
 
 package bad.robot.http.apache;
 
+import bad.robot.http.HttpClientBuilder;
 import bad.robot.turtle.Defect;
 import com.google.code.tempusfugit.temporal.Duration;
 import org.apache.http.HttpHost;
@@ -45,7 +46,7 @@ import static org.apache.http.params.CoreConnectionPNames.CONNECTION_TIMEOUT;
 import static org.apache.http.params.CoreConnectionPNames.SO_TIMEOUT;
 import static org.apache.http.params.CoreProtocolPNames.USE_EXPECT_CONTINUE;
 
-public class ApacheHttpClientBuilder {
+public class ApacheHttpClientBuilder implements HttpClientBuilder {
 
     private Duration timeout = Duration.seconds(30);
     private List<ApacheHttpAuthenticationCredentials> credentials = new ArrayList<ApacheHttpAuthenticationCredentials>();
