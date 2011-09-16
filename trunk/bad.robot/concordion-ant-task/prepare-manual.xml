@@ -18,7 +18,7 @@
 <project name="bad.robot.concordion.ant" default="copy.concordion.output.to.manual.folder">
 
     <target name="check.dependencies" unless="concordion.output.dir">
-        <fail message="please supply a property 'concordion.output.dir'"/>
+        <fail message="please supply a property 'concordion.output.dir', for example, C:\temp\concordion"/>
     </target>
 
     <target name="copy.concordion.output.to.manual.folder" depends="check.dependencies">

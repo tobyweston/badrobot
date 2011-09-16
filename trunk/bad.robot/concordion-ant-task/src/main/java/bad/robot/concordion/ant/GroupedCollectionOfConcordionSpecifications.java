@@ -37,7 +37,7 @@ public class GroupedCollectionOfConcordionSpecifications implements Builder<Map<
 
     private static void createIfRequired(Map<String, TreeSet<DuplicateAwareConcordionSpecification>> results, String group) {
         if (!results.containsKey(group))
-            results.put(group, new TreeSet<DuplicateAwareConcordionSpecification>(new DescrendingBySpecification()));
+            results.put(group, new TreeSet<DuplicateAwareConcordionSpecification>(new DescendingBySpecification()));
     }
 
     public static <K, V> Map<K, V> sort(Map<K, V> in, Comparator<? super K> compare) {

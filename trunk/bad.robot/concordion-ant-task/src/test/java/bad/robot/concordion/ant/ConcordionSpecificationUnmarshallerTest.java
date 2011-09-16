@@ -12,7 +12,6 @@ public class ConcordionSpecificationUnmarshallerTest {
 
     private final ConcordionSpecificationUnmarshaller unmarshaller = new ConcordionSpecificationUnmarshaller();
 
-
     @Test(expected = IOException.class)
     public void shouldFailForMissingFiles() throws Exception {
         unmarshaller.unmarshall(testFile("no-file.html"));
@@ -25,7 +24,7 @@ public class ConcordionSpecificationUnmarshallerTest {
 
     @Test
     public void shouldSetGroup() throws IOException {
-        assertThat(unmarshaller.unmarshall(file("sample.html")).getGroup(), is("0, 1, 2"));
+        assertThat(unmarshaller.unmarshall(file("sample.html")).getGroup(), is("0, 1, 2, JIRA j9"));
     }
 
     @Test
@@ -44,8 +43,23 @@ public class ConcordionSpecificationUnmarshallerTest {
     }
 
     @Test
-    public void shouldAllowIterationAsASubstituteForGroup() throws IOException {
-        assertThat(unmarshaller.unmarshall(file("noGroup.html")).getGroup(), is("8"));
+    public void shouldAllowIterationAsASubstituteForNoGroupNoJira() throws IOException {
+        assertThat(unmarshaller.unmarshall(file("sampleWithNoGroupNoJira.html")).getGroup(), is("8"));
+    }
+
+    @Test
+    public void shouldAllowIterationAndJiraAsASubstituteForNoGroup() throws IOException {
+        assertThat(unmarshaller.unmarshall(file("sampleWithNoGroup.html")).getGroup(), is("8, JIRA number-9, JIRA number-10"));
+    }
+
+    @Test
+    public void shouldAllowGroupAndJira() throws IOException {
+        assertThat(unmarshaller.unmarshall(file("sampleWithGroupAndJira.html")).getGroup(), is("0, 1, 2, JIRA A, JIRA B, JIRA C"));
+    }
+
+    @Test
+    public void shouldAllowJiraAsASubstituteForNoGroupNoIteration() throws IOException {
+        assertThat(unmarshaller.unmarshall(file("sampleWithNoGroupNoIteration.html")).getGroup(), is("JIRA number-9, JIRA number-10"));
     }
 
     private static IncludedFile file(String name) {
@@ -61,6 +75,4 @@ public class ConcordionSpecificationUnmarshallerTest {
     private static File dummyFile() {
         return new File(".");
     }
-
-
 }
