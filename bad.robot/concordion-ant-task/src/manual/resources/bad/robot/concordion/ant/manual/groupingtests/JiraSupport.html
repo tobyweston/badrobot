@@ -1,8 +1,7 @@
 <html xmlns:concordion="http://www.concordion.org/2007/concordion">
 <head>
     <title>Supporting JIRA</title>
-    <meta name="group" content="JIRA Support"/>
-    <meta name="jira" content="808, 909"/>
+    <meta name="jira" content="Support"/>
 </head>
 <body>
 
@@ -11,15 +10,14 @@
 <h2>Given</h2>
 <p>
     One or more Concordion specifications includes a <code>jira</code> tag in the head element, indicating they relate
-    to a JIRA ticket(s)
+    to a JIRA ticket. Comma separated ticket numbers are supported.
 </p>
 
 <div class="example">
 <pre>
 &lt;head&gt;
     &lt;title&gt;Supporting JIRA&lt;/title&gt;
-    &lt;meta name="group" content="JIRA Support"/&gt;
-    &lt;meta name="jira" content="808, 909"/&gt;
+    &lt;meta name="jira" content="Support"&gt;
 &lt;/head&gt; </pre>
 </div>
 
@@ -34,18 +32,6 @@
 </p>
 <div class="example">
 <pre concordion:assertEquals="getOverview()">
-&lt;h2&gt;Jira 808&lt;/h2&gt;
-&lt;ul&gt;
-    &lt;li&gt;
-        &lt;a class="ignored" href="JiraSupport.html"&gt;Supporting JIRA&lt;/a&gt;
-    &lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2&gt;Jira 909&lt;/h2&gt;
-&lt;ul&gt;
-    &lt;li&gt;
-        &lt;a class="ignored" href="JiraSupport.html"&gt;Supporting JIRA&lt;/a&gt;
-    &lt;/li&gt;
-&lt;/ul&gt;
 &lt;h2&gt;Jira Support&lt;/h2&gt;
 &lt;ul&gt;
     &lt;li&gt;
