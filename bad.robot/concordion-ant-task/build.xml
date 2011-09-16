@@ -18,14 +18,18 @@
 <project name="bad.robot.concordion.ant.example" default="generate-overview">
 
     <path id="dependencies">
-        <fileset dir="example/dependencies" includes="concordion-ant-task-*.jar"/>
-        <fileset dir="example/dependencies" includes="freemarker*.jar"/>
+        <fileset dir="manual/lib" includes="concordion-ant-task-*.jar"/>
+        <fileset dir="manual/lib" includes="freemarker*.jar"/>
     </path>
 
-    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpath="${classpath.as.supplied.by.maven}"/>
+    <!-- for maven -->
+    <!--<taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpath="${classpath.as.supplied.by.maven}"/>-->
+
+    <!-- for ant -->
+    <taskdef name="generate-test-overview" classname="bad.robot.concordion.ant.GenerateTestOverviewTask" classpathref="dependencies"/>
 
     <target name="check.dependencies" unless="classpath.as.supplied.by.maven">
-        <fail message="Missing dependencies, run using Maven instead (*blush*) or switch to use classpathref='dependencies'"/>
+        <!--<fail message="Missing dependencies, run using Maven instead (*blush*) or switch to use classpathref='dependencies'"/>-->
     </target>
 
     <target name="generate-overview" depends="check.dependencies">
