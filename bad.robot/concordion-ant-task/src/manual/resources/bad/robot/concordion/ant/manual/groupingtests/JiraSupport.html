@@ -1,0 +1,78 @@
+<html xmlns:concordion="http://www.concordion.org/2007/concordion">
+<head>
+    <title>Supporting JIRA</title>
+    <meta name="group" content="JIRA Support"/>
+    <meta name="jira" content="808, 909"/>
+</head>
+<body>
+
+<h1>Supporting JIRA</h1>
+
+<h2>Given</h2>
+<p>
+    One or more Concordion specifications includes a <code>jira</code> tag in the head element, indicating they relate
+    to a JIRA ticket(s)
+</p>
+
+<div class="example">
+<pre>
+&lt;head&gt;
+    &lt;title&gt;Supporting JIRA&lt;/title&gt;
+    &lt;meta name="group" content="JIRA Support"/&gt;
+    &lt;meta name="jira" content="808, 909"/&gt;
+&lt;/head&gt; </pre>
+</div>
+
+<h2>When</h2>
+<p>
+    The overview page is generated from <code><a href="JiraSupport.html" concordion:execute="generateOverview(#TEXT)">JiraSupport.html</a></code> (this page),
+</p>
+<h2>Then</h2>
+<p>
+    The generated overview page will include the tests, grouped by the JIRA (and ignoring duplicated tests as described
+    in <a href="AddingMultipleGroupMeta.html">Adding to Multiple Groups</a>).
+</p>
+<div class="example">
+<pre concordion:assertEquals="getOverview()">
+&lt;h2&gt;Jira 808&lt;/h2&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;a class="ignored" href="JiraSupport.html"&gt;Supporting JIRA&lt;/a&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Jira 909&lt;/h2&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;a class="ignored" href="JiraSupport.html"&gt;Supporting JIRA&lt;/a&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Jira Support&lt;/h2&gt;
+&lt;ul&gt;
+    &lt;li&gt;
+        &lt;a concordion:run="concordion" href="JiraSupport.html"&gt;Supporting JIRA&lt;/a&gt;
+    &lt;/li&gt;
+&lt;/ul&gt;    
+</pre>
+</div>
+
+<p>
+    You can link these to your JIRA instance in the main template. For example,
+</p>
+<div class="example">
+<pre>
+&lt;#if group?starts_with("JIRA")&gt;
+    &lt;h2&gt;&lt;a href="http://localhost:8080/jira/browse/${group?split(" ")[1]?trim}"&gt;${group?cap_first}&lt;/a&gt;&lt;/h2&gt;
+    &lt;#else&gt;
+        &lt;a name="${group?url}"&gt;&lt;h2&gt;${group?cap_first}&lt;/h2&gt;&lt;/a&gt;
+&lt;/#if&gt;
+</pre>
+</div>    
+
+<div class="information">
+    <ul>
+        <li><a href="../../../../../../Overview.html">Overview</a></li>
+    </ul>
+</div>
+
+</body>
+</html>
