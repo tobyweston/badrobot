@@ -48,23 +48,8 @@ public class TaskFactory {
         if (folders.size() != 1)
             throw new RuntimeException("incorrect number of folders found, you can only test Concordion specfications from the same folder");
         return first(folders);
-
     }
 
-    private static <T> int count(Iterable<T> iterable, Counter<T> counter) {
-        int count = 0;
-        for (T t : iterable) {
-            if (counter.increment(t))
-                count++;
-        }
-        return count;
-    }
-
-    private interface Counter<T> {
-
-        boolean increment(T t);
-
-    }
     private static FilenameFilter matching(final String page) {
         return new FilenameFilter() {
             public boolean accept(File folder, String target) {

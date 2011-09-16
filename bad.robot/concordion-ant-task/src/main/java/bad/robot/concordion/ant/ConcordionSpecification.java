@@ -41,10 +41,14 @@ public class ConcordionSpecification implements Comparable<ConcordionSpecificati
 
         ConcordionSpecification specification = (ConcordionSpecification) o;
 
-        if (ignore != specification.ignore) return false;
-        if (group != null ? !group.equals(specification.group) : specification.group != null) return false;
-        if (location != null ? !location.equals(specification.location) : specification.location != null) return false;
-        if (title != null ? !title.equals(specification.title) : specification.title != null) return false;
+        if (ignore != specification.ignore)
+            return false;
+        if (group != null ? !group.equals(specification.group) : specification.group != null)
+            return false;
+        if (location != null ? !location.equals(specification.location) : specification.location != null)
+            return false;
+        if (title != null ? !title.equals(specification.title) : specification.title != null)
+            return false;
 
         return true;
     }
