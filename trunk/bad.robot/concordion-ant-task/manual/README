@@ -1,0 +1,7 @@
+
+This folder is published via the Google project's wiki, it represents the "user manual" and is created by running
+the prepare-manual.xml build script.
+
+It's served directly from Subversion via
+
+http://badrobot.googlecode.com/svn/trunk/bad.robot/concordion-ant-task/manual/Overview.html
