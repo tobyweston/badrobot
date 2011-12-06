@@ -48,7 +48,7 @@
     this will change it for everything though so grrr. Setting a jvmarg below doesnt work,
     double grrr.
     -->
-    <target name="run.acceptance.tests" depends="generate-overview">
+    <target name="run.acceptance.tests" depends="generate-overview" description="to be called from Maven. Won't run from vanilla Ant because of the classpath">
         <junit printsummary="yes" haltonfailure="yes">
             <classpath>
                 <fileset dir="${basedir}" includes="${classpath.as.supplied.by.maven}"/>
