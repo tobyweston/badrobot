@@ -2,6 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>bad.robot</groupId>
     <artifactId>concordion-ant-task</artifactId>
@@ -10,6 +17,9 @@
     <organization>
         <name>bad robot (london) ltd</name>
     </organization>
+    <description>Ant task to create Concordion overview pages, collecting your acceptance tests in a HTML overview for
+        example
+    </description>
     <inceptionYear>2010</inceptionYear>
     <url>http://code.google.com/p/badrobot/</url>
     <scm>
@@ -30,6 +40,18 @@
         <system>Google Code</system>
         <url>http://code.google.com/p/badrobot/issues/list</url>
     </issueManagement>
+
+    <developers>
+        <developer>
+            <id>toby.weston</id>
+            <name>Toby Weston</name>
+            <email>toby weston gmail com</email>
+            <organization/>
+            <roles>
+                <role>Java Developer</role>
+            </roles>
+        </developer>
+    </developers>
 
     <!-- Use MAVEN_OPTS to set JVM variables -->
 
@@ -107,7 +129,8 @@
                         <configuration>
                             <tasks>
                                 <property name="classpath.as.supplied.by.maven" refid="maven.test.classpath"/>
-                                <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask" classpathref="maven.test.classpath"/>
+                                <taskdef name="junit" classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTask"
+                                         classpathref="maven.test.classpath"/>
                                 <ant target="run.acceptance.tests"/>
                             </tasks>
                         </configuration>
@@ -125,7 +148,7 @@
         <dependency>
             <groupId>org.apache.ant</groupId>
             <artifactId>ant</artifactId>
-            <version>1.8.0</version>            
+            <version>1.8.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ant</groupId>
@@ -164,11 +187,41 @@
         </dependency>
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
-             <artifactId>htmlunit</artifactId>
-             <version>2.7</version>
-            <scope>test</scope>            
+            <artifactId>htmlunit</artifactId>
+            <version>2.7</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <reporting>
         <plugins>
