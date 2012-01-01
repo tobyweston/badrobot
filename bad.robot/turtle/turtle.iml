@@ -15,7 +15,7 @@
       </configuration>
       <facet type="google-app-engine" name="Google App Engine">
         <configuration>
-          <sdk-home-path>$MODULE_DIR$/../../../bin/appengine-java-sdk-1.5.1</sdk-home-path>
+          <sdk-home-path>$USER_HOME$/bin/appengine-java-sdk-1.5.1</sdk-home-path>
         </configuration>
       </facet>
     </facet>
@@ -32,13 +32,19 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="AppEngine API" level="project" />
     <orderEntry type="library" name="Jersey" level="project" />
+    <orderEntry type="module" module-name="http" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-library:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.0.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.tempus-fugit:tempus-fugit:1.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.jersey:jersey-server:1.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: asm:asm:3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.jersey:jersey-core:1.8" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jmock:jmock:2.5.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-library:1.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jmock:jmock-junit4:2.5.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit-dep:4.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jmock:jmock-legacy:2.5.1" level="project" />
@@ -50,11 +56,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.mortbay.jetty:jetty:6.1.26" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mortbay.jetty:jetty-util:6.1.26" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.mortbay.jetty:servlet-api:2.5-20081211" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.0.1" level="project" />
-    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.1.1" level="project" />
-    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.3" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.tempus-fugit:tempus-fugit:1.1" level="project" />
   </component>
 </module>
 

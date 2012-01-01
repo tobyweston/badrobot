@@ -14,26 +14,28 @@
  * limitations under the License.
  */
 
-package bad.robot.turtle.http;
+package bad.robot.http.matchers;
 
 import bad.robot.http.HttpResponse;
 import org.hamcrest.Description;
+import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeMatcher;
 
-public class HttpResponseStatusCodeMatcher extends TypeSafeMatcher<HttpResponse> {
-    private final int expected;
+public class HttpResponseStatusMessageMatcher extends TypeSafeMatcher<HttpResponse> {
+    private final String expected;
 
-    public HttpResponseStatusCodeMatcher(int expected) {
-        this.expected = expected;
+    @Factory
+    public static HttpResponseStatusMessageMatcher hasStatusMessage(String expected) {
+        return new HttpResponseStatusMessageMatcher(expected);
     }
 
-    public static HttpResponseStatusCodeMatcher hasStatus(int expected) {
-        return new HttpResponseStatusCodeMatcher(expected);
+    private HttpResponseStatusMessageMatcher(String expected) {
+        this.expected = expected;
     }
 
     @Override
     public boolean matchesSafely(HttpResponse actual) {
-        return actual.getStatusCode() == expected;
+        return actual.getStatusMessage().equals(expected);
     }
 
     @Override
