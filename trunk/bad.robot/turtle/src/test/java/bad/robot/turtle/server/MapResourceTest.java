@@ -27,8 +27,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static bad.robot.http.apache.ApacheHttpClientBuilder.anApacheClientWithLowTimeout;
-import static bad.robot.turtle.http.Matchers.hasBody;
-import static bad.robot.turtle.http.Matchers.hasStatus;
+import static bad.robot.http.matchers.Matchers.hasBody;
+import static bad.robot.http.matchers.Matchers.hasStatus;
 import static org.junit.Assert.assertThat;
 
 public class MapResourceTest {

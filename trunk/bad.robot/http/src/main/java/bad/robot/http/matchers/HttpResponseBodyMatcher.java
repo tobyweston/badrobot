@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package bad.robot.turtle.http;
+package bad.robot.http.matchers;
 
 import bad.robot.http.HttpResponse;
 import org.hamcrest.Description;
+import org.hamcrest.Factory;
 import org.hamcrest.TypeSafeMatcher;
 
 public class HttpResponseBodyMatcher extends TypeSafeMatcher<HttpResponse> {
     private final String expected;
 
-    public HttpResponseBodyMatcher(String expected) {
-        this.expected = expected;
-    }
-
+    @Factory
     public static HttpResponseBodyMatcher hasBody(String expected) {
         return new HttpResponseBodyMatcher(expected);
+    }
+
+    private HttpResponseBodyMatcher(String expected) {
+        this.expected = expected;
     }
 
     @Override
