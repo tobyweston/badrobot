@@ -12,6 +12,24 @@
     Configure your <code>pom.xml</code> using the information below.
 </p>
 
+<p>
+    First, configure the repository;
+</p>
+<div class="example">
+<pre>
+&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;bad.robot&lt;/id&gt;
+        &lt;name&gt;bad.robot repository on robotooling&lt;/name&gt;
+        &lt;url&gt;http://www.robotooling.com/maven/&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
+</pre>
+</div>
+<p>
+    Add a dependency;
+</p>
+
 <div class="example">
 <pre>
 &lt;dependency&gt;
@@ -25,23 +43,17 @@
 <h2>Direct</h2>
 
 <p>
-    You can also download the jar directly from
+    You can also download the jar <a href="http://robotooling.com/maven/bad/robot/concordion-ant-task/">directly</a> from
 </p>
 
-<pre>http://repo2.maven.org/maven2/bad/robot/concordion-ant-task/</pre>
-
-<p>
-    or
-</p>
-
-<pre>https://oss.sonatype.org/content/groups/public/bad/robot/concordion-ant-task/ </pre>
+<pre>http://www.robotooling.com/maven/bad/robot/concordion-ant-task/</pre>
 
 <p>
     or from the terminal
 </p>
 
 <pre>
-$ curl http://repo2.maven.org/maven2/bad/robot/1.1/concordion-ant-task-1.1.jar > concordion-ant-task-1.1.jar
+$ curl http://www.robotooling.com/maven/bad/robot1.1/concordion-ant-task-1.1.jar > concordion-ant-task-1.1.jar
 $ mvn install:install-file -Dfile=concordion-ant-task-1.1.jar -DgroupId=bad.robot -DartifactId=concordion-ant-task -Dversion=1.1 -Dpackaging=jar
 </pre>
 
