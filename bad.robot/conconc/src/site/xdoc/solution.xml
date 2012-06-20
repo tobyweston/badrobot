@@ -34,7 +34,7 @@ Fool Maven's validator:
         <section name="Example Solutions">
 
             <p>
-                This section presents various solutions to recording statistics of our HTTP server. Essentially, I
+                This section presents various solutions to recording the statistics of our HTTP server. Essentially, I
                 went about implementing basic performance monitoring abstractions and embedding these into the server.
                 By implementing various versions of these components (optimistic and pessimistic), we're able to compare
                 their characteristics. As the embedded components are associated with the request-response cycle, we can
@@ -92,7 +92,7 @@ Fool Maven's validator:
                     strategies which should offer improvements over vanilla SkySTM. The improved core engine pools more
                     objects and is described by its author as faster than previous versions. Lev (2009) notes that
                     SkySTM offers more scalable STM than previous approaches such as TL2. The central engine in 0.7 started
-                    live as BetaSTM but has since been deprecated and a newer version called GammaSTM introduced. At the
+                    life as BetaSTM but has since been deprecated and a newer version called GammaSTM introduced. At the
                     time of writing, GammaSTM is the engine used in 0.7.
                 </p>
             </subsection>
