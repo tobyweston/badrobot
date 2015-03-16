@@ -1,0 +1,1 @@
+See the "live" [User Manual](http://badrobot.googlecode.com/svn/trunk/bad.robot/concordion-ant-task/manual/Overview.html) for details
