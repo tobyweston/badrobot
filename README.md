@@ -1,4 +1,4 @@
-# scracth
+# Scratch / Misc Projects
 
 Scratch project or misc utilities. Nothing to look at. Move along.
 
